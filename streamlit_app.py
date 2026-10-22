@@ -24,38 +24,85 @@ st.markdown(
     <style>
       .stApp { background: #f4f7fb; }
       [data-testid="stHeader"] { background: rgba(244,247,251,.92); }
-      [data-testid="stSidebar"] { background: #14243a; }
-      [data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
-      [data-testid="stSidebar"] label,
-      [data-testid="stSidebar"] p,
-      [data-testid="stSidebar"] h1,
-      [data-testid="stSidebar"] h2,
-      [data-testid="stSidebar"] h3 { color: #edf4ff !important; }
+      [data-testid="stSidebar"] { background: #111f32; }
+      [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1 {
+        color: #f1f6ff !important; font-size: 1.45rem; font-weight: 750;
+        letter-spacing: -0.01em; margin-bottom: 0.1rem;
+      }
+      [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+        color: #dbe7f7 !important; font-size: 1rem; font-weight: 700;
+        margin-top: 0.75rem; margin-bottom: 0.35rem;
+      }
+      [data-testid="stSidebar"] .stCaption,
+      [data-testid="stSidebar"] p { color: #9ab4d6 !important; }
+      [data-testid="stSidebar"] label {
+        color: #dbe7f7 !important; font-weight: 600 !important; font-size: 0.86rem !important;
+      }
+      .if-sidebar-badge {
+        display: inline-block; border: 1px solid #2f4562; border-radius: 8px;
+        padding: 6px 10px; color: #b8d4f8; font-size: 0.74rem; font-weight: 650;
+        letter-spacing: 0.05em; background: rgba(41, 62, 90, 0.35); margin-top: 0.25rem;
+      }
+      h1 {
+        color: #111f35 !important; font-weight: 750 !important;
+        letter-spacing: -0.02em !important; margin-top: 0 !important;
+        padding-top: 0 !important; margin-bottom: 0.3rem !important;
+      }
+      h2, h3 {
+        color: #152744 !important; font-weight: 700 !important;
+        letter-spacing: -0.01em !important;
+      }
       [data-testid="stMetric"] {
         background: #ffffff; border: 1px solid #dce5f0; border-radius: 13px;
-        padding: 16px 18px; box-shadow: 0 2px 8px rgba(16,35,60,.035);
+        padding: 16px 20px; box-shadow: 0 2px 6px rgba(16,35,60,0.035);
       }
-      [data-testid="stMetricLabel"] { color: #62748b; }
-      [data-testid="stMetricValue"] { color: #15253b; }
+      [data-testid="stMetricLabel"] {
+        color: #5a6e85 !important; font-size: 0.84rem !important; font-weight: 600 !important;
+      }
+      [data-testid="stMetricValue"] {
+        color: #122137 !important; font-weight: 750 !important; letter-spacing: -0.015em !important;
+      }
       div[data-testid="stPlotlyChart"] {
         background: #ffffff; border: 1px solid #dce5f0; border-radius: 13px;
-        padding: 6px 8px; overflow: hidden;
+        padding: 8px 10px; box-shadow: 0 2px 6px rgba(16,35,60,0.035); overflow: hidden;
       }
       .if-eyebrow {
-        color: #2764df; font-size: .74rem; font-weight: 750;
-        letter-spacing: .12em; text-transform: uppercase; margin-bottom: .25rem;
+        display: inline-flex; align-items: center; background: #e8f1fc;
+        color: #1a4f9c; border: 1px solid #c2daf7; border-radius: 9999px;
+        padding: 5px 14px; font-size: 0.78rem; font-weight: 700;
+        letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.4;
+        margin-bottom: 0.5rem;
+      }
+      .if-subtitle {
+        color: #4b5f76; font-size: 1.02rem; line-height: 1.45;
+        margin-top: -0.1rem; margin-bottom: 0.9rem;
       }
       .if-note {
-        border: 1px solid #cfe0fb; background: #edf4ff; color: #31547e;
-        border-radius: 10px; padding: 11px 14px; font-size: .88rem;
+        border: 1px solid #cfe0fb; background: #edf4ff; color: #244b7a;
+        border-radius: 11px; padding: 12px 16px; font-size: 0.88rem;
+        line-height: 1.45; margin-bottom: 1.25rem;
       }
-      .if-section-note { color: #65758b; font-size: .88rem; margin-top: -.35rem; }
+      .if-note strong { color: #133a68; }
+      .if-section-note {
+        color: #556982; font-size: 0.88rem; line-height: 1.4;
+        margin-top: -0.25rem; margin-bottom: 1rem;
+      }
       div[data-testid="stDataFrame"] {
-        border: 1px solid #dce5f0;
-        border-radius: 12px;
-        overflow: hidden;
+        background: #ffffff; border: 1px solid #dce5f0; border-radius: 13px;
+        box-shadow: 0 2px 6px rgba(16,35,60,0.035); overflow: hidden;
       }
-      .block-container { padding-top: 2rem; padding-bottom: 3rem; max-width: 1540px; }
+      .block-container {
+        padding-top: 4.5rem !important; padding-bottom: 3.5rem !important; max-width: 1540px;
+      }
+      @media (max-width: 768px) {
+        .block-container {
+          padding-top: 3.75rem !important; padding-bottom: 2rem !important;
+          padding-left: 1rem !important; padding-right: 1rem !important;
+        }
+        [data-testid="stMetric"] { padding: 12px 14px; }
+        .if-eyebrow { font-size: 0.72rem; padding: 4px 11px; }
+        .if-subtitle { font-size: 0.94rem; }
+      }
     </style>
     """,
     unsafe_allow_html=True,
@@ -85,9 +132,7 @@ raw_profile = data["raw_profile"]
 st.sidebar.markdown("# InsightFlow")
 st.sidebar.caption("SALES & INVENTORY INTELLIGENCE")
 st.sidebar.markdown(
-    "<div style='border:1px solid #3b5270;border-radius:9px;padding:9px 11px;"
-    "color:#c6dcfa;font-size:12px;'>"
-    "DEMO MODE · SYNTHETIC DATA</div>",
+    '<div class="if-sidebar-badge">DEMO MODE · SYNTHETIC DATA</div>',
     unsafe_allow_html=True,
 )
 st.sidebar.markdown(" ")
@@ -168,8 +213,9 @@ st.markdown(
 )
 st.title("InsightFlow")
 st.markdown(
-    "Turn inconsistent sales and inventory exports into cleaner data, decision-ready metrics, "
-    "and reviewable exceptions."
+    '<p class="if-subtitle">Turn inconsistent sales and inventory exports into cleaner data, '
+    "decision-ready metrics, and reviewable exceptions.</p>",
+    unsafe_allow_html=True,
 )
 st.markdown(
     '<div class="if-note"><strong>Demo data notice:</strong> All records and business figures '
@@ -177,7 +223,6 @@ st.markdown(
     "validation pipeline; the PostgreSQL / SQL / API stack is documented separately.</div>",
     unsafe_allow_html=True,
 )
-st.write("")
 
 
 def metric_row(frame: pd.DataFrame) -> None:
