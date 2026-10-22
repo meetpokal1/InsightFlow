@@ -20,21 +20,21 @@ def main():
             executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe",
             headless=True,
         )
-        context = browser.new_context(viewport={"width": 1440, "height": 1000})
+        context = browser.new_context(viewport={"width": 1600, "height": 1200})
         page = context.new_page()
 
-        print("Navigating to Streamlit app...")
+        print("Navigating to running Streamlit application...")
         page.goto("http://localhost:8501", timeout=60000)
 
         page.wait_for_selector('[data-testid="stSidebar"]', timeout=60000)
-        time.sleep(4)
+        time.sleep(3)
 
         for page_name, out_path in PAGES:
             print(f"Testing and capturing page: {page_name}")
             radio_item = page.locator(f'[data-testid="stSidebar"] label:has-text("{page_name}")')
             radio_item.click()
 
-            time.sleep(3)
+            time.sleep(2)
             page.wait_for_selector(
                 '[data-testid="stStatusWidget"]', state="detached", timeout=30000
             )
@@ -44,7 +44,7 @@ def main():
             print(f"Saved: {out_path} ({out_path.stat().st_size} bytes)")
 
         browser.close()
-        print("All four pages captured successfully!")
+        print("All four genuine runtime screenshots captured successfully!")
 
 
 if __name__ == "__main__":

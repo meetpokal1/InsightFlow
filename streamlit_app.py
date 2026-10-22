@@ -122,24 +122,45 @@ else:
 region_options = sorted(sales["region"].dropna().unique().tolist())
 category_options = sorted(sales["category_name"].dropna().unique().tolist())
 customer_type_options = sorted(sales["customer_type"].dropna().unique().tolist())
-selected_regions = st.sidebar.multiselect("Region", region_options, default=region_options)
-selected_categories = st.sidebar.multiselect("Category", category_options, default=category_options)
+selected_regions = st.sidebar.multiselect(
+    "Region",
+    region_options,
+    default=[],
+    placeholder="All regions",
+    help="Leave empty for all regions.",
+)
+selected_categories = st.sidebar.multiselect(
+    "Category",
+    category_options,
+    default=[],
+    placeholder="All categories",
+    help="Leave empty for all categories.",
+)
 selected_customer_types = st.sidebar.multiselect(
-    "Customer type", customer_type_options, default=customer_type_options
+    "Customer type",
+    customer_type_options,
+    default=[],
+    placeholder="All customer types",
+    help="Leave empty for all customer types.",
 )
 st.sidebar.markdown("---")
 st.sidebar.caption("Snapshot date: 30 Sep 2026")
 st.sidebar.caption("No database connection or external API key is needed for this demo dashboard.")
 
+active_regions = selected_regions if selected_regions else region_options
+active_categories = selected_categories if selected_categories else category_options
+active_customer_types = (
+    selected_customer_types if selected_customer_types else customer_type_options
+)
+
 filtered_sales = sales.loc[
     sales["order_date"].dt.date.between(start_date, end_date)
-    & sales["region"].isin(selected_regions)
-    & sales["category_name"].isin(selected_categories)
-    & sales["customer_type"].isin(selected_customer_types)
+    & sales["region"].isin(active_regions)
+    & sales["category_name"].isin(active_categories)
+    & sales["customer_type"].isin(active_customer_types)
 ].copy()
 filtered_inventory = inventory.loc[
-    inventory["region"].isin(selected_regions)
-    & inventory["category_name"].isin(selected_categories)
+    inventory["region"].isin(active_regions) & inventory["category_name"].isin(active_categories)
 ].copy()
 st.markdown(
     '<div class="if-eyebrow">Business intelligence · portfolio demo</div>',
@@ -172,19 +193,64 @@ def metric_row(frame: pd.DataFrame) -> None:
     cols[4].metric("Average order value", format_inr(summary["average_order_value"]))
 
 
-def style_chart(fig, height: int = 340):
-    fig.update_layout(
+def style_chart(
+    fig,
+    height: int = 340,
+    show_legend: bool = False,
+    legend_position: str = "top-right",
+):
+    layout_update = dict(
         template="plotly_white",
         height=height,
-        margin=dict(l=18, r=18, t=56, b=18),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#ffffff",
         font=dict(family="Inter, Segoe UI, Arial, sans-serif", color="#24364b", size=12),
-        title=dict(font=dict(size=15, color="#15253b"), x=0.02, xanchor="left"),
-        legend=dict(orientation="h", yanchor="bottom", y=1.01, x=0.02),
+        title=dict(
+            font=dict(size=15, color="#15253b"),
+            x=0.02,
+            xanchor="left",
+            y=0.96,
+            yanchor="top",
+        ),
+        showlegend=show_legend,
     )
-    fig.update_xaxes(showgrid=False, linecolor="#e5ebf3", zeroline=False)
-    fig.update_yaxes(gridcolor="#edf1f6", zeroline=False)
+
+    if not show_legend:
+        layout_update["margin"] = dict(l=18, r=18, t=46, b=18)
+    elif legend_position == "top-right":
+        layout_update["margin"] = dict(l=18, r=18, t=54, b=18)
+        layout_update["legend"] = dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            x=0.98,
+            xanchor="right",
+            title=dict(text=""),
+        )
+    elif legend_position == "bottom":
+        layout_update["margin"] = dict(l=18, r=18, t=46, b=58)
+        layout_update["legend"] = dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.14,
+            x=0.5,
+            xanchor="center",
+            title=dict(text=""),
+        )
+    elif legend_position == "right":
+        layout_update["margin"] = dict(l=18, r=160, t=46, b=18)
+        layout_update["legend"] = dict(
+            orientation="v",
+            yanchor="top",
+            y=0.98,
+            x=1.02,
+            xanchor="left",
+            title=dict(text=""),
+        )
+
+    fig.update_layout(**layout_update)
+    fig.update_xaxes(showgrid=False, linecolor="#e5ebf3", zeroline=False, automargin=True)
+    fig.update_yaxes(gridcolor="#edf1f6", zeroline=False, automargin=True)
     return fig
 
 
@@ -352,7 +418,10 @@ elif page == "Sales & Products":
                 "category_name": "Category",
             },
         )
-        st.plotly_chart(style_chart(fig, 420), use_container_width=True)
+        st.plotly_chart(
+            style_chart(fig, 440, show_legend=True, legend_position="right"),
+            use_container_width=True,
+        )
         display = product.sort_values("net_revenue", ascending=False).rename(
             columns={
                 "product_name": "Product",
@@ -416,7 +485,10 @@ elif page == "Inventory Intelligence":
             },
         )
         fig.update_traces(textposition="inside", textinfo="percent")
-        st.plotly_chart(style_chart(fig, 380), use_container_width=True)
+        st.plotly_chart(
+            style_chart(fig, 400, show_legend=True, legend_position="bottom"),
+            use_container_width=True,
+        )
     with right:
         by_category = (
             filtered_inventory.groupby("category_name", as_index=False)["inventory_value"]
@@ -432,7 +504,7 @@ elif page == "Inventory Intelligence":
             labels={"category_name": "Category", "inventory_value": "Inventory value (₹)"},
             color_discrete_sequence=["#4b8bf4"],
         )
-        st.plotly_chart(style_chart(fig, 380), use_container_width=True)
+        st.plotly_chart(style_chart(fig, 400), use_container_width=True)
     st.subheader("Priority review queue")
     if not needs_action.empty:
         priority = {"Out of stock": 1, "Stock-out risk": 2, "Low stock": 3}
@@ -527,8 +599,16 @@ else:
                 "revenue": "Net revenue (₹)",
                 "customer_type": "Type",
             },
+            color_discrete_map={
+                "Retail": "#2764df",
+                "Wholesale": "#178b73",
+                "Corporate": "#8d7ee8",
+            },
         )
-        st.plotly_chart(style_chart(fig), use_container_width=True)
+        st.plotly_chart(
+            style_chart(fig, show_legend=True, legend_position="top-right"),
+            use_container_width=True,
+        )
     st.subheader("Data quality actions")
     quality_display = quality_log.sort_values("rows_affected", ascending=False).rename(
         columns={
