@@ -1,0 +1,72 @@
+erDiagram
+    categories ||--o{ products : classifies
+    suppliers ||--o{ products : supplies
+    customers ||--o{ orders : places
+    locations ||--o{ orders : "ships from"
+    orders ||--|{ order_items : contains
+    products ||--o{ order_items : "sold as"
+    products ||--o{ inventory : "stocked as"
+    locations ||--o{ inventory : holds
+
+    categories {
+        varchar category_id PK
+        varchar category_name UK
+    }
+    suppliers {
+        varchar supplier_id PK
+        varchar supplier_name
+        varchar city
+        varchar contact_email
+        int lead_time_days
+    }
+    locations {
+        varchar location_id PK
+        varchar location_name UK
+        varchar city
+        varchar state
+        varchar region
+        varchar location_type
+    }
+    products {
+        varchar product_id PK
+        varchar product_name
+        varchar category_id FK
+        varchar supplier_id FK
+        numeric cost_price
+        numeric selling_price
+        varchar unit
+    }
+    customers {
+        varchar customer_id PK
+        varchar customer_name
+        varchar email
+        varchar phone
+        varchar city
+        varchar customer_type
+        date signup_date
+    }
+    orders {
+        varchar order_id PK
+        varchar customer_id FK
+        varchar location_id FK
+        date order_date
+        varchar order_status
+        varchar payment_method
+    }
+    order_items {
+        varchar order_item_id PK
+        varchar order_id FK
+        varchar product_id FK
+        int quantity
+        numeric unit_price
+        numeric discount_pct
+    }
+    inventory {
+        varchar inventory_id PK
+        varchar product_id FK
+        varchar location_id FK
+        int quantity_on_hand
+        int reorder_level
+        date last_restocked_date
+        date snapshot_date
+    }

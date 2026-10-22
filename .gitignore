@@ -1,0 +1,24 @@
+# local settings and secrets
+.env
+.streamlit/secrets.toml
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# files written by the pipeline (run scripts/run_pipeline.py to create them)
+data/processed/*
+!data/processed/.gitkeep
+
+# editors and OS
+.vscode/
+.idea/
+.DS_Store
+
+# files written for Power BI (run scripts/export_powerbi_data.py to create them)
+powerbi/data/

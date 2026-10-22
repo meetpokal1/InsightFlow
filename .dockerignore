@@ -1,0 +1,18 @@
+# Never send local credentials into the Docker build context.
+.env
+.streamlit/secrets.toml
+
+# Source control, local environments, caches and test artefacts.
+.git/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Runtime-generated exports; the raw synthetic input files remain included.
+data/processed/*
+!data/processed/.gitkeep
+powerbi/data/

@@ -1,0 +1,62 @@
+erDiagram
+    Date ||--o{ Sales : "date_key = order_date"
+    Customer ||--o{ Sales : "customer_id"
+    Product ||--o{ Sales : "product_id"
+    Product ||--o{ Inventory : "product_id"
+    Location ||--o{ Sales : "location_id"
+    Location ||--o{ Inventory : "location_id"
+
+    Sales {
+        text order_item_id
+        text order_id
+        date order_date FK
+        text customer_id FK
+        text location_id FK
+        text product_id FK
+        int quantity
+        decimal net_revenue
+        decimal cost_of_goods
+        decimal gross_profit
+    }
+    Inventory {
+        text inventory_id
+        text product_id FK
+        text location_id FK
+        int quantity_on_hand
+        int reorder_level
+        decimal inventory_value
+        int units_sold_90d
+        decimal days_of_cover
+        text stock_status
+        decimal suggested_order_qty
+    }
+    Date {
+        date date_key PK
+        int year
+        int quarter
+        text month_name
+        text year_month
+        bool is_weekend
+    }
+    Product {
+        text product_id PK
+        text product_name
+        text category_name
+        text supplier_name
+        decimal selling_price
+    }
+    Customer {
+        text customer_id PK
+        text customer_name
+        text customer_type
+        text city
+        date first_order_date
+        text segment
+    }
+    Location {
+        text location_id PK
+        text location_name
+        text region
+        text location_type
+        text city
+    }

@@ -1,0 +1,20 @@
+flowchart LR
+    categories["categories<br/>tidy names, add Uncategorized"]
+    suppliers["suppliers<br/>email check, fill lead time"]
+    locations["locations<br/>city names, region and type"]
+    customers["customers<br/>merge duplicates, return id map"]
+    products["products<br/>prices, swapped cost, category,<br/>missing cost"]
+    orders["orders<br/>dates, status, payment,<br/>remap merged customers"]
+    inventory["inventory<br/>negative stock, reorder level,<br/>stale duplicates"]
+    items["order_items<br/>quantity, price, discount,<br/>reject lines of lost orders"]
+    empty["orders without valid lines<br/>are rejected"]
+
+    categories --> products
+    suppliers --> products
+    products --> inventory
+    locations --> inventory
+    products --> items
+    customers --> orders
+    locations --> orders
+    orders --> items
+    items --> empty

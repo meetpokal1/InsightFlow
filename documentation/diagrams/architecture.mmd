@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph sources["1. Data sources"]
+        direction LR
+        csv["CSV exports<br/>orders, order_items, categories,<br/>suppliers, locations"]
+        xlsx["Excel files<br/>customers, products, inventory"]
+    end
+
+    subgraph pipeline["2. Python pipeline (src/)"]
+        direction LR
+        ingest["Ingestion<br/>read as text"] --> profile["Profiling<br/>missing values"] --> clean["Cleaning<br/>standardise, repair,<br/>merge duplicates"] --> validate["Validation<br/>keys, relationships,<br/>value rules"] --> loader["Loader<br/>one transaction"]
+    end
+
+    files["data/processed<br/>clean CSVs, rejected rows,<br/>data quality report"]
+    pg[("PostgreSQL<br/>8 tables, quality log,<br/>calendar table, 6 views")]
+
+    subgraph consumers["3. Consumers read the views"]
+        direction LR
+        sql["SQL analytics<br/>17 queries"]
+        api["FastAPI<br/>6 endpoints and /health"]
+        bi["Power BI<br/>4 report pages"]
+    end
+
+    sources --> pipeline
+    pipeline --> files
+    pipeline --> pg
+    pg --> sql
+    pg --> api
+    pg --> bi

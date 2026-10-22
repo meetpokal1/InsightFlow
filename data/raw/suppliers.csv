@@ -1,0 +1,14 @@
+supplier_id,supplier_name,city,contact_email,lead_time_days
+S01,Sunrise Beverages Pvt Ltd,MUMBAI,sales@sunrisebeverages.example,5
+S02,Coastal Drinks Co,Chennai,sales@coastaldrinks.example,8
+S03,Golden Harvest Foods,jaipur,sales@goldenharvest.example,7 days
+S04,Everfresh Staples Ltd,Delhi,sales@everfreshstaples.example,10
+S05,CrunchTime Snacks LLP,Pune,sales@crunchtimesnacks.example,6
+S06,CleanWave Household Pvt Ltd,Mumbai,sales@cleanwavehousehold.example,9
+S07,BrightHome Products,Ahmedabad,,12
+S08,PureGlow Personal Care,BENGALURU,,14
+S09,Skyline Cosmetics Ltd,Hyderabad,sales@skylinecosmetics.example,18
+S10,PaperTrail Stationers,Kolkata,sales@papertrailstationers.example,7
+S11,OfficeEase Supplies,DELHI,sales@officeeasesupplies.example,11 days
+S12,VoltEdge Accessories,Bengaluru,sales@voltedgeaccessories.example,21
+S03,Golden Harvest Foods,jaipur,sales@goldenharvest.example,7 days

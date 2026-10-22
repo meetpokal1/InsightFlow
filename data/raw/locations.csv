@@ -1,0 +1,10 @@
+location_id,location_name,city,state,region,location_type
+L01,  Mumbai   Warehouse ,Mumbai,Maharashtra,west,Warehouse
+L02,DELHI WAREHOUSE,DELHI,Delhi,north,Warehouse
+L03,Bangalore Warehouse,Bangalore,Karnataka,south,Warehouse
+L04,Pune Store,Pune,Maharashtra,West,Store
+L05,Hyderabad Store,Hyderabad,Telangana,South,Store
+L06,Chennai Store,Chennai,Tamil Nadu,South,Store
+L07,Kolkata Store,Kolkata,West Bengal,East,Store
+L08,Jaipur Store,Jaipur,Rajasthan,North,Store
+L03,Bengaluru Warehouse,Bengaluru,Karnataka,south,Warehouse

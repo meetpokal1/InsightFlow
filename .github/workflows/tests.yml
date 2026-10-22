@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sales_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: sales_intelligence
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sales_user -d sales_intelligence"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: sales_intelligence
+      DB_USER: sales_user
+      DB_PASSWORD: test_password
+      AS_OF_DATE: "2026-09-30"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+      - name: Create isolated test database
+        run: |
+          python - <<'PY'
+          import os
+          import psycopg2
+
+          connection = psycopg2.connect(
+              dbname=os.environ["DB_NAME"],
+              user=os.environ["DB_USER"],
+              password=os.environ["DB_PASSWORD"],
+              host=os.environ["DB_HOST"],
+              port=os.environ["DB_PORT"],
+          )
+          connection.autocommit = True
+          with connection.cursor() as cursor:
+              cursor.execute("CREATE DATABASE sales_intelligence_test OWNER sales_user")
+          connection.close()
+          PY
+      - name: Run test suite
+        run: python -m pytest -q
+      - name: Check formatting and lint
+        run: |
+          ruff check .
+          ruff format --check .

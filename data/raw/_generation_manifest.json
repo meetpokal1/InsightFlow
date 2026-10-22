@@ -1,0 +1,97 @@
+{
+  "seed": 42,
+  "n_customers": 800,
+  "ground_truth": {
+    "customers": 800,
+    "orders_total": 8946,
+    "orders_completed": 8072,
+    "order_items_total": 39127,
+    "completed_net_revenue": 216134944.45
+  },
+  "injected_issues": {
+    "customers": {
+      "duplicate_customers_new_id": 40,
+      "missing_email": 50,
+      "missing_phone": 67,
+      "missing_city": 17,
+      "missing_customer_type": 25,
+      "inconsistent_name_formatting": 126,
+      "inconsistent_city_names": 163,
+      "inconsistent_customer_type": 81,
+      "mixed_date_formats_signup_date": 246,
+      "invalid_signup_date": 17,
+      "exact_duplicate_rows": 8
+    },
+    "orders": {
+      "orders_booked_under_duplicate_customer_id": 220,
+      "mixed_date_formats_order_date": 2662,
+      "invalid_order_date": 54,
+      "future_order_date": 18,
+      "customer_id_case_or_whitespace": 179,
+      "unknown_customer_id": 45,
+      "missing_customer_id": 36,
+      "location_id_case_or_whitespace": 89,
+      "unknown_location_id": 27,
+      "missing_location_id": 18,
+      "inconsistent_order_status": 1074,
+      "inconsistent_payment_method": 358,
+      "missing_payment_method": 179,
+      "order_total_does_not_match_items": 268,
+      "missing_order_total": 179,
+      "order_total_stored_as_formatted_text": 895,
+      "exact_duplicate_rows": 107
+    },
+    "categories": {
+      "inconsistent_text_formatting": 3,
+      "exact_duplicate_rows": 1
+    },
+    "suppliers": {
+      "inconsistent_text_formatting": 4,
+      "missing_contact_email": 2,
+      "lead_time_stored_as_text": 2,
+      "exact_duplicate_rows": 1
+    },
+    "locations": {
+      "inconsistent_location_names": 3,
+      "inconsistent_text_formatting": 3,
+      "duplicate_location_id_conflicting_names": 1
+    },
+    "products": {
+      "inconsistent_text_formatting": 12,
+      "missing_category": 5,
+      "invalid_category_id": 2,
+      "price_stored_as_formatted_text": 7,
+      "cost_price_greater_than_selling_price": 3,
+      "missing_cost_price": 2,
+      "product_id_case_or_whitespace": 2,
+      "exact_duplicate_rows": 3
+    },
+    "order_items": {
+      "product_id_case_or_whitespace": 783,
+      "invalid_product_id": 157,
+      "orphan_order_id": 78,
+      "negative_quantity": 235,
+      "zero_quantity": 78,
+      "missing_quantity": 117,
+      "quantity_stored_as_decimal_text": 1174,
+      "quantity_outlier": 78,
+      "missing_unit_price": 391,
+      "unit_price_stored_as_formatted_text": 1956,
+      "unit_price_outlier": 117,
+      "missing_discount": 783,
+      "discount_stored_with_percent_sign": 1174,
+      "invalid_discount": 78,
+      "exact_duplicate_rows": 391
+    },
+    "inventory": {
+      "product_id_case_or_whitespace": 9,
+      "invalid_product_id": 5,
+      "negative_quantity_on_hand": 7,
+      "quantity_stored_with_unit_text": 14,
+      "missing_reorder_level": 18,
+      "invalid_last_restocked_date": 5,
+      "mixed_date_formats_last_restocked_date": 91,
+      "stale_duplicate_product_location_row": 9
+    }
+  }
+}

@@ -1,0 +1,15 @@
+flowchart TD
+    raw["data/raw<br/>3 Excel and 5 CSV files"]
+    read["1. Read and profile<br/>every column as text,<br/>missing values per column"]
+    clean["2. Clean<br/>standardise and repair,<br/>reject what cannot be repaired"]
+    check{"3. Validate<br/>keys, relationships,<br/>value rules"}
+    stop["Stop<br/>nothing is saved or loaded"]
+    save["4. Save files<br/>clean CSVs, rejected rows,<br/>data quality report"]
+    schema["5. Create the schema<br/>tables, indexes, calendar<br/>and views"]
+    load["6. Load PostgreSQL<br/>one transaction: truncate,<br/>insert parent tables first"]
+    verify["7. Verify<br/>row counts in the database<br/>against the cleaned data"]
+    use["SQL analytics, FastAPI, Power BI<br/>read the views"]
+
+    raw --> read --> clean --> check
+    check -- "a rule is broken" --> stop
+    check -- "all rules pass" --> save --> schema --> load --> verify --> use
