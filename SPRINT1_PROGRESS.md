@@ -2,7 +2,7 @@
 **Candidate:** Meet Pokal  
 **Branch:** `feature/sprint1-analytics-upgrade`  
 **Date:** October 23, 2026  
-**Status:** **SPRINT 1 FULLY COMPLETED (152/152 TESTS PASSING)**
+**Status:** **SPRINT 1 FULLY COMPLETED (161/161 RUNTIME TESTS PASSING, 0 FAILURES)**
 
 ---
 
@@ -13,10 +13,10 @@ Sprint 1 successfully upgraded InsightFlow from a technical ETL demo into an evi
 ### Key Milestones Delivered:
 1. **Inventory Semantics Corrected:** Clarified the crucial business difference between working capital required at purchase cost to restore safety buffers (`replenishment_cost_estimate` = ₹9.66 L across 5,791 units) vs retail catalog valuation (`stock_gap_retail_val` = ₹13.41 L) vs true stockouts (40 positions with 0 units on hand).
 2. **Price & Margin Sensitivity Simulator Implemented:** Built an interactive decision simulator in Streamlit and `src/analytics/demo.py`. Verified with the flagship Basmati Rice case study: a +3% price increase yields +₹494,133.26 GP at 0% volume change and +₹455,966.51 GP at -4.5% volume change (|ε|=1.5), with a break-even volume decline tolerance of **58.26% (58.3%)**.
-3. **Data Assurance Workpaper Generated:** Developed `scripts/generate_data_assurance_workpaper.py` using `openpyxl` producing `documentation/data_assurance_workpaper.xlsx` across 6 professional worksheets with dynamic Excel formulas, formula injection guards, and exact conservation equations ($Raw - Duplicates - Quarantined = Clean$).
+3. **Data Assurance Workpaper Generated:** Developed `scripts/generate_data_assurance_workpaper.py` using `openpyxl` producing `documentation/data_assurance_workpaper.xlsx` across 6 professional worksheets with dynamic Excel formulas, formula injection guards, and exact conservation equations ($Raw - Duplicates - Quarantined - Merged = Clean$).
 4. **Power BI Deliverable (PBIP):** Built a complete, modern version-controlled Power BI Project (`powerbi/InsightFlow.pbip`, `InsightFlow.Report/`, `InsightFlow.SemanticModel/`) featuring 7 star schema tables, all 45+ DAX measures, and 4 complete analytical pages.
 5. **Runtime Screenshots Captured:** Deployed an automated headless Playwright script with Microsoft Edge, capturing 5 authentic full-page runtime screenshots into `screenshots/runtime/`.
-6. **Automated Test Suite Expansion:** Expanded pytest coverage from 137 passing tests to **152 passing tests, 14 skipped, 56 deselected, 0 failures**.
+6. **Automated Test Suite Expansion:** Expanded pytest coverage to **161 passing tests, 69 skipped (PostgreSQL offline), 0 failures across 230 collected items**.
 
 ---
 
@@ -73,8 +73,8 @@ Sprint 1 successfully upgraded InsightFlow from a technical ETL demo into an evi
 
 ### Task 6: Final Verification, Screenshots & Documentation
 - **Automated Test Run:**
-  - Total tests collected: 222 items (56 deselected, 166 selected)
-  - Result: **152 passed, 14 skipped in 11.34s**
+  - Total tests collected: 230 items
+  - Result: **161 passed, 69 skipped in 26.29s (PostgreSQL offline), 0 failed**
 - **Runtime Screenshots:**
   - Captured via `scripts/capture_runtime_screenshots.py` using Playwright:
     - `screenshots/runtime/01_executive_overview.png`
@@ -96,13 +96,15 @@ Sprint 1 successfully upgraded InsightFlow from a technical ETL demo into an evi
 | `tests/test_clean_sales.py` | 13 | Passed | Line item validation & sign corrections |
 | `tests/test_config.py` | 2 | Passed | Database configuration parsing |
 | `tests/test_demo_analytics.py` | 7 | Passed | Pandas demo analytics rollup |
-| `tests/test_inventory_metrics.py` | 4 | Passed | **NEW:** Inventory replenishment semantics & boundaries |
+| `tests/test_ingestion.py` | 8 | Passed | Ingestion file inspection & raw profiling |
+| `tests/test_inventory_metrics.py` | 4 | Passed | Inventory replenishment semantics & boundaries |
+| `tests/test_parsing.py` | 15 | Passed | Raw table parsing & type coercions |
 | `tests/test_pipeline.py` | 37 | Passed | End-to-end pipeline & synthetic data |
-| `tests/test_powerbi_deliverable.py` | 4 | Passed | **NEW:** PBIP project, semantic model & DAX measures |
-| `tests/test_price_sensitivity.py` | 3 | Passed | **NEW:** Margin simulator & break-even math |
+| `tests/test_powerbi_deliverable.py` | 12 | Passed | PBIP project, semantic model, PBIR visual bindings & CSV feeds |
+| `tests/test_price_sensitivity.py` | 3 | Passed | Margin simulator & break-even math |
 | `tests/test_quality_log.py` | 4 | Passed | Quarantine logging & auditing |
-| `tests/test_text_cleaning.py` | 11 | Passed | Whitespace & vocabulary normalization |
-| `tests/test_validators.py` | 44 | Passed | Schema & domain validation rules |
-| `tests/test_workpaper.py` | 4 | Passed | **NEW:** Excel workpaper structure & formulas |
-| **TOTAL RUNTIME TESTS** | **152** | **ALL PASSED** | **Zero failures / Zero regressions** |
-Proceed to **Task 2**: Implement the corrected inventory measures in `src/analytics/demo.py`, `sql/schema/04_views.sql`, update the Streamlit inventory view, and write comprehensive unit tests in `tests/test_inventory_metrics.py`.
+| `tests/test_text_cleaning.py` | 16 | Passed | Whitespace & vocabulary normalization |
+| `tests/test_validators.py` | 16 | Passed | Schema & domain validation rules |
+| `tests/test_workpaper.py` | 4 | Passed | Excel workpaper structure & formulas |
+| `tests/test_api.py` | 1 (35 skip) | Passed | API route schema definition |
+| **TOTAL RUNTIME TESTS** | **161** | **ALL PASSED** | **Zero failures / Zero regressions (69 DB tests skipped offline)** |

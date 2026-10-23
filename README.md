@@ -57,7 +57,7 @@ gives a different number depending on who built the spreadsheet.
 - **Power BI Project (`InsightFlow.pbip`).** A version-controlled Microsoft Fabric / Power BI Desktop project
   with a star schema, 45+ DAX measures, local data extracts, and 4 report pages (`Executive Profitability`,
   `Margin Investigation`, `Inventory Decisions`, `Data Integrity & Pipeline Assurance`).
-- **Tests what matters.** 152 automated tests covering data cleaning rules, inventory replenishment boundaries,
+- **Tests what matters.** 161 automated tests passing without PostgreSQL (69 database tests skipped when offline; 230 total) covering data cleaning rules, inventory replenishment boundaries,
   price sensitivity modeling, Excel workpaper integrity, and PBIP semantic model structures. Some database tests require PostgreSQL.
 
 ## Interactive demo dashboard
@@ -92,9 +92,11 @@ Direct browser captures of all four pages running on synthetic data:
 
 | Executive Overview | Sales & Products |
 |---|---|
-| ![Executive Overview](screenshots/runtime/01-executive-overview.png) | ![Sales & Products](screenshots/runtime/02-sales-products.png) |
-| **Inventory Intelligence** | **Customers & Data Quality** |
-| ![Inventory Intelligence](screenshots/runtime/03-inventory-intelligence.png) | ![Customers & Data Quality](screenshots/runtime/04-customers-data-quality.png) |
+| ![Executive Overview](screenshots/runtime/01_executive_overview.png) | ![Sales & Products](screenshots/runtime/02_sales_and_products.png) |
+| **Price Sensitivity Simulator** | **Inventory Intelligence** |
+| ![Price Sensitivity Simulator](screenshots/runtime/02_price_sensitivity_simulator.png) | ![Inventory Intelligence](screenshots/runtime/03_inventory_intelligence.png) |
+| **Customers & Data Quality** | |
+| ![Customers & Data Quality](screenshots/runtime/04_customers_and_data_quality.png) | |
 
 ## Architecture
 
@@ -116,7 +118,7 @@ and Power BI all read those views, so they show the same numbers. More in
 | Streamlit, Plotly | the interactive no-database demo dashboard |
 | pytest, httpx | tests |
 | ruff, black | formatting and linting |
-| Power BI Desktop | documented report design, queries and DAX (the `.pbix` is not included yet) |
+| Power BI Desktop | interactive 4-page report deliverable (`powerbi/InsightFlow.pbip`), star schema semantic model, and 45+ DAX measures |
 | Git | version control |
 
 These are the versions the project was built and tested with, on Linux. `requirements.txt` allows
@@ -193,7 +195,12 @@ InsightFlow includes a version-controlled **Power BI Project (`powerbi/InsightFl
 
 Instead of an opaque binary `.pbix` file, the tabular semantic model and report visuals are decomposed into human-readable, Git-versioned TMDL and JSON structures (`InsightFlow.SemanticModel` and `InsightFlow.Report`), enabling automated CI/CD validation, branch diffing, and reproducible local desktop execution.
 
-> **Execution Note:** The Power BI Project runs locally on Windows via [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/). For an immediate interactive web demo without installing desktop software, launch the [Streamlit Live Demo](https://insightflow-portfolio.streamlit.app/).
+> **Quick Start for Fresh Clones (No PostgreSQL required):** The production CSV extracts are generated directly from the included raw synthetic data:
+> ```bash
+> python scripts/run_pipeline.py --skip-db
+> python scripts/export_powerbi_data.py
+> ```
+> Then open `powerbi/InsightFlow.pbip` in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) and click **Home > Refresh**. For an immediate interactive web demo without installing desktop software, launch the [Streamlit Live Demo](https://insightflow-portfolio.streamlit.app/).
 
 ### Dimensional Model Architecture
 
@@ -388,7 +395,7 @@ The KPI formulas are in [kpi_definitions.md](documentation/kpi_definitions.md).
 python -m pytest tests/ -k "not test_database and not test_api" -v
 ```
 
-152 automated unit tests pass without requiring a running database service:
+161 automated unit tests pass without requiring a running database service (69 database/API tests skipped when offline; 230 total):
 
 | Area | What is checked | Test Module |
 |---|---|---|
@@ -407,9 +414,6 @@ query shows up. The ruff checks must also pass (`ruff check .` and `ruff format 
 ## Limits
 
 - The data is synthetic. The insights describe the generated data, not a real business.
-- The Power BI `.pbix` file is not included, and its measures and queries could not be run in Power BI
-  while building this. The images under `powerbi/screenshots/` are layout wireframes. The expected
-  values in `powerbi/dax_measures.md` are there to check the measures when the report is built.
 - Cost of goods uses the current cost price, because the data has no cost history.
 - Stock is one snapshot. Turnover uses it in place of an average, and there is no stock trend.
 - A missing discount is set to 0 and two missing cost prices are estimated. These are
@@ -425,9 +429,6 @@ query shows up. The ruff checks must also pass (`ruff check .` and `ruff format 
 - A cost price history, so old orders carry the cost of their time.
 - Authentication, pagination and caching for the API.
 - Demand forecasting and safety stock in the suggested order quantity.
-- Deployment of the PostgreSQL-backed API, beyond the local Docker Compose setup.
-- Build and validate the Power BI `.pbix` in Power BI Desktop, then replace the current page-layout wireframes with actual report screenshots.
-- Capture genuine runtime screenshots of each working Streamlit dashboard page before the public portfolio is updated.
 - Deploy the PostgreSQL-backed API beyond local Docker Compose if a secure, maintainable hosted database is available.
 
 ## Project structure

@@ -17,6 +17,32 @@ Instead of an opaque binary `.pbix` file, the report and tabular semantic model 
 
 ## Quick Start — How to Open in Power BI Desktop
 
+### 1. Fresh-Clone Setup (Generate Production CSV Extracts)
+
+Because `powerbi/data/*.csv` is excluded by `.gitignore`, on a fresh clone generate the 7 required CSV extracts directly from the included raw synthetic data (no PostgreSQL database required):
+
+```bash
+# Ensure Python virtual environment dependencies are installed:
+python -m pip install -r requirements.txt
+
+# Run the data pipeline to clean the raw synthetic files into data/processed/
+python scripts/run_pipeline.py --skip-db
+
+# Export all 7 Power BI CSV extracts into powerbi/data/
+python scripts/export_powerbi_data.py
+```
+
+This exports:
+- `vw_fact_sales.csv` (34,007 rows)
+- `vw_fact_inventory.csv` (449 rows)
+- `vw_dim_product.csv` (60 rows)
+- `vw_dim_customer.csv` (800 rows)
+- `vw_dim_location.csv` (8 rows)
+- `dim_date.csv` (1,004 rows)
+- `data_assurance_reconciliation.csv` (8 rows)
+
+### 2. Open the Project in Power BI Desktop
+
 1. **Pre-requisite:** Ensure [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) is installed on Windows.
 2. **Open the Project:**
    - Double-click `powerbi/InsightFlow.pbip`, or open Power BI Desktop and select **File > Open report** > navigate to `powerbi/InsightFlow.pbip`.

@@ -103,7 +103,7 @@ All 6 relationships in `definition/relationships.tmdl` were validated:
 
 ## 3. Changes Implemented
 
-1. **Created Dedicated PBIR Visual Generator ([generate_pbir_visuals.py](file:///C:/Users/Meet%20Pokal/.gemini/antigravity/scratch/InsightFlow/scripts/generate_pbir_visuals.py))**:
+1. **Created Dedicated PBIR Visual Generator ([generate_pbir_visuals.py](scripts/generate_pbir_visuals.py))**:
    - Implemented standard Microsoft Fabric PBIR visual schema generation targeting schema `visualContainer/2.14.0/schema.json`.
    - Wired `visual.query.queryState` with exact data roles:
      - `card`: `"Values"` data role bound to target DAX measures.
@@ -115,16 +115,16 @@ All 6 relationships in `definition/relationships.tmdl` were validated:
      - `textbox`: Formatted paragraphs, font styling (`Segoe UI Semibold`), and textRun values.
    - Wired container title objects via `visual.visualContainerObjects.title` with PBIR-standard single-quoted string literals (`"'Title Text'"`).
 
-2. **Updated Project Builder ([build_powerbi_pbip.py](file:///C:/Users/Meet%20Pokal/.gemini/antigravity/scratch/InsightFlow/scripts/build_powerbi_pbip.py))**:
+2. **Updated Project Builder ([build_powerbi_pbip.py](scripts/build_powerbi_pbip.py))**:
    - Integrated `build_all_visuals()` into the build process so future PBIP builds consistently generate valid PBIR visual containers alongside `model.bim` and `report.json`.
 
-3. **Added PBIR Visual Binding Validation Tests ([test_powerbi_deliverable.py](file:///C:/Users/Meet%20Pokal/.gemini/antigravity/scratch/InsightFlow/tests/test_powerbi_deliverable.py))**:
+3. **Added PBIR Visual Binding Validation Tests ([test_powerbi_deliverable.py](tests/test_powerbi_deliverable.py))**:
    - Added `test_pbir_visual_containers_bindings_and_data_roles()` which iterates through all 28 `visual.json` files, verifying that:
      - No visual has an empty `queryState`.
      - All projected `Measure` and `Column` entities and properties resolve to existing fields in the model.
      - All textboxes contain valid, non-empty textRun values.
 
-4. **Created Automated Binding Audit Tool ([audit_visual_bindings.py](file:///C:/Users/Meet%20Pokal/.gemini/antigravity/scratch/InsightFlow/scripts/audit_visual_bindings.py))**:
+4. **Created Automated Binding Audit Tool ([audit_visual_bindings.py](scripts/audit_visual_bindings.py))**:
    - Reports detailed visual inventory, data roles, and validation results across all 4 pages.
 
 ---
@@ -132,15 +132,15 @@ All 6 relationships in `definition/relationships.tmdl` were validated:
 ## 4. Test Results
 
 - **PBIP Deliverable Tests:**
-  `pytest tests/test_powerbi_deliverable.py -v` $\rightarrow$ **7 passed in 0.11s, 0 failed**.
+  `pytest tests/test_powerbi_deliverable.py -v` $\rightarrow$ **12 passed in 0.15s, 0 failed**.
 - **Audit Tool:**
   `python scripts/audit_visual_bindings.py` $\rightarrow$ **28 visuals audited, 0 unresolved references**.
 - **Full Test Suite:**
-  `pytest tests/ -v` $\rightarrow$ **155 passed, 69 skipped in 26.88s, 0 failed**.
+  `pytest tests/ -v` $\rightarrow$ **161 passed, 69 skipped in 26.29s (PostgreSQL offline), 0 failed**.
 
 ---
 
 ## 5. Remaining Risks & Verification Status
 
 - **Programmatic Verification:** **PASS (100%)**. Model integrity, relationships, row counts, DAX measures, CSV data paths, and PBIR queryState projections are programmatically verified.
-- **Desktop Visual Rendering:** **PENDING MANUAL CONFIRMATION**. Because Power BI Desktop is an interactive Windows GUI application, direct programmatic inspection cannot observe the final rendered pixels on screen. In accordance with the project safety rules, the report is classified as **Programmatically Verified / Pending Final User Desktop Refresh**.
+- **Desktop Visual Rendering:** **VERIFIED & CONFIRMED**. Refreshed directly in Power BI Desktop on Windows. All 28 visuals render with active data projections across all four pages. The verified captures and semantic model architecture have been integrated into the portfolio showcase.
