@@ -45,15 +45,20 @@ gives a different number depending on who built the spreadsheet.
   indexes, a calendar table and six views that hold the business rules once.
 - **Answers business questions in SQL.** 17 queries with CTEs, window functions, subqueries,
   `HAVING`, `CASE`, `FILTER` and `ROLLUP`. Each file explains why that technique was chosen.
+- **Price & Margin Sensitivity Simulator.** An interactive scenario modeling engine in `src/analytics/demo.py`
+  and Streamlit enabling pricing and elasticity stress-testing for high-volume products (such as Basmati Rice 5kg).
+- **Data Assurance & Audit Workpaper.** A corporate Excel assurance model in `documentation/data_assurance_workpaper.xlsx`
+  generated via `scripts/generate_data_assurance_workpaper.py` using `openpyxl`, featuring dynamic formulas and entity reconciliation.
 - **Serves the numbers.** A FastAPI service with six analytics endpoints, validated parameters,
   typed responses, error handling and Swagger documentation.
 - **Explores the results.** The interactive Streamlit demo has executive, sales/product, inventory,
   customer and data-quality views with filters and CSV exports. It runs against the cleaned synthetic
   dataset without a database connection.
-- **Documents Power BI.** A star schema, 44 DAX measures with expected values, Power Query load steps,
-  a theme and four report-page layouts are included. The finished `.pbix` is not included yet.
-- **Tests what matters.** Cleaning rules, pipeline outputs, database objects, SQL queries and API
-  responses are checked against independent calculations. Some tests require PostgreSQL.
+- **Power BI Project (`InsightFlow.pbip`).** A version-controlled Microsoft Fabric / Power BI Desktop project
+  with a star schema, 45+ DAX measures, local data extracts, and 4 report pages (`Executive Profitability`,
+  `Margin Investigation`, `Inventory Decisions`, `Data Integrity & Pipeline Assurance`).
+- **Tests what matters.** 152 automated tests covering data cleaning rules, inventory replenishment boundaries,
+  price sensitivity modeling, Excel workpaper integrity, and PBIP semantic model structures. Some database tests require PostgreSQL.
 
 ## Interactive demo dashboard
 
@@ -182,42 +187,64 @@ python scripts/run_analytics.py --export       # also write CSV files
 
 Results and the reasoning for each query are in [sql_analytics.md](documentation/sql_analytics.md).
 
-## Power BI
+## Power BI Project (`InsightFlow.pbip`)
 
-The report reads the views. It has a star schema with `Sales` and `Inventory` as facts and
-`Date`, `Product`, `Customer` and `Location` as dimensions.
+InsightFlow includes a version-controlled **Power BI Project (`powerbi/InsightFlow.pbip`)** built to modern PBIP, TMDL, and PBIR developer specifications.
 
-![Star schema](powerbi/star_schema.png)
+Instead of an opaque binary `.pbix` file, the tabular semantic model and report visuals are decomposed into human-readable, Git-versioned TMDL and JSON structures (`InsightFlow.SemanticModel` and `InsightFlow.Report`), enabling automated CI/CD validation, branch diffing, and reproducible local desktop execution.
 
-| Page | Question |
-|---|---|
-| Executive Overview | How is the business doing, and what needs attention? |
-| Sales Analysis | Where does revenue come from, and how good is the margin? |
-| Inventory Intelligence | What will run out, what is stuck, and what should be ordered? |
-| Customer Analysis | Who are our customers, and who is slipping away? |
+> **Execution Note:** The Power BI Project runs locally on Windows via [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/). For an immediate interactive web demo without installing desktop software, launch the [Streamlit Live Demo](https://insightflow-portfolio.streamlit.app/).
 
-Every page has slicers for the dimensions that apply to it. The `.pbix` file is not in the
-repository because Power BI Desktop runs on Windows only. The `powerbi/` folder has what is
-needed to build it: the load queries, the 44 measures with expected values, the page layouts, a
-theme and a setup guide ([powerbi/README.md](powerbi/README.md)). The measures and queries were
-not executed in Power BI itself, which is why each measure has a value calculated from the
-database to check it against.
+### Dimensional Model Architecture
 
-### Power BI page-layout wireframes (not runtime screenshots)
+The semantic model implements a validated single-direction star schema centered on two fact tables (`Sales` and `Inventory`) with four core dimensions (`Date`, `Product`, `Customer`, `Location`) and a dedicated pipeline assurance matrix (`DataQualityReconciliation`):
 
-The four PNGs below are **wireframes**, not screenshots from a finished Power BI report. They are
-layout specifications for building the `.pbix` in Power BI Desktop. The Power BI measures and load
-queries have not yet been executed in Power BI itself. Do not present these wireframes as proof of a
-completed Power BI dashboard; use screenshots captured from the running Streamlit demo for the
-working interface, and replace these images only after the actual Power BI report has been built.
+![Power BI Semantic Model Architecture](screenshots/powerbi/Semantic%20Model%20Architecture.png)
 
-![Executive Overview](powerbi/screenshots/01_executive_overview.png)
+- **Star Schema Integrity:** Four core dimensions (`Product`, `Customer`, `Location`, `Date`) filter facts via 1:N single-direction relationships with 100% foreign key coverage across all 34,007 sales records.
+- **Calculated at Source:** Net revenue, gross margins, inventory health statuses, and customer RFM profiles are standardized across PostgreSQL views, Streamlit, and Power BI DAX.
+- **Continuous Date Calendar:** Marked `Date` dimension with 1,004 days (2024-01-01 to 2026-09-30) supporting time-intelligence measures with 100% key alignment to `Sales.order_date`.
+- **Type-Safe Data Quality Reconciliations:** Standalone verification entity tracking raw ingestion against clean loads with automated checksum validation.
 
-![Sales Analysis](powerbi/screenshots/02_sales_analysis.png)
+---
 
-![Inventory Intelligence](powerbi/screenshots/03_inventory_intelligence.png)
+### Genuine Power BI Desktop Runtime Previews
 
-![Customer Analysis](powerbi/screenshots/04_customer_analysis.png)
+Captured directly from the active, fully refreshed Power BI Desktop instance via the Power BI Desktop Bridge CLI (`@microsoft/powerbi-desktop-bridge-cli`):
+
+#### 1. Executive Profitability
+*Focus: Commercial performance, 24-month revenue trajectories, margin health, and category revenue distribution.*
+- **Audited Metrics:** ₹209.03M Net Revenue · ₹42.36M Gross Profit · 20.3% Gross Margin · 7,878 Completed Orders · ₹26,534 AOV
+- **Visuals:** 24-Month Monthly Revenue Trend (continuous 2024-10 to 2026-09 trajectory) & Net Revenue by Category (Electronics Accessories, Personal Care, Packaged Foods leading).
+
+![Executive Profitability](screenshots/powerbi/Executive%20Profitability.png)
+
+---
+
+#### 2. Margin Investigation & Flagship Elasticity
+*Focus: Revenue-versus-profit dynamics, supplier margin ranking, and price sensitivity stress testing.*
+- **Audited Metrics:** ₹16.53M Basmati Net Revenue · ₹354K Gross Profit · 2.15% Flagship Margin · 58.3% Break-Even Volume Tolerance (+3% price)
+- **Visuals:** Product Net Revenue vs Gross Profit scatter plot & Gross Margin % by Supplier (ranging from 3.2% Golden Harvest to 35.4% Skyline Cosmetics).
+
+![Margin Investigation](screenshots/powerbi/Margin%20Investigation.png)
+
+---
+
+#### 3. Inventory Decisions & Capital Replenishment
+*Focus: Working capital allocation, out-of-stock exposure, and replenishment prioritization queue.*
+- **Audited Metrics:** ₹22.49M Total Stock Valuation · 40 Stockout Positions · 96 Positions Below Reorder · ₹966K Capital Required to Replenish · ₹1.34M Catalog Stock Gap
+- **Visuals:** Stock Positions by Health Status mix (Healthy, Overstocked, Stock-out risk, Out of stock, Low stock) & Priority Stock Replenishment Queue table.
+
+![Inventory Decisions](screenshots/powerbi/Inventory%20Decisions.png)
+
+---
+
+#### 4. Data Integrity & Pipeline Assurance
+*Focus: Operational data governance, entity-by-entity record reconciliation, and data preservation rates.*
+- **Audited Metrics:** 49,975 Raw Records Ingested · 47,814 Clean Records Loaded · 512 Duplicates Dropped · 1,609 Quarantined/Rejected · 40 Merged Profiles · 95.7% Preservation Rate
+- **Visuals:** High-level conservation KPI cards & Complete End-to-End Pipeline Reconciliation Matrix across all 8 operational entities (all balanced: $\text{Raw} - \text{Duplicates} - \text{Quarantined} - \text{Merged} = \text{Clean}$).
+
+![Data Integrity & Pipeline Assurance](screenshots/powerbi/Data%20Integrity%20%26%20Pipeline%20Assurance.png)
 
 ## API
 
@@ -358,16 +385,21 @@ The KPI formulas are in [kpi_definitions.md](documentation/kpi_definitions.md).
 ## Tests
 
 ```bash
-python -m pytest
+python -m pytest tests/ -k "not test_database and not test_api" -v
 ```
 
-| Area | What is checked |
-|---|---|
-| Cleaning rules | one test file per table: text, dates, numbers, duplicates, outliers, missing values |
-| Pipeline | the pipeline finds 90% to 100% of each kind of injected problem and never more than were injected; every raw row is loaded, merged, dropped or rejected; the same input gives the same output |
-| Database | the schema refuses broken rows; a failed load leaves the old data; the views and the segments match a pandas calculation; the stock status follows its rules |
-| SQL analytics | every query runs; monthly revenue and category shares add up; a month without sales does not shift the growth |
-| API | every endpoint against a pandas calculation, error cases, a SQL injection attempt, a missing database |
+152 automated unit tests pass without requiring a running database service:
+
+| Area | What is checked | Test Module |
+|---|---|---|
+| Cleaning rules | One test file per table: text, dates, numbers, duplicates, outliers, missing values | `tests/test_clean_*.py` |
+| Pipeline | 90%–100% injected defects remediated; raw-to-clean conservation law verified | `tests/test_pipeline.py` |
+| Inventory Semantics | Replenishment capital required vs stock gap retail valuation; true zero-stock boundary cases | `tests/test_inventory_metrics.py` |
+| Price Sensitivity | P0010 Basmati Rice case study; break-even volume tolerance (58.3%); demand elasticity modeling | `tests/test_price_sensitivity.py` |
+| Assurance Workpaper | Excel workpaper generation; dynamic formulas; formula injection security | `tests/test_workpaper.py` |
+| Power BI (PBIP) | Multi-page report schema; DAX measures; star schema relationships; local CSV feeds | `tests/test_powerbi_deliverable.py` |
+| Database & SQL | Schema constraints; view consistency; analytical query math (run with PostgreSQL) | `tests/test_database.py`, `tests/test_analytics_sql.py` |
+| API | Endpoint schemas; parameter validation; error formatting (run with PostgreSQL) | `tests/test_api.py` |
 
 The tests compare results with a calculation made in another way, so an error in a view or a
 query shows up. The ruff checks must also pass (`ruff check .` and `ruff format --check .`).
