@@ -26,3 +26,30 @@ class LowStockItem(BaseModel):
     suggested_order_qty: float = Field(
         description="Units to order to cover the lead time plus 30 more days of sales"
     )
+    replenishment_qty_required: int = Field(
+        default=0,
+        description="Units required to bring quantity_on_hand up to reorder_level: max(0, reorder_level - quantity_on_hand)",
+    )
+    replenishment_cost_estimate: float = Field(
+        default=0.0,
+        description="Capital required at cost price to bring stock to reorder level",
+    )
+    stock_gap_retail_val: float = Field(
+        default=0.0,
+        description="Retail valuation at list selling price of the replenishment quantity required",
+    )
+    is_stockout: bool = Field(
+        default=False,
+        description="True if quantity_on_hand is zero",
+    )
+
+
+class InventorySummaryResponse(BaseModel):
+    total_positions: int
+    total_inventory_value: float
+    stockout_positions: int
+    below_reorder_positions: int
+    replenishment_units_required: int
+    replenishment_cost_estimate: float
+    stock_gap_retail_val: float
+    suggested_order_units: int

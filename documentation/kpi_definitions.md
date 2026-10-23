@@ -87,9 +87,20 @@ therefore not the all-time figure of query 08.
 | Days of cover | `quantity_on_hand * 90 / units_sold_90d`: how long the stock lasts at the sales rate of the last 90 days. Empty when nothing sold | `vw_fact_inventory.days_of_cover`; `/inventory/low-stock` | `[Days of Cover]` | 81.2 days |
 | Stock status | The first matching rule of: No recent sales, Out of stock, Stock-out risk (cover below the supplier lead time), Low stock (at or below the reorder level), Overstocked (more than 180 days of cover), Healthy | `vw_fact_inventory.stock_status` | `Inventory[stock_status]` | 20, 39, 39, 14, 45 and 292 positions |
 | Items needing action | Out of stock, Stock-out risk and Low stock positions together | query 11; `/inventory/low-stock` | `[Items Needing Action]` | 92 |
+| Replenishment quantity required | `GREATEST(reorder_level - quantity_on_hand, 0)`: units required to bring depleted positions back to safety reorder threshold | `vw_fact_inventory.replenishment_quantity_required` | `[Replenishment Qty Required]` | 5,791 units across 96 positions |
+| Replenishment cost estimate | `replenishment_quantity_required * cost_price`: working capital required at purchase cost to restore buffer to reorder level | `vw_fact_inventory.replenishment_cost_estimate` | `[Replenishment Cost Estimate]` | ₹9.66 L (₹966,026.68) |
+| Stock gap retail valuation | `replenishment_quantity_required * selling_price`: retail catalog valuation of the buffer deficit units | `vw_fact_inventory.stock_gap_retail_valuation` | `[Stock Gap Retail Valuation]` | ₹13.41 L (₹1,340,814.00) |
+| True zero-stock exposure | Positions with strictly `quantity_on_hand == 0` | `vw_fact_inventory.is_stockout` | `[Stockout Positions]` | 40 positions |
 | Overstock share | Cost value of overstocked positions divided by stock value | query 16 | `[Overstock Share of Stock %]` | 56.4% (12.69M) |
 | Suggested order quantity | `CEIL(avg_daily_units * (lead_time_days + 30)) - quantity_on_hand`, never below 0. The units that cover the lead time plus 30 days of sales | `vw_fact_inventory.suggested_order_qty`; `suggested_order_qty` | `[Suggested Order Units]` | 15,641 units in total |
 | Inventory turnover | Cost of goods of the last 12 months divided by stock value | query 09 | `[Inventory Turnover]` | 4.41 a year |
+
+> [!IMPORTANT]
+> **Inventory Semantics Distinction:**
+> - **Replenishment Cost Estimate (₹9.66 L):** The actual purchase capital required to restore safety buffer stock up to reorder level.
+> - **Stock Gap Retail Valuation (₹13.41 L):** The potential selling price of those replenishment units. This is a catalog valuation, **not confirmed lost sales**.
+> - **True Out of Stock vs Low Stock:** 40 positions have 0 units on hand (immediate fulfillment failure risk), whereas 56 positions have stock above 0 but below the reorder threshold (depleted buffer risk).
+> - Never label stock buffer gaps as "lost revenue" unless unfulfilled customer orders or bounce transactions can be directly measured.
 
 Turnover and days of inventory use the single snapshot instead of an average stock. With one
 snapshot per month, the average of the year would be the better base.

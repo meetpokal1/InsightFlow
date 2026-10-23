@@ -139,6 +139,8 @@ stock AS (
         i.reorder_level,
         i.last_restocked_date,
         s.lead_time_days,
+        p.cost_price,
+        p.selling_price,
         ROUND(i.quantity_on_hand * p.cost_price, 2) AS inventory_value,
         COALESCE(r.units_sold_90d, 0) AS units_sold_90d,
         ROUND(COALESCE(r.units_sold_90d, 0) / 90.0, 2) AS avg_daily_units
@@ -162,5 +164,10 @@ SELECT
         ELSE 'Healthy'
     END AS stock_status,
     GREATEST(CEIL(avg_daily_units * (lead_time_days + 30)) - quantity_on_hand, 0)
-        AS suggested_order_qty
+        AS suggested_order_qty,
+    GREATEST(reorder_level - quantity_on_hand, 0) AS replenishment_quantity_required,
+    ROUND(GREATEST(reorder_level - quantity_on_hand, 0) * cost_price, 2) AS replenishment_cost_estimate,
+    ROUND(GREATEST(reorder_level - quantity_on_hand, 0) * selling_price, 2) AS stock_gap_retail_valuation,
+    (quantity_on_hand = 0) AS is_stockout,
+    (quantity_on_hand < reorder_level) AS is_below_reorder
 FROM stock;
