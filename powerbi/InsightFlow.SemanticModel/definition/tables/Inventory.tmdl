@@ -1,0 +1,183 @@
+/// Stock snapshot and buffer replenishment metrics as of 30 Sept 2026
+table Inventory
+	lineageTag: 05672b54-f8be-41b6-a172-2583c3f86a37
+
+	/// Total valuation of stock on hand at cost price (₹22.49M)
+	measure 'Stock Value' = SUM(Inventory[inventory_value])
+		formatString: "₹"#,##0
+		lineageTag: 28129eed-62af-4ac4-973d-730938fa6576
+
+	/// Total tracked product-location inventory positions (449)
+	measure 'Stock Positions' = COUNTROWS(Inventory)
+		formatString: #,0
+		lineageTag: 6710f42a-e38c-4734-b64d-80f6bd411a53
+
+	/// Average days of stock cover based on 90-day run rate
+	measure 'Days of Cover' = AVERAGE(Inventory[days_of_cover])
+		formatString: 0.0
+		lineageTag: 6c1d75ae-c94b-4a3c-92d7-dd1fb03eb397
+
+	/// Positions requiring purchasing review (92)
+	measure 'Items Needing Action' = CALCULATE(COUNTROWS(Inventory), Inventory[stock_status] IN {"Out of stock", "Stock-out risk", "Low stock"})
+		formatString: #,0
+		lineageTag: 9fa4cd34-eeb7-4618-817a-0afdccbbd9e9
+
+	/// True out of stock positions with 0 units on hand (40 positions)
+	measure 'Stockout Positions' = CALCULATE(COUNTROWS(Inventory), Inventory[quantity_on_hand] = 0)
+		formatString: #,0
+		lineageTag: 32c0c92a-bf34-406d-936a-b1ba7c771e1e
+
+	/// Positions where stock is below reorder threshold (96 positions)
+	measure 'Positions Below Reorder' = CALCULATE(COUNTROWS(Inventory), Inventory[quantity_on_hand] < Inventory[reorder_level])
+		formatString: #,0
+		lineageTag: 5c12e10c-0147-402f-8389-ad4719abe11b
+
+	/// Total units required to restore depleted buffers to reorder level (5,791 units)
+	measure 'Replenishment Qty Required' = SUM(Inventory[replenishment_quantity_required])
+		formatString: #,0
+		lineageTag: c686f0b5-5ff2-4901-b7f5-316b4ddb928c
+
+	/// Working capital required at purchase cost to restore buffer stock (₹9.66 L)
+	measure 'Replenishment Cost Estimate' = SUM(Inventory[replenishment_cost_estimate])
+		formatString: "₹"#,##0
+		lineageTag: 55d4ba0a-8533-44e5-93fb-90fe72792fec
+
+	/// Catalog retail valuation of buffer deficit units; NOT lost revenue (₹13.41 L)
+	measure 'Stock Gap Retail Valuation' = SUM(Inventory[stock_gap_retail_valuation])
+		formatString: "₹"#,##0
+		lineageTag: 7b12bb69-80d2-4aa9-af3d-df27e29fc91e
+
+	column inventory_id
+		dataType: string
+		lineageTag: a457fe0f-9278-4a9e-b50c-c5429798ecc3
+		sourceColumn: inventory_id
+
+	column product_id
+		dataType: string
+		lineageTag: 93fcd233-c0ab-4056-84bd-a2ad030a0541
+		sourceColumn: product_id
+
+	column location_id
+		dataType: string
+		lineageTag: 46033217-0d11-426a-be3c-c72c92182e09
+		sourceColumn: location_id
+
+	column snapshot_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: f518b89e-2d95-4049-8661-8196de71323b
+		summarizeBy: none
+		sourceColumn: snapshot_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity_on_hand
+		dataType: int64
+		formatString: #,0
+		lineageTag: a6be9704-946a-4687-8e9c-90ff4678b5b3
+		sourceColumn: quantity_on_hand
+
+	column reorder_level
+		dataType: int64
+		formatString: #,0
+		lineageTag: 18c2bd84-0fb4-4cb7-a893-6b969830cc35
+		sourceColumn: reorder_level
+
+	column last_restocked_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: a98cb241-91f5-4146-aff4-0006f1aa7ae1
+		summarizeBy: none
+		sourceColumn: last_restocked_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column lead_time_days
+		dataType: int64
+		lineageTag: faa62c87-8132-4f3d-96dd-b4a4a4f53a74
+		sourceColumn: lead_time_days
+
+	column cost_price
+		dataType: double
+		lineageTag: 9e81d201-8f8e-4eac-bc29-1be60144d513
+		sourceColumn: cost_price
+
+	column selling_price
+		dataType: double
+		lineageTag: 9339890d-8125-4dbc-8bc2-e373a2e0d444
+		sourceColumn: selling_price
+
+	column inventory_value
+		dataType: double
+		formatString: "₹"#,##0.00
+		lineageTag: 0664c310-0e52-4b40-8bd8-f8af3c3c1185
+		sourceColumn: inventory_value
+
+	column units_sold_90d
+		dataType: int64
+		lineageTag: 2a309975-6f59-4498-8a7c-46978a011c9d
+		sourceColumn: units_sold_90d
+
+	column avg_daily_units
+		dataType: double
+		lineageTag: 443221b8-4ef5-46f7-b339-9c244919c30f
+		sourceColumn: avg_daily_units
+
+	column days_of_cover
+		dataType: double
+		lineageTag: 2b383a84-c630-4366-b8ae-d33c84812692
+		sourceColumn: days_of_cover
+
+	column stock_status
+		dataType: string
+		lineageTag: 6bd342b5-bdda-413f-8f00-945939d08229
+		sourceColumn: stock_status
+
+	column suggested_order_qty
+		dataType: int64
+		lineageTag: c28e344b-700b-44de-8fbb-b2e10ee6b7bb
+		sourceColumn: suggested_order_qty
+
+	column replenishment_quantity_required
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2443e990-020d-4174-acbb-cc3e769e49a0
+		sourceColumn: replenishment_quantity_required
+
+	column replenishment_cost_estimate
+		dataType: double
+		formatString: "₹"#,##0.00
+		lineageTag: 196b27b8-b54a-449c-a1c8-16d88931a95f
+		sourceColumn: replenishment_cost_estimate
+
+	column stock_gap_retail_valuation
+		dataType: double
+		formatString: "₹"#,##0.00
+		lineageTag: d6ae1cce-ab7b-4dc0-89ab-48641a97ffdc
+		sourceColumn: stock_gap_retail_valuation
+
+	column is_stockout
+		dataType: boolean
+		lineageTag: 50a5cb50-4966-48d5-b05e-b1882b054873
+		sourceColumn: is_stockout
+
+	column is_below_reorder
+		dataType: boolean
+		lineageTag: 65b28416-704b-4587-b43a-09b27bf5e80e
+		sourceColumn: is_below_reorder
+
+	partition InventoryPartition = m
+		source =
+				let
+				    FolderPath = if Text.EndsWith(DataFolder, "\") or Text.EndsWith(DataFolder, "/") then DataFolder else DataFolder & "\",
+				    Source = Csv.Document(File.Contents(FolderPath & "vw_fact_inventory.csv"), [Delimiter=",", Columns=21, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Replaced Blank Dates" = Table.ReplaceValue(#"Promoted Headers", "", null, Replacer.ReplaceValue, {"last_restocked_date", "days_of_cover"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Replaced Blank Dates", {{"inventory_id", type text}, {"product_id", type text}, {"location_id", type text}, {"snapshot_date", type date}, {"quantity_on_hand", Int64.Type}, {"reorder_level", Int64.Type}, {"last_restocked_date", type date}, {"lead_time_days", Int64.Type}, {"cost_price", type number}, {"selling_price", type number}, {"inventory_value", type number}, {"units_sold_90d", Int64.Type}, {"avg_daily_units", type number}, {"days_of_cover", type number}, {"stock_status", type text}, {"suggested_order_qty", Int64.Type}, {"replenishment_quantity_required", Int64.Type}, {"replenishment_cost_estimate", type number}, {"stock_gap_retail_valuation", type number}, {"is_stockout", type logical}, {"is_below_reorder", type logical}}, "en-US")
+				in
+				    #"Changed Type"
+

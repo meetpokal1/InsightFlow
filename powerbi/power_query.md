@@ -94,9 +94,8 @@ in
 
 ## CSV route
 
-Run `python scripts/export_powerbi_data.py`. It writes six files to `powerbi/data`. Create a
-text parameter `DataFolder` with the full path of that folder **including the final
-backslash**, for example `C:\Users\you\sales-inventory-intelligence\powerbi\data\`.
+Run `python scripts/export_powerbi_data.py`. It writes the extract files to `powerbi/data`.
+In `InsightFlow.pbip`, the text parameter `DataFolder` is already defined under the model expressions and defaults to the project's absolute path to `powerbi/data`. If you move the project, update `DataFolder` via **Home > Transform data > Edit parameters** (or via `python scripts/build_powerbi_pbip.py`). The partition queries normalize paths with or without a trailing backslash.
 
 Then add one function query, named `LoadCsv`, which reads a file and sets the column types:
 

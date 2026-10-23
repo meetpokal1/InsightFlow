@@ -1,0 +1,58 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "CardTotalRaw",
+  "position": {
+    "x": 20,
+    "y": 80,
+    "z": 1000,
+    "height": 110,
+    "width": 380,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "Total Raw Records"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.Total Raw Records"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Raw Records Ingested'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

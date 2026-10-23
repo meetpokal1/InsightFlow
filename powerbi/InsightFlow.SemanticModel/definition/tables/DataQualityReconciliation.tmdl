@@ -1,0 +1,97 @@
+/// Pipeline data assurance reconciliation matrix
+table DataQualityReconciliation
+	lineageTag: f36f448b-ae6e-499c-9d24-83b47cc5cf8e
+
+	measure 'Total Raw Records' = SUM(DataQualityReconciliation[raw_ingested])
+		formatString: #,0
+		lineageTag: 97d051d1-6a71-4f16-af12-8bd917950bc4
+
+	measure 'Total Clean Records' = SUM(DataQualityReconciliation[clean_loaded])
+		formatString: #,0
+		lineageTag: 81dc7846-d182-4cd9-98fe-a0947ca576f1
+
+	measure 'Total Duplicate Records' = SUM(DataQualityReconciliation[exact_duplicates_dropped])
+		formatString: #,0
+		lineageTag: a7b1c3d5-8e9f-4104-b362-b46ec4192680
+
+	measure 'Total Quarantined Records' = SUM(DataQualityReconciliation[quarantined_rejected])
+		formatString: #,0
+		lineageTag: b8c2d4e6-9f0a-4909-a27f-91c6b27b6fee
+
+	measure 'Overall Preservation Rate %' = DIVIDE([Total Clean Records], [Total Raw Records])
+		formatString: 0.0%
+		lineageTag: 72d252c0-60fe-4b7a-bbe5-728a7cd331f8
+
+	column table_name
+		dataType: string
+		lineageTag: 08c1a63f-852d-4882-b761-004819bca863
+		sourceColumn: table_name
+
+	column raw_ingested
+		dataType: int64
+		formatString: #,0
+		lineageTag: 35ae13f9-fd1f-4c76-89a8-ff395438e90b
+		summarizeBy: sum
+		sourceColumn: raw_ingested
+
+		annotation SummarizationSetBy = Automatic
+
+	column exact_duplicates_dropped
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0ee2acd9-939c-4104-b362-b46ec4192680
+		summarizeBy: sum
+		sourceColumn: exact_duplicates_dropped
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarantined_rejected
+		dataType: int64
+		formatString: #,0
+		lineageTag: 4879b1cf-771a-4909-a27f-91c6b27b6fee
+		summarizeBy: sum
+		sourceColumn: quarantined_rejected
+
+		annotation SummarizationSetBy = Automatic
+
+	column merged_deduplicated
+		dataType: int64
+		formatString: #,0
+		lineageTag: 20feace9-c416-4285-a64a-c52340ea75fb
+		summarizeBy: sum
+		sourceColumn: merged_deduplicated
+
+		annotation SummarizationSetBy = Automatic
+
+	column clean_loaded
+		dataType: int64
+		formatString: #,0
+		lineageTag: 796ba9f3-6d11-4cad-b835-35d9db6a337a
+		summarizeBy: sum
+		sourceColumn: clean_loaded
+
+		annotation SummarizationSetBy = Automatic
+
+	column reconciliation_status
+		dataType: string
+		lineageTag: bfbcb475-95bb-42d2-88e7-406b5fbce379
+		sourceColumn: reconciliation_status
+
+	column preservation_rate
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 37d04086-1a32-4c86-8271-37782fa03fce
+		summarizeBy: none
+		sourceColumn: preservation_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ReconciliationPartition = m
+		source =
+				let
+				    FolderPath = if Text.EndsWith(DataFolder, "\") or Text.EndsWith(DataFolder, "/") then DataFolder else DataFolder & "\",
+				    Source = Csv.Document(File.Contents(FolderPath & "data_assurance_reconciliation.csv"), [Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"table_name", type text}, {"raw_ingested", Int64.Type}, {"exact_duplicates_dropped", Int64.Type}, {"quarantined_rejected", Int64.Type}, {"merged_deduplicated", Int64.Type}, {"clean_loaded", Int64.Type}, {"reconciliation_status", type text}, {"preservation_rate", type number}}, "en-US")
+				in
+				    #"Changed Type"

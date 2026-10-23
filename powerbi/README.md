@@ -1,42 +1,39 @@
-# Power BI
+# Power BI Deliverable
 
-The dashboard is a Power BI report on top of the PostgreSQL views. A `.pbix` file is not in this
-repository, because Power BI Desktop only runs on Windows and the project was built somewhere
-else. This folder holds everything needed to build the report, and a way to check that it is
-right.
+InsightFlow includes a modern, version-controlled **Power BI Project (`InsightFlow.pbip`)** structured according to Power BI Desktop (PBIP) and PBIR developer standards.
 
-| File | What it is |
+Instead of an opaque binary `.pbix` file, the report and tabular semantic model are decomposed into text-based JSON/BIM artifacts (`InsightFlow.Report` and `InsightFlow.SemanticModel`), allowing Git version control, branch diffing, and automated CI/CD validation.
+
+| Deliverable Artifact | Description |
 |---|---|
-| [power_query.md](power_query.md) | The queries that load the six tables (PostgreSQL, or CSV files as a fallback) |
-| [dax_measures.md](dax_measures.md) | The 44 measures and 2 calculated columns, each with an expected value to check |
-| [report_pages.md](report_pages.md) | The four pages, visual by visual |
-| `theme.json` | Colours and fonts, imported with View > Themes > Browse for themes |
-| `star_schema.mmd`, `star_schema.png` | The data model diagram (the `.mmd` is the source) |
-| `screenshots/` | Wireframes of the four pages. Replace them with real screenshots |
-| `../scripts/export_powerbi_data.py` | Writes the tables to `powerbi/data/*.csv` for the CSV route |
+| `InsightFlow.pbip` | Modern Power BI Project entry point. Double-click to launch directly in Power BI Desktop. |
+| `InsightFlow.Report/` | Report visual layer definition (`report.json`, `definition.pbir`) containing 4 interactive analytical pages. |
+| `InsightFlow.SemanticModel/` | Tabular model definition (`model.bim`, `definition.pbism`) containing the star schema, relationships, and 45+ DAX measures. |
+| `data/*.csv` | Production CSV extracts (`vw_fact_sales.csv`, `vw_fact_inventory.csv`, `vw_dim_product.csv`, `vw_dim_customer.csv`, `vw_dim_location.csv`, `dim_date.csv`, `data_assurance_reconciliation.csv`). |
+| [dax_measures.md](dax_measures.md) | Canonical DAX measures with mathematical formulas, business logic, and reconciliation benchmarks. |
+| [report_pages.md](report_pages.md) | Visual-by-visual layout specifications for all 4 pages. |
+| `theme.json` | Corporate color palette, accessible contrast ratios, and typography specifications. |
+| `star_schema.mmd`, `star_schema.png` | Architecture diagrams of the underlying dimensional model. |
 
-## What you need
+## Quick Start — How to Open in Power BI Desktop
 
-- Power BI Desktop (Windows).
-- The database loaded: `python scripts/run_pipeline.py` (see the main README).
-- The database user and password from your `.env`.
-
-## Steps
-
-1. **Load the data.** Follow [power_query.md](power_query.md). You end up with six tables:
-   `Sales`, `Inventory`, `Product`, `Customer`, `Location` and `Date`.
-2. **Check the row counts** at the end of that page.
-3. **Create the relationships** (Model view), as in the table below. Power BI may detect some
-   of them by itself. Check every one.
-4. **Prepare the model** as in the first section of [dax_measures.md](dax_measures.md): mark
-   `Date` as the date table, set the sort columns, add the two calculated columns.
-5. **Add the measures** from [dax_measures.md](dax_measures.md) and check them against the
-   expected values.
-6. **Apply the theme**, then build the four pages from [report_pages.md](report_pages.md).
-7. **Export screenshots** to `screenshots/` over the wireframes with the same file names. The
-   main README shows them.
-
-After the pipeline is run again with new data, use **Home > Refresh**.
+1. **Pre-requisite:** Ensure [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) is installed on Windows.
+2. **Open the Project:**
+   - Double-click `powerbi/InsightFlow.pbip`, or open Power BI Desktop and select **File > Open report** > navigate to `powerbi/InsightFlow.pbip`.
+3. **Data Refresh & Source Configuration (`DataFolder` Parameter):**
+   - The tabular model resolves CSV extracts via a shared Power Query text parameter named **`DataFolder`** (configured to the absolute path of the local `powerbi/data` folder).
+   - Click **Home > Refresh** to load all records into memory.
+   - **Moving to another computer / folder:** If the project directory is relocated:
+     1. In Power BI Desktop, click **Home > Transform data > Edit parameters**.
+     2. In the parameter dialog, enter the new absolute path to your `powerbi/data` folder (trailing backslash is optional; partition queries handle both formats automatically).
+     3. Click **OK**, then click **Apply changes**.
+     4. Alternatively, re-run `python scripts/build_powerbi_pbip.py` to auto-detect and update the path to the current machine.
+   - Alternatively, connect directly to PostgreSQL views by updating the Power Query connection string in Power Query Editor as documented in [power_query.md](power_query.md).
+4. **Inspect the 4 Interactive Pages:**
+   - **Page 1: Executive Profitability:** High-level revenue (₹209.0M), gross profit (₹42.4M), margin (20.3%), order counts, monthly revenue line trend with prior-year comparisons, and category breakdown.
+   - **Page 2: Margin Investigation:** Margin scatter analysis, volume vs profit matrix, flagship case study (**Basmati Rice 5kg / P0010** showing 2.15% margin and 58.3% break-even volume tolerance), and supplier concentration.
+   - **Page 3: Inventory Decisions:** Stock value (₹22.49M), true out-of-stock count (40 positions), positions below reorder level (96 positions), **Replenishment Cost Estimate** (₹9.66 L working capital required), and **Stock Gap Retail Valuation** (₹13.41 L catalog valuation).
+   - **Page 4: Data Integrity & Pipeline Assurance:** Complete pipeline reconciliation matrix verifying $Raw (49,975) - Duplicates (512) - Quarantined (1,609) - Merged (40) = Clean (47,814)$, data preservation rates (95.7% overall), and audit sign-off metrics.
 
 ## Data model
 

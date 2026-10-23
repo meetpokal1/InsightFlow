@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
+  "pageOrder": [
+    "ReportSection_ExecProfitability",
+    "ReportSection_MarginInvestigation",
+    "ReportSection_InventoryDecisions",
+    "ReportSection_DataIntegrity"
+  ],
+  "activePageName": "ReportSection_ExecProfitability"
+}
