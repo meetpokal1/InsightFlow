@@ -1,0 +1,34 @@
+{
+  "executive_metrics": {
+    "Net revenue": "\u20b920.90 Cr",
+    "Gross profit": "\u20b94.24 Cr",
+    "Gross margin": "20.3%",
+    "Completed orders": "7,878",
+    "Average order value": "\u20b926,534",
+    "Stock positions": "449",
+    "Need review": "92",
+    "Suggested units": "13,184"
+  },
+  "executive_plotly_count": 4,
+  "break_even_callout": "Break-Even Tolerance: At a +3.0% price adjustment, unit sales volume can decline by up to 58.3% before gross profit falls below the current baseline (\u20b9354,016.80).",
+  "inventory_metrics": {
+    "Total Inventory Value": "\u20b92.25 Cr",
+    "True Out of Stock (0 units)": "40",
+    "Positions Below Reorder Level": "96",
+    "Replenishment Units Required": "5,791",
+    "Replenishment Cost Estimate": "\u20b99.66 L",
+    "Stock Gap Retail Valuation": "\u20b913.41 L"
+  },
+  "table_has_replenish_fields": true,
+  "data_quality_metrics": {
+    "Buying customers": "780",
+    "Repeat customers": "644",
+    "Quality actions logged": "41",
+    "Source fields profiled": "47",
+    "Raw Ingested Records": "49,975",
+    "Clean Records Loaded": "47,814",
+    "Preservation Rate": "95.7%",
+    "Quarantined Rows": "1,609",
+    "Duplicates Dropped": "512"
+  }
+}
