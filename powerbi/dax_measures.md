@@ -1,6 +1,6 @@
 # DAX measures
 
-The report uses 47 measures and 2 calculated columns, including three text-only card display measures. They assume the table names from
+This reference documents 44 DAX measure definitions and 2 calculated columns. The checked-in PBIP model currently implements 24 numeric measures plus 3 text-only card display measures; other definitions in this catalog are available for extending the report. The names below assume the tables from
 [README.md](README.md): `Sales`, `Inventory`, `Date`, `Product`, `Customer` and `Location`.
 
 The analytical measures were written for Power BI Desktop and could not be run in the
