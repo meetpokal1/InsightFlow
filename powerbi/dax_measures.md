@@ -1,6 +1,6 @@
 # DAX measures
 
-The report uses 44 measures and 2 calculated columns. They assume the table names from
+The report uses 47 measures and 2 calculated columns, including three text-only card display measures. They assume the table names from
 [README.md](README.md): `Sales`, `Inventory`, `Date`, `Product`, `Customer` and `Location`.
 
 The measures were written for Power BI Desktop and could not be run in the environment where
@@ -334,6 +334,27 @@ Days of Inventory = DIVIDE(365 * [Stock Value], [Cost of Goods Last 12 Months])
 Turnover and days of inventory use the single stock snapshot in place of the average stock, as
 in `sql/analytics/09_inventory_turnover.sql`. They respond to `Product` and `Location` slicers
 but not to the date slicer.
+
+### Card-only currency display measures
+
+The three cards on the Inventory Decisions page use text-only display measures to show Indian-scale units (crore/lakh). Keep the underlying money measures numeric: other calculations, sort logic, and future analyses must use `Stock Value`, `Replenishment Cost Estimate`, and `Stock Gap Retail Valuation`, not these display labels.
+
+```dax
+Stock Value Display =
+"₹" & FORMAT(DIVIDE([Stock Value], 10000000), "0.00") & " Cr"
+```
+
+```dax
+Replenishment Cost Estimate Display =
+"₹" & FORMAT(DIVIDE([Replenishment Cost Estimate], 100000), "0.00") & " L"
+```
+
+```dax
+Stock Gap Retail Valuation Display =
+"₹" & FORMAT(DIVIDE([Stock Gap Retail Valuation], 100000), "0.00") & " L"
+```
+
+These are presentation-only strings for cards. They are not numeric measures and must not be used for further arithmetic.
 
 ## Checking the measures
 
