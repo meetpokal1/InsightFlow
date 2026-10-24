@@ -20,7 +20,10 @@ def get_engine(database_url=None):
 def run_sql_file(engine, path):
     """Run all the statements in one .sql file inside a single transaction."""
     with engine.begin() as connection:
-        connection.exec_driver_sql(Path(path).read_text())
+        connection.exec_driver_sql(
+            Path(path).read_text(encoding="utf-8"),
+            execution_options={"no_parameters": True},
+        )
 
 
 def create_schema(engine, schema_dir=SCHEMA_DIR):
@@ -33,4 +36,7 @@ def drop_schema(engine):
     """Delete this project's tables (the views that depend on them go with them)."""
     with engine.begin() as connection:
         for table in [*reversed(TABLE_LOAD_ORDER), *EXTRA_TABLES]:
-            connection.exec_driver_sql(f"DROP TABLE IF EXISTS {table} CASCADE")
+            connection.exec_driver_sql(
+                f"DROP TABLE IF EXISTS {table} CASCADE",
+                execution_options={"no_parameters": True},
+            )

@@ -66,9 +66,9 @@ jobs:
           python scripts/export_powerbi_data.py
       - name: Run test suite
         run: python -m pytest -q
-      - name: Check formatting and lint
+      - name: Lint with Ruff
         if: always()
-        continue-on-error: true
-        run: |
-          ruff check .
-          ruff format --check .
+        run: ruff check .
+      - name: Check code formatting with Ruff
+        if: always()
+        run: ruff format --check .

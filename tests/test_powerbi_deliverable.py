@@ -2,6 +2,7 @@
 
 import json
 import pathlib
+
 import pytest
 
 PROJECT_ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -12,17 +13,16 @@ def test_pbip_project_files_exist():
     """Verify modern PBIP directory structure and entry points exist."""
     assert (POWERBI_DIR / "InsightFlow.pbip").exists()
     assert (POWERBI_DIR / "InsightFlow.Report" / "definition.pbir").exists()
-    assert (
-        (POWERBI_DIR / "InsightFlow.Report" / "report.json").exists()
-        or (POWERBI_DIR / "InsightFlow.Report" / "definition" / "pages" / "pages.json").exists()
-    )
+    assert (POWERBI_DIR / "InsightFlow.Report" / "report.json").exists() or (
+        POWERBI_DIR / "InsightFlow.Report" / "definition" / "pages" / "pages.json"
+    ).exists()
     assert (POWERBI_DIR / "InsightFlow.SemanticModel" / "definition.pbism").exists()
     assert (POWERBI_DIR / "InsightFlow.SemanticModel" / "model.bim").exists()
 
 
 def test_pbip_shortcut_schema_and_path_resolution():
     """Verify InsightFlow.pbip conforms strictly to Microsoft PBIP 1.0 schema.
-    
+
     Guards against desktop parser errors like 'Property enableAutoAuth has not been defined'.
     """
     pbip_file = POWERBI_DIR / "InsightFlow.pbip"
@@ -92,7 +92,9 @@ def test_report_pages_configuration():
         page_names = [s.get("displayName") for s in sections]
         assert page_names == expected_pages
     else:
-        pytest.fail("Neither definition/pages/pages.json nor report.json found in InsightFlow.Report")
+        pytest.fail(
+            "Neither definition/pages/pages.json nor report.json found in InsightFlow.Report"
+        )
 
 
 def test_semantic_model_star_schema_and_measures():
@@ -209,23 +211,37 @@ def test_pbip_data_folder_parameter_and_source_paths():
         expr_str = "\n".join(source_expr) if isinstance(source_expr, list) else source_expr
 
         # Must NOT use unparameterized relative paths
-        assert 'File.Contents("data/' not in expr_str, f"Table {table_name} contains unparameterized relative path"
-        assert 'File.Contents("./' not in expr_str, f"Table {table_name} contains unparameterized relative path"
+        assert 'File.Contents("data/' not in expr_str, (
+            f"Table {table_name} contains unparameterized relative path"
+        )
+        assert 'File.Contents("./' not in expr_str, (
+            f"Table {table_name} contains unparameterized relative path"
+        )
 
         # Must reference DataFolder parameter
-        assert "DataFolder" in expr_str, f"Table {table_name} does not reference DataFolder parameter"
+        assert "DataFolder" in expr_str, (
+            f"Table {table_name} does not reference DataFolder parameter"
+        )
         assert csv_filename in expr_str, f"Table {table_name} does not reference {csv_filename}"
 
         # Validate that the generated CSV exists in project powerbi/data/
         project_csv_file = project_data_dir / csv_filename
-        assert project_csv_file.is_file(), f"Target CSV does not exist in powerbi/data: {project_csv_file}"
-        assert project_csv_file.stat().st_size > 0, f"Target CSV in powerbi/data is empty: {project_csv_file}"
+        assert project_csv_file.is_file(), (
+            f"Target CSV does not exist in powerbi/data: {project_csv_file}"
+        )
+        assert project_csv_file.stat().st_size > 0, (
+            f"Target CSV in powerbi/data is empty: {project_csv_file}"
+        )
 
         # If running on the workstation where the configured folder exists, verify it matches
         if configured_folder.is_dir():
             configured_csv_file = configured_folder / csv_filename
-            assert configured_csv_file.is_file(), f"Target CSV does not exist in configured folder: {configured_csv_file}"
-            assert configured_csv_file.stat().st_size > 0, f"Target CSV in configured folder is empty: {configured_csv_file}"
+            assert configured_csv_file.is_file(), (
+                f"Target CSV does not exist in configured folder: {configured_csv_file}"
+            )
+            assert configured_csv_file.stat().st_size > 0, (
+                f"Target CSV in configured folder is empty: {configured_csv_file}"
+            )
 
 
 def test_pbir_visual_containers_bindings_and_data_roles():
@@ -235,7 +251,9 @@ def test_pbir_visual_containers_bindings_and_data_roles():
         pytest.skip("PBIR pages directory not present")
 
     visual_files = list(pages_dir.glob("*/visuals/*/visual.json"))
-    assert len(visual_files) >= 25, f"Expected at least 25 visual containers, found {len(visual_files)}"
+    assert len(visual_files) >= 25, (
+        f"Expected at least 25 visual containers, found {len(visual_files)}"
+    )
 
     model_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "model.bim"
     with open(model_file, "r", encoding="utf-8") as f:
@@ -249,7 +267,13 @@ def test_pbir_visual_containers_bindings_and_data_roles():
         v_name = v_data.get("name")
 
         if v_type == "textbox":
-            paragraphs = v_data.get("visual", {}).get("objects", {}).get("general", [{}])[0].get("properties", {}).get("paragraphs", [])
+            paragraphs = (
+                v_data.get("visual", {})
+                .get("objects", {})
+                .get("general", [{}])[0]
+                .get("properties", {})
+                .get("paragraphs", [])
+            )
             assert len(paragraphs) > 0, f"Textbox {v_name} has no paragraphs"
             val = paragraphs[0].get("textRuns", [{}])[0].get("value", "")
             assert len(val) > 0, f"Textbox {v_name} has empty text value"
@@ -258,7 +282,7 @@ def test_pbir_visual_containers_bindings_and_data_roles():
             assert len(query_state) > 0, f"Visual {v_name} ({v_type}) has empty queryState"
 
             total_proj = 0
-            for role, role_dict in query_state.items():
+            for _role, role_dict in query_state.items():
                 projections = role_dict.get("projections", [])
                 total_proj += len(projections)
                 for proj in projections:
@@ -268,13 +292,17 @@ def test_pbir_visual_containers_bindings_and_data_roles():
                         prop = field["Measure"]["Property"]
                         assert entity in tables, f"Visual {v_name}: Entity '{entity}' not in model"
                         measure_names = {m["name"] for m in tables[entity].get("measures", [])}
-                        assert prop in measure_names, f"Visual {v_name}: Measure '{prop}' not in table '{entity}'"
+                        assert prop in measure_names, (
+                            f"Visual {v_name}: Measure '{prop}' not in table '{entity}'"
+                        )
                     elif "Column" in field:
                         entity = field["Column"]["Expression"]["SourceRef"]["Entity"]
                         prop = field["Column"]["Property"]
                         assert entity in tables, f"Visual {v_name}: Entity '{entity}' not in model"
                         col_names = {c["name"] for c in tables[entity].get("columns", [])}
-                        assert prop in col_names, f"Visual {v_name}: Column '{prop}' not in table '{entity}'"
+                        assert prop in col_names, (
+                            f"Visual {v_name}: Column '{prop}' not in table '{entity}'"
+                        )
                     else:
                         pytest.fail(f"Visual {v_name}: Unknown field projection format: {field}")
             assert total_proj > 0, f"Visual {v_name} ({v_type}) has 0 projections"
@@ -282,7 +310,7 @@ def test_pbir_visual_containers_bindings_and_data_roles():
 
 def test_customer_date_columns_and_powerquery_handling():
     """Verify Customer date columns handling, ISO validation, null conversion, and model types.
-    
+
     Guards against VertiPaq model loading failure:
     'Datatype conversion failed for [Table: '', Column: '', Value: '']. (Customer (19); first order date (86))'
     """
@@ -298,7 +326,16 @@ def test_customer_date_columns_and_powerquery_handling():
         rows = list(reader)
 
     assert len(rows) == 800, f"Expected 800 customers, found {len(rows)}"
-    expected_fields = {"customer_id", "customer_name", "city", "customer_type", "signup_date", "first_order_date", "last_order_date", "segment"}
+    expected_fields = {
+        "customer_id",
+        "customer_name",
+        "city",
+        "customer_type",
+        "signup_date",
+        "first_order_date",
+        "last_order_date",
+        "segment",
+    }
     assert expected_fields.issubset(rows[0].keys())
 
     # 2. Verify date value distributions and format adherence
@@ -330,7 +367,9 @@ def test_customer_date_columns_and_powerquery_handling():
 
     # Exactly 17 unrecorded signup dates and 20 no-purchase customers
     assert blank_signup == 17, f"Expected 17 blank signup dates, found {blank_signup}"
-    assert blank_first_order == 20, f"Expected 20 blank first_order dates, found {blank_first_order}"
+    assert blank_first_order == 20, (
+        f"Expected 20 blank first_order dates, found {blank_first_order}"
+    )
     assert blank_last_order == 20, f"Expected 20 blank last_order dates, found {blank_last_order}"
 
     # 3. Verify semantic model column types and formatString in model.bim
@@ -357,11 +396,23 @@ def test_customer_date_columns_and_powerquery_handling():
     cust_expr = cust_partitions[0].get("source", {}).get("expression", [])
     cust_expr_str = "\n".join(cust_expr) if isinstance(cust_expr, list) else cust_expr
 
-    assert "ReplaceValue" in cust_expr_str, "Customer partition missing Table.ReplaceValue for blanks"
-    assert "TransformColumnTypes" in cust_expr_str, "Customer partition missing Table.TransformColumnTypes"
-    assert '"signup_date", type date' in cust_expr_str or '{"signup_date", type date}' in cust_expr_str
-    assert '"first_order_date", type date' in cust_expr_str or '{"first_order_date", type date}' in cust_expr_str
-    assert '"last_order_date", type date' in cust_expr_str or '{"last_order_date", type date}' in cust_expr_str
+    assert "ReplaceValue" in cust_expr_str, (
+        "Customer partition missing Table.ReplaceValue for blanks"
+    )
+    assert "TransformColumnTypes" in cust_expr_str, (
+        "Customer partition missing Table.TransformColumnTypes"
+    )
+    assert (
+        '"signup_date", type date' in cust_expr_str or '{"signup_date", type date}' in cust_expr_str
+    )
+    assert (
+        '"first_order_date", type date' in cust_expr_str
+        or '{"first_order_date", type date}' in cust_expr_str
+    )
+    assert (
+        '"last_order_date", type date' in cust_expr_str
+        or '{"last_order_date", type date}' in cust_expr_str
+    )
 
 
 def test_inventory_date_columns_and_powerquery_handling():
@@ -414,8 +465,14 @@ def test_inventory_date_columns_and_powerquery_handling():
     assert "ReplaceValue" in inv_expr_str, "Inventory partition missing Table.ReplaceValue"
     assert "last_restocked_date" in inv_expr_str
     assert "TransformColumnTypes" in inv_expr_str
-    assert '"snapshot_date", type date' in inv_expr_str or '{"snapshot_date", type date}' in inv_expr_str
-    assert '"last_restocked_date", type date' in inv_expr_str or '{"last_restocked_date", type date}' in inv_expr_str
+    assert (
+        '"snapshot_date", type date' in inv_expr_str
+        or '{"snapshot_date", type date}' in inv_expr_str
+    )
+    assert (
+        '"last_restocked_date", type date' in inv_expr_str
+        or '{"last_restocked_date", type date}' in inv_expr_str
+    )
 
 
 def test_report_json_visual_containers_and_prototype_queries():
@@ -433,7 +490,7 @@ def test_report_json_visual_containers_and_prototype_queries():
         "Executive Profitability",
         "Margin Investigation",
         "Inventory Decisions",
-        "Data Integrity & Pipeline Assurance"
+        "Data Integrity & Pipeline Assurance",
     ]
     actual_page_titles = [s.get("displayName") for s in sections]
     assert actual_page_titles == expected_page_titles
@@ -451,29 +508,42 @@ def test_report_json_visual_containers_and_prototype_queries():
             v_name = cfg.get("name")
 
             if v_type == "textbox":
-                paragraphs = sv.get("objects", {}).get("general", [{}])[0].get("properties", {}).get("paragraphs", [])
+                paragraphs = (
+                    sv.get("objects", {})
+                    .get("general", [{}])[0]
+                    .get("properties", {})
+                    .get("paragraphs", [])
+                )
                 assert len(paragraphs) > 0, f"Textbox {v_name} has no paragraphs"
             else:
                 projections = sv.get("projections", {})
                 assert len(projections) > 0, f"Visual {v_name} ({v_type}) has no projections"
 
                 proto = sv.get("prototypeQuery", {})
-                assert proto.get("Version") == 2, f"Visual {v_name} prototypeQuery missing Version 2"
-                assert len(proto.get("From", [])) > 0, f"Visual {v_name} prototypeQuery missing From"
-                assert len(proto.get("Select", [])) > 0, f"Visual {v_name} prototypeQuery missing Select"
+                assert proto.get("Version") == 2, (
+                    f"Visual {v_name} prototypeQuery missing Version 2"
+                )
+                assert len(proto.get("From", [])) > 0, (
+                    f"Visual {v_name} prototypeQuery missing From"
+                )
+                assert len(proto.get("Select", [])) > 0, (
+                    f"Visual {v_name} prototypeQuery missing Select"
+                )
 
                 select_names = {s.get("Name") for s in proto.get("Select", [])}
-                for role, proj_list in projections.items():
+                for _role, proj_list in projections.items():
                     for proj in proj_list:
                         qref = proj.get("queryRef")
-                        assert qref in select_names, f"Visual {v_name}: projection {qref} not in prototypeQuery Select: {select_names}"
+                        assert qref in select_names, (
+                            f"Visual {v_name}: projection {qref} not in prototypeQuery Select: {select_names}"
+                        )
 
     assert total_visuals == 28, f"Expected 28 visuals across all pages, found {total_visuals}"
 
 
 def test_date_dimension_and_sales_relationship_data_types():
     """Verify Date dimension and Sales relationship data types, M transformation, and 100% key match.
-    
+
     Guards against Revenue by year_month displaying (Blank) due to dateTime vs string mismatch.
     """
     import csv
@@ -500,7 +570,9 @@ def test_date_dimension_and_sales_relationship_data_types():
 
     assert len(sales_dates) == 34007
     missing_dates = set(sales_dates) - date_keys
-    assert len(missing_dates) == 0, f"Sales order_dates not found in Date dimension: {missing_dates}"
+    assert len(missing_dates) == 0, (
+        f"Sales order_dates not found in Date dimension: {missing_dates}"
+    )
 
     # 3. Verify model.bim column types and relationship
     model_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "model.bim"
@@ -512,27 +584,36 @@ def test_date_dimension_and_sales_relationship_data_types():
     sales_cols = {c["name"]: c for c in tables["Sales"].get("columns", [])}
 
     assert date_cols["date_key"].get("dataType") == "dateTime", "Date.date_key must be dateTime"
-    assert sales_cols["order_date"].get("dataType") == "dateTime", "Sales.order_date must be dateTime"
+    assert sales_cols["order_date"].get("dataType") == "dateTime", (
+        "Sales.order_date must be dateTime"
+    )
 
     # 4. Verify Power Query M partition transforms in model.bim
     date_part = tables["Date"].get("partitions", [])[0]
     date_m_src = "\n".join(date_part.get("source", {}).get("expression", []))
-    assert "TransformColumnTypes" in date_m_src, "DatePartition missing TransformColumnTypes in model.bim"
+    assert "TransformColumnTypes" in date_m_src, (
+        "DatePartition missing TransformColumnTypes in model.bim"
+    )
     assert '{"date_key", type date}' in date_m_src or '"date_key", type date' in date_m_src
 
     # 5. Verify TMDL Date table if present
-    date_tmdl_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "definition" / "tables" / "Date.tmdl"
+    date_tmdl_file = (
+        POWERBI_DIR / "InsightFlow.SemanticModel" / "definition" / "tables" / "Date.tmdl"
+    )
     if date_tmdl_file.exists():
         tmdl_text = date_tmdl_file.read_text(encoding="utf-8")
-        assert "column date_key\n\t\tdataType: dateTime" in tmdl_text or "column date_key\r\n\t\tdataType: dateTime" in tmdl_text, (
-            "Date.tmdl date_key must be dataType: dateTime"
+        assert (
+            "column date_key\n\t\tdataType: dateTime" in tmdl_text
+            or "column date_key\r\n\t\tdataType: dateTime" in tmdl_text
+        ), "Date.tmdl date_key must be dataType: dateTime"
+        assert "TransformColumnTypes" in tmdl_text, (
+            "Date.tmdl missing TransformColumnTypes in partition source"
         )
-        assert "TransformColumnTypes" in tmdl_text, "Date.tmdl missing TransformColumnTypes in partition source"
 
 
 def test_data_assurance_reconciliation_model_and_powerquery_handling():
     """Verify DataQualityReconciliation numeric column types, DAX measures, and Power Query M transformation.
-    
+
     Guards against 'The function SUM cannot work with values of type String' regression on Page 4.
     """
     model_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "model.bim"
@@ -540,18 +621,30 @@ def test_data_assurance_reconciliation_model_and_powerquery_handling():
         bim_data = json.load(f)
 
     tables = {t["name"]: t for t in bim_data.get("model", {}).get("tables", [])}
-    assert "DataQualityReconciliation" in tables, "DataQualityReconciliation table missing from model.bim"
+    assert "DataQualityReconciliation" in tables, (
+        "DataQualityReconciliation table missing from model.bim"
+    )
     dqr_table = tables["DataQualityReconciliation"]
     dqr_cols = {c["name"]: c for c in dqr_table.get("columns", [])}
 
     # Verify column data types
-    int_cols = ["raw_ingested", "exact_duplicates_dropped", "quarantined_rejected", "merged_deduplicated", "clean_loaded"]
+    int_cols = [
+        "raw_ingested",
+        "exact_duplicates_dropped",
+        "quarantined_rejected",
+        "merged_deduplicated",
+        "clean_loaded",
+    ]
     for col in int_cols:
         assert col in dqr_cols, f"Column {col} missing from DataQualityReconciliation"
-        assert dqr_cols[col].get("dataType") == "int64", f"{col} must be int64, got {dqr_cols[col].get('dataType')}"
+        assert dqr_cols[col].get("dataType") == "int64", (
+            f"{col} must be int64, got {dqr_cols[col].get('dataType')}"
+        )
 
     assert "preservation_rate" in dqr_cols
-    assert dqr_cols["preservation_rate"].get("dataType") == "double", "preservation_rate must be double"
+    assert dqr_cols["preservation_rate"].get("dataType") == "double", (
+        "preservation_rate must be double"
+    )
 
     # Verify M partition contains TransformColumnTypes
     partitions = dqr_table.get("partitions", [])
@@ -561,11 +654,17 @@ def test_data_assurance_reconciliation_model_and_powerquery_handling():
     assert "Int64.Type" in m_expr
 
     # Verify TMDL DataQualityReconciliation if exists
-    dqr_tmdl = POWERBI_DIR / "InsightFlow.SemanticModel" / "definition" / "tables" / "DataQualityReconciliation.tmdl"
+    dqr_tmdl = (
+        POWERBI_DIR
+        / "InsightFlow.SemanticModel"
+        / "definition"
+        / "tables"
+        / "DataQualityReconciliation.tmdl"
+    )
     if dqr_tmdl.exists():
         tmdl_text = dqr_tmdl.read_text(encoding="utf-8")
-        assert "column raw_ingested\n\t\tdataType: int64" in tmdl_text or "column raw_ingested\r\n\t\tdataType: int64" in tmdl_text
+        assert (
+            "column raw_ingested\n\t\tdataType: int64" in tmdl_text
+            or "column raw_ingested\r\n\t\tdataType: int64" in tmdl_text
+        )
         assert "TransformColumnTypes" in tmdl_text
-
-
-

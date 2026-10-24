@@ -77,7 +77,7 @@ def run_ui_qa():
 
             metric_vals = page.locator('[data-testid="stMetricValue"]').all_text_contents()
             metric_labels = page.locator('[data-testid="stMetricLabel"]').all_text_contents()
-            exec_metrics = dict(zip(metric_labels, metric_vals))
+            exec_metrics = dict(zip(metric_labels, metric_vals, strict=False))
             print("Executive metrics displayed:", exec_metrics)
             results["executive_metrics"] = exec_metrics
 
@@ -93,7 +93,9 @@ def run_ui_qa():
             # 2. Sales & Products & Simulator Interaction
             # ---------------------------------------------------------
             print("\n[QA Step 2] Validating Sales & Products + Sensitivity Simulator...")
-            page.locator('[data-testid="stSidebar"]').get_by_text("Sales & Products", exact=True).click()
+            page.locator('[data-testid="stSidebar"]').get_by_text(
+                "Sales & Products", exact=True
+            ).click()
             page.wait_for_selector("text=Price & Margin Sensitivity Simulator", timeout=15000)
             page.wait_for_timeout(2000)
 
@@ -131,21 +133,28 @@ def run_ui_qa():
             # 3. Inventory Intelligence
             # ---------------------------------------------------------
             print("\n[QA Step 3] Validating Inventory Intelligence & Capital Semantics...")
-            page.locator('[data-testid="stSidebar"]').get_by_text("Inventory Intelligence", exact=True).click()
+            page.locator('[data-testid="stSidebar"]').get_by_text(
+                "Inventory Intelligence", exact=True
+            ).click()
             page.wait_for_selector("text=Priority review queue", timeout=20000)
             page.wait_for_timeout(2500)
 
             inv_metric_vals = page.locator('[data-testid="stMetricValue"]').all_text_contents()
             inv_metric_labels = page.locator('[data-testid="stMetricLabel"]').all_text_contents()
-            inv_metrics = dict(zip(inv_metric_labels, inv_metric_vals))
+            inv_metrics = dict(zip(inv_metric_labels, inv_metric_vals, strict=False))
             print("Inventory metrics displayed:", inv_metrics)
             results["inventory_metrics"] = inv_metrics
 
             # Check that review queue table has columns:
             # Buffer deficit, Replenish cost, Status, On hand, Reorder level
             table_header = page.locator('[data-testid="stDataFrame"]').first.text_content()
-            has_buffer_deficit = "Buffer deficit" in table_header or page.locator("text=Buffer deficit").count() > 0
-            has_replenish_cost = "Replenish cost" in table_header or page.locator("text=Replenish cost (₹)").count() > 0
+            has_buffer_deficit = (
+                "Buffer deficit" in table_header or page.locator("text=Buffer deficit").count() > 0
+            )
+            has_replenish_cost = (
+                "Replenish cost" in table_header
+                or page.locator("text=Replenish cost (₹)").count() > 0
+            )
             print("Table has Buffer deficit column:", has_buffer_deficit)
             print("Table has Replenish cost column:", has_replenish_cost)
             results["table_has_replenish_fields"] = has_buffer_deficit and has_replenish_cost
@@ -157,21 +166,27 @@ def run_ui_qa():
             # 4. Customers & Data Quality
             # ---------------------------------------------------------
             print("\n[QA Step 4] Validating Customers & Data Quality...")
-            page.locator('[data-testid="stSidebar"]').get_by_text("Customers & Data Quality", exact=True).click()
+            page.locator('[data-testid="stSidebar"]').get_by_text(
+                "Customers & Data Quality", exact=True
+            ).click()
             page.wait_for_selector("text=Data quality actions", timeout=20000)
             page.wait_for_timeout(2500)
 
             dq_metric_vals = page.locator('[data-testid="stMetricValue"]').all_text_contents()
             dq_metric_labels = page.locator('[data-testid="stMetricLabel"]').all_text_contents()
-            dq_metrics = dict(zip(dq_metric_labels, dq_metric_vals))
+            dq_metrics = dict(zip(dq_metric_labels, dq_metric_vals, strict=False))
             print("Data Quality metrics displayed:", dq_metrics)
             results["data_quality_metrics"] = dq_metrics
 
-            page.screenshot(path=str(OUTPUT_DIR / "04_customers_and_data_quality.png"), full_page=True)
+            page.screenshot(
+                path=str(OUTPUT_DIR / "04_customers_and_data_quality.png"), full_page=True
+            )
             print("Captured fresh 04_customers_and_data_quality.png")
 
             browser.close()
-            print("\nAll runtime UI validation checks and screenshot captures completed successfully.")
+            print(
+                "\nAll runtime UI validation checks and screenshot captures completed successfully."
+            )
 
     finally:
         print("Terminating Streamlit process...")

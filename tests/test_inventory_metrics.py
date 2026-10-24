@@ -62,12 +62,10 @@ def test_inventory_synthetic_boundary_cases():
     df["replenishment_qty_required"] = np.maximum(
         0, df["reorder_level"] - np.maximum(0, df["quantity_on_hand"])
     ).astype(int)
-    df["replenishment_cost_estimate"] = (
-        df["replenishment_qty_required"] * df["cost_price"]
-    ).round(2)
-    df["stock_gap_retail_val"] = (
-        df["replenishment_qty_required"] * df["selling_price"]
-    ).round(2)
+    df["replenishment_cost_estimate"] = (df["replenishment_qty_required"] * df["cost_price"]).round(
+        2
+    )
+    df["stock_gap_retail_val"] = (df["replenishment_qty_required"] * df["selling_price"]).round(2)
 
     # Position 1: 0 stock, reorder 50 -> required 50
     assert df.loc[0, "replenishment_qty_required"] == 50
@@ -144,9 +142,7 @@ def test_production_clean_inventory_metrics():
     if not (data_dir / "inventory.csv").exists():
         pytest.skip("Production clean data files not found in data/processed.")
 
-    clean_tables = {
-        f.stem: pd.read_csv(f) for f in data_dir.glob("*.csv")
-    }
+    clean_tables = {f.stem: pd.read_csv(f) for f in data_dir.glob("*.csv")}
     lines = build_sales_lines(clean_tables)
     inventory = build_inventory_view(clean_tables, lines)
 

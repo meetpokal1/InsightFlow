@@ -7,7 +7,6 @@ Saves screenshots to screenshots/runtime/.
 import os
 import pathlib
 import subprocess
-import sys
 import time
 import urllib.request
 
@@ -96,7 +95,9 @@ def capture_screenshots():
             print("Navigating to Customers & Data Quality...")
             page.click("text=Customers & Data Quality")
             page.wait_for_timeout(3000)
-            page.screenshot(path=str(OUTPUT_DIR / "04_customers_and_data_quality.png"), full_page=True)
+            page.screenshot(
+                path=str(OUTPUT_DIR / "04_customers_and_data_quality.png"), full_page=True
+            )
             print("Captured 04_customers_and_data_quality.png")
 
             browser.close()

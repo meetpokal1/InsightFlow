@@ -18,7 +18,7 @@ def get_alias(entity):
         "Customer": "c",
         "Location": "l",
         "Date": "d",
-        "DataQualityReconciliation": "r"
+        "DataQualityReconciliation": "r",
     }
     return mapping.get(entity, entity[0].lower())
 
@@ -27,15 +27,8 @@ def build_select_item(entity, prop, is_measure):
     alias = get_alias(entity)
     field_kind = "Measure" if is_measure else "Column"
     return {
-        field_kind: {
-            "Expression": {
-                "SourceRef": {
-                    "Source": alias
-                }
-            },
-            "Property": prop
-        },
-        "Name": f"{entity}.{prop}"
+        field_kind: {"Expression": {"SourceRef": {"Source": alias}}, "Property": prop},
+        "Name": f"{entity}.{prop}",
     }
 
 
@@ -44,62 +37,47 @@ def make_card_container(name, entity, prop, x, y, width, height, title, z=1000):
     cfg = {
         "name": name,
         "layouts": [
-            {
-                "id": 0,
-                "position": {
-                    "x": x,
-                    "y": y,
-                    "z": z,
-                    "width": width,
-                    "height": height
-                }
-            }
+            {"id": 0, "position": {"x": x, "y": y, "z": z, "width": width, "height": height}}
         ],
         "singleVisual": {
             "visualType": "card",
-            "projections": {
-                "Values": [
-                    {
-                        "queryRef": f"{entity}.{prop}"
-                    }
-                ]
-            },
+            "projections": {"Values": [{"queryRef": f"{entity}.{prop}"}]},
             "prototypeQuery": {
                 "Version": 2,
-                "From": [
-                    {
-                        "Name": alias,
-                        "Entity": entity,
-                        "Type": 0
-                    }
-                ],
-                "Select": [
-                    build_select_item(entity, prop, is_measure=True)
-                ]
+                "From": [{"Name": alias, "Entity": entity, "Type": 0}],
+                "Select": [build_select_item(entity, prop, is_measure=True)],
             },
             "objects": {
                 "title": [
                     {
                         "properties": {
                             "show": {"expr": {"Literal": {"Value": "true"}}},
-                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}}
+                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}},
                         }
                     }
                 ]
-            }
-        }
+            },
+        },
     }
-    return {
-        "x": x,
-        "y": y,
-        "z": z,
-        "width": width,
-        "height": height,
-        "config": json.dumps(cfg)
-    }
+    return {"x": x, "y": y, "z": z, "width": width, "height": height, "config": json.dumps(cfg)}
 
 
-def make_chart_container(name, visual_type, cat_entity, cat_prop, y_entity, y_prop, x, y, width, height, title, is_y_measure=True, z=2000, order_by_cat=False):
+def make_chart_container(
+    name,
+    visual_type,
+    cat_entity,
+    cat_prop,
+    y_entity,
+    y_prop,
+    x,
+    y,
+    width,
+    height,
+    title,
+    is_y_measure=True,
+    z=2000,
+    order_by_cat=False,
+):
     cat_alias = get_alias(cat_entity)
     y_alias = get_alias(y_entity)
     from_list = [{"Name": cat_alias, "Entity": cat_entity, "Type": 0}]
@@ -111,8 +89,8 @@ def make_chart_container(name, visual_type, cat_entity, cat_prop, y_entity, y_pr
         "From": from_list,
         "Select": [
             build_select_item(cat_entity, cat_prop, is_measure=False),
-            build_select_item(y_entity, y_prop, is_measure=is_y_measure)
-        ]
+            build_select_item(y_entity, y_prop, is_measure=is_y_measure),
+        ],
     }
     if order_by_cat:
         proto["OrderBy"] = [
@@ -120,45 +98,23 @@ def make_chart_container(name, visual_type, cat_entity, cat_prop, y_entity, y_pr
                 "Direction": 1,
                 "Expression": {
                     "Column": {
-                        "Expression": {
-                            "SourceRef": {
-                                "Source": cat_alias
-                            }
-                        },
-                        "Property": cat_prop
+                        "Expression": {"SourceRef": {"Source": cat_alias}},
+                        "Property": cat_prop,
                     }
-                }
+                },
             }
         ]
 
     cfg = {
         "name": name,
         "layouts": [
-            {
-                "id": 0,
-                "position": {
-                    "x": x,
-                    "y": y,
-                    "z": z,
-                    "width": width,
-                    "height": height
-                }
-            }
+            {"id": 0, "position": {"x": x, "y": y, "z": z, "width": width, "height": height}}
         ],
         "singleVisual": {
             "visualType": visual_type,
             "projections": {
-                "Category": [
-                    {
-                        "queryRef": f"{cat_entity}.{cat_prop}",
-                        "active": True
-                    }
-                ],
-                "Y": [
-                    {
-                        "queryRef": f"{y_entity}.{y_prop}"
-                    }
-                ]
+                "Category": [{"queryRef": f"{cat_entity}.{cat_prop}", "active": True}],
+                "Y": [{"queryRef": f"{y_entity}.{y_prop}"}],
             },
             "prototypeQuery": proto,
             "objects": {
@@ -166,24 +122,31 @@ def make_chart_container(name, visual_type, cat_entity, cat_prop, y_entity, y_pr
                     {
                         "properties": {
                             "show": {"expr": {"Literal": {"Value": "true"}}},
-                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}}
+                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}},
                         }
                     }
                 ]
-            }
-        }
+            },
+        },
     }
-    return {
-        "x": x,
-        "y": y,
-        "z": z,
-        "width": width,
-        "height": height,
-        "config": json.dumps(cfg)
-    }
+    return {"x": x, "y": y, "z": z, "width": width, "height": height, "config": json.dumps(cfg)}
 
 
-def make_scatter_container(name, det_entity, det_prop, x_entity, x_prop, y_entity, y_prop, x, y, width, height, title, z=2000):
+def make_scatter_container(
+    name,
+    det_entity,
+    det_prop,
+    x_entity,
+    x_prop,
+    y_entity,
+    y_prop,
+    x,
+    y,
+    width,
+    height,
+    title,
+    z=2000,
+):
     det_alias = get_alias(det_entity)
     x_alias = get_alias(x_entity)
     y_alias = get_alias(y_entity)
@@ -193,35 +156,14 @@ def make_scatter_container(name, det_entity, det_prop, x_entity, x_prop, y_entit
     cfg = {
         "name": name,
         "layouts": [
-            {
-                "id": 0,
-                "position": {
-                    "x": x,
-                    "y": y,
-                    "z": z,
-                    "width": width,
-                    "height": height
-                }
-            }
+            {"id": 0, "position": {"x": x, "y": y, "z": z, "width": width, "height": height}}
         ],
         "singleVisual": {
             "visualType": "scatterChart",
             "projections": {
-                "Details": [
-                    {
-                        "queryRef": f"{det_entity}.{det_prop}"
-                    }
-                ],
-                "X": [
-                    {
-                        "queryRef": f"{x_entity}.{x_prop}"
-                    }
-                ],
-                "Y": [
-                    {
-                        "queryRef": f"{y_entity}.{y_prop}"
-                    }
-                ]
+                "Details": [{"queryRef": f"{det_entity}.{det_prop}"}],
+                "X": [{"queryRef": f"{x_entity}.{x_prop}"}],
+                "Y": [{"queryRef": f"{y_entity}.{y_prop}"}],
             },
             "prototypeQuery": {
                 "Version": 2,
@@ -229,29 +171,22 @@ def make_scatter_container(name, det_entity, det_prop, x_entity, x_prop, y_entit
                 "Select": [
                     build_select_item(det_entity, det_prop, is_measure=False),
                     build_select_item(x_entity, x_prop, is_measure=True),
-                    build_select_item(y_entity, y_prop, is_measure=True)
-                ]
+                    build_select_item(y_entity, y_prop, is_measure=True),
+                ],
             },
             "objects": {
                 "title": [
                     {
                         "properties": {
                             "show": {"expr": {"Literal": {"Value": "true"}}},
-                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}}
+                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}},
                         }
                     }
                 ]
-            }
-        }
+            },
+        },
     }
-    return {
-        "x": x,
-        "y": y,
-        "z": z,
-        "width": width,
-        "height": height,
-        "config": json.dumps(cfg)
-    }
+    return {"x": x, "y": y, "z": z, "width": width, "height": height, "config": json.dumps(cfg)}
 
 
 def make_table_container(name, cols_and_measures, x, y, width, height, title, z=2000):
@@ -269,63 +204,32 @@ def make_table_container(name, cols_and_measures, x, y, width, height, title, z=
     cfg = {
         "name": name,
         "layouts": [
-            {
-                "id": 0,
-                "position": {
-                    "x": x,
-                    "y": y,
-                    "z": z,
-                    "width": width,
-                    "height": height
-                }
-            }
+            {"id": 0, "position": {"x": x, "y": y, "z": z, "width": width, "height": height}}
         ],
         "singleVisual": {
             "visualType": "tableEx",
-            "projections": {
-                "Values": projections
-            },
-            "prototypeQuery": {
-                "Version": 2,
-                "From": from_list,
-                "Select": select_items
-            },
+            "projections": {"Values": projections},
+            "prototypeQuery": {"Version": 2, "From": from_list, "Select": select_items},
             "objects": {
                 "title": [
                     {
                         "properties": {
                             "show": {"expr": {"Literal": {"Value": "true"}}},
-                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}}
+                            "text": {"expr": {"Literal": {"Value": f"'{title}'"}}},
                         }
                     }
                 ]
-            }
-        }
+            },
+        },
     }
-    return {
-        "x": x,
-        "y": y,
-        "z": z,
-        "width": width,
-        "height": height,
-        "config": json.dumps(cfg)
-    }
+    return {"x": x, "y": y, "z": z, "width": width, "height": height, "config": json.dumps(cfg)}
 
 
 def make_textbox_container(name, title_text, x, y, width, height, z=0):
     cfg = {
         "name": name,
         "layouts": [
-            {
-                "id": 0,
-                "position": {
-                    "x": x,
-                    "y": y,
-                    "z": z,
-                    "width": width,
-                    "height": height
-                }
-            }
+            {"id": 0, "position": {"x": x, "y": y, "z": z, "width": width, "height": height}}
         ],
         "singleVisual": {
             "visualType": "textbox",
@@ -341,8 +245,8 @@ def make_textbox_container(name, title_text, x, y, width, height, z=0):
                                             "textStyle": {
                                                 "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
                                                 "fontSize": "16pt",
-                                                "color": "#111827"
-                                            }
+                                                "color": "#111827",
+                                            },
                                         }
                                     ]
                                 }
@@ -350,17 +254,10 @@ def make_textbox_container(name, title_text, x, y, width, height, z=0):
                         }
                     }
                 ]
-            }
-        }
+            },
+        },
     }
-    return {
-        "x": x,
-        "y": y,
-        "z": z,
-        "width": width,
-        "height": height,
-        "config": json.dumps(cfg)
-    }
+    return {"x": x, "y": y, "z": z, "width": width, "height": height, "config": json.dumps(cfg)}
 
 
 def build_full_report_json():
@@ -368,60 +265,260 @@ def build_full_report_json():
     p1_visuals = [
         make_textbox_container("PageHeader", "Executive Profitability Overview", 20, 20, 1240, 50),
         make_card_container("CardRevenue", "Sales", "Revenue", 20, 80, 230, 110, "Net Revenue"),
-        make_card_container("CardGrossProfit", "Sales", "Gross Profit", 270, 80, 230, 110, "Gross Profit"),
-        make_card_container("CardGrossMargin", "Sales", "Gross Margin %", 520, 80, 230, 110, "Gross Margin %"),
+        make_card_container(
+            "CardGrossProfit", "Sales", "Gross Profit", 270, 80, 230, 110, "Gross Profit"
+        ),
+        make_card_container(
+            "CardGrossMargin", "Sales", "Gross Margin %", 520, 80, 230, 110, "Gross Margin %"
+        ),
         make_card_container("CardOrders", "Sales", "Orders", 770, 80, 230, 110, "Completed Orders"),
-        make_card_container("CardAOV", "Sales", "Average Order Value", 1020, 80, 240, 110, "Average Order Value"),
-        make_chart_container("MonthlyRevenueTrend", "lineChart", "Date", "year_month", "Sales", "Revenue", 20, 210, 780, 480, "Monthly Net Revenue Trend", is_y_measure=True, order_by_cat=True),
-        make_chart_container("CategoryRevenueBreakdown", "barChart", "Product", "category_name", "Sales", "Revenue", 820, 210, 440, 480, "Net Revenue by Product Category", is_y_measure=True),
+        make_card_container(
+            "CardAOV", "Sales", "Average Order Value", 1020, 80, 240, 110, "Average Order Value"
+        ),
+        make_chart_container(
+            "MonthlyRevenueTrend",
+            "lineChart",
+            "Date",
+            "year_month",
+            "Sales",
+            "Revenue",
+            20,
+            210,
+            780,
+            480,
+            "Monthly Net Revenue Trend",
+            is_y_measure=True,
+            order_by_cat=True,
+        ),
+        make_chart_container(
+            "CategoryRevenueBreakdown",
+            "barChart",
+            "Product",
+            "category_name",
+            "Sales",
+            "Revenue",
+            820,
+            210,
+            440,
+            480,
+            "Net Revenue by Product Category",
+            is_y_measure=True,
+        ),
     ]
 
     # Page 2: Margin Investigation
     p2_visuals = [
-        make_textbox_container("HeaderMargin", "Product Margin Investigation & Flagship Elasticity", 20, 20, 1240, 50),
-        make_card_container("CardBasmatiRev", "Sales", "Basmati Rice Net Revenue", 20, 80, 290, 110, "Basmati Rice Net Revenue (P0010)"),
-        make_card_container("CardBasmatiGP", "Sales", "Basmati Rice Gross Profit", 330, 80, 290, 110, "Basmati Rice Gross Profit"),
-        make_card_container("CardBasmatiMargin", "Sales", "Basmati Rice Margin %", 640, 80, 290, 110, "Basmati Rice Gross Margin %"),
-        make_card_container("CardBasmatiTolerance", "Sales", "Basmati Break Even Volume Decline %", 950, 80, 310, 110, "Volume Decline Tolerance (+3% Price)"),
-        make_scatter_container("MarginScatter", "Product", "product_name", "Sales", "Revenue", "Sales", "Gross Profit", 20, 210, 780, 480, "Product Net Revenue vs Gross Profit"),
-        make_chart_container("SupplierMarginRanking", "barChart", "Product", "supplier_name", "Sales", "Gross Margin %", 820, 210, 440, 480, "Gross Margin % by Supplier", is_y_measure=True),
+        make_textbox_container(
+            "HeaderMargin", "Product Margin Investigation & Flagship Elasticity", 20, 20, 1240, 50
+        ),
+        make_card_container(
+            "CardBasmatiRev",
+            "Sales",
+            "Basmati Rice Net Revenue",
+            20,
+            80,
+            290,
+            110,
+            "Basmati Rice Net Revenue (P0010)",
+        ),
+        make_card_container(
+            "CardBasmatiGP",
+            "Sales",
+            "Basmati Rice Gross Profit",
+            330,
+            80,
+            290,
+            110,
+            "Basmati Rice Gross Profit",
+        ),
+        make_card_container(
+            "CardBasmatiMargin",
+            "Sales",
+            "Basmati Rice Margin %",
+            640,
+            80,
+            290,
+            110,
+            "Basmati Rice Gross Margin %",
+        ),
+        make_card_container(
+            "CardBasmatiTolerance",
+            "Sales",
+            "Basmati Break Even Volume Decline %",
+            950,
+            80,
+            310,
+            110,
+            "Volume Decline Tolerance (+3% Price)",
+        ),
+        make_scatter_container(
+            "MarginScatter",
+            "Product",
+            "product_name",
+            "Sales",
+            "Revenue",
+            "Sales",
+            "Gross Profit",
+            20,
+            210,
+            780,
+            480,
+            "Product Net Revenue vs Gross Profit",
+        ),
+        make_chart_container(
+            "SupplierMarginRanking",
+            "barChart",
+            "Product",
+            "supplier_name",
+            "Sales",
+            "Gross Margin %",
+            820,
+            210,
+            440,
+            480,
+            "Gross Margin % by Supplier",
+            is_y_measure=True,
+        ),
     ]
 
     # Page 3: Inventory Decisions
     p3_visuals = [
-        make_textbox_container("HeaderInventory", "Inventory Intelligence & Capital Replenishment", 20, 20, 1240, 50),
-        make_card_container("CardStockVal", "Inventory", "Stock Value", 20, 80, 230, 110, "Total Stock Value"),
-        make_card_container("CardStockouts", "Inventory", "Stockout Positions", 270, 80, 230, 110, "Out of Stock Positions"),
-        make_card_container("CardBelowReorder", "Inventory", "Positions Below Reorder", 520, 80, 230, 110, "Positions Below Reorder"),
-        make_card_container("CardReplenishCost", "Inventory", "Replenishment Cost Estimate", 770, 80, 230, 110, "Replenishment Working Capital"),
-        make_card_container("CardStockGapRetail", "Inventory", "Stock Gap Retail Valuation", 1020, 80, 240, 110, "Stock Gap Retail Valuation"),
-        make_chart_container("StockStatusMix", "pieChart", "Inventory", "stock_status", "Inventory", "Stock Positions", 20, 210, 580, 480, "Stock Positions by Health Status", is_y_measure=True),
-        make_table_container("ReplenishmentQueueTable", [
-            ("Product", "product_name", False),
-            ("Location", "location_name", False),
-            ("Inventory", "quantity_on_hand", False),
-            ("Inventory", "reorder_level", False),
-            ("Inventory", "replenishment_quantity_required", False),
-            ("Inventory", "replenishment_cost_estimate", False),
-        ], 620, 210, 640, 480, "Priority Stock Replenishment Queue"),
+        make_textbox_container(
+            "HeaderInventory", "Inventory Intelligence & Capital Replenishment", 20, 20, 1240, 50
+        ),
+        make_card_container(
+            "CardStockVal", "Inventory", "Stock Value", 20, 80, 230, 110, "Total Stock Value"
+        ),
+        make_card_container(
+            "CardStockouts",
+            "Inventory",
+            "Stockout Positions",
+            270,
+            80,
+            230,
+            110,
+            "Out of Stock Positions",
+        ),
+        make_card_container(
+            "CardBelowReorder",
+            "Inventory",
+            "Positions Below Reorder",
+            520,
+            80,
+            230,
+            110,
+            "Positions Below Reorder",
+        ),
+        make_card_container(
+            "CardReplenishCost",
+            "Inventory",
+            "Replenishment Cost Estimate",
+            770,
+            80,
+            230,
+            110,
+            "Replenishment Working Capital",
+        ),
+        make_card_container(
+            "CardStockGapRetail",
+            "Inventory",
+            "Stock Gap Retail Valuation",
+            1020,
+            80,
+            240,
+            110,
+            "Stock Gap Retail Valuation",
+        ),
+        make_chart_container(
+            "StockStatusMix",
+            "pieChart",
+            "Inventory",
+            "stock_status",
+            "Inventory",
+            "Stock Positions",
+            20,
+            210,
+            580,
+            480,
+            "Stock Positions by Health Status",
+            is_y_measure=True,
+        ),
+        make_table_container(
+            "ReplenishmentQueueTable",
+            [
+                ("Product", "product_name", False),
+                ("Location", "location_name", False),
+                ("Inventory", "quantity_on_hand", False),
+                ("Inventory", "reorder_level", False),
+                ("Inventory", "replenishment_quantity_required", False),
+                ("Inventory", "replenishment_cost_estimate", False),
+            ],
+            620,
+            210,
+            640,
+            480,
+            "Priority Stock Replenishment Queue",
+        ),
     ]
 
     # Page 4: Data Integrity & Pipeline Assurance
     p4_visuals = [
-        make_textbox_container("HeaderIntegrity", "Data Pipeline Assurance & Conservation Reconciliation Matrix", 20, 20, 1240, 50),
-        make_card_container("CardTotalRaw", "DataQualityReconciliation", "Total Raw Records", 20, 80, 380, 110, "Raw Records Ingested"),
-        make_card_container("CardTotalClean", "DataQualityReconciliation", "Total Clean Records", 430, 80, 380, 110, "Clean Records Loaded"),
-        make_card_container("CardPreservationRate", "DataQualityReconciliation", "Overall Preservation Rate %", 840, 80, 420, 110, "Data Preservation Rate %"),
-        make_table_container("ReconciliationMatrixTable", [
-            ("DataQualityReconciliation", "table_name", False),
-            ("DataQualityReconciliation", "raw_ingested", False),
-            ("DataQualityReconciliation", "exact_duplicates_dropped", False),
-            ("DataQualityReconciliation", "quarantined_rejected", False),
-            ("DataQualityReconciliation", "merged_deduplicated", False),
-            ("DataQualityReconciliation", "clean_loaded", False),
-            ("DataQualityReconciliation", "preservation_rate", False),
-            ("DataQualityReconciliation", "reconciliation_status", False),
-        ], 20, 210, 1240, 480, "End-to-End Pipeline Reconciliation Matrix"),
+        make_textbox_container(
+            "HeaderIntegrity",
+            "Data Pipeline Assurance & Conservation Reconciliation Matrix",
+            20,
+            20,
+            1240,
+            50,
+        ),
+        make_card_container(
+            "CardTotalRaw",
+            "DataQualityReconciliation",
+            "Total Raw Records",
+            20,
+            80,
+            380,
+            110,
+            "Raw Records Ingested",
+        ),
+        make_card_container(
+            "CardTotalClean",
+            "DataQualityReconciliation",
+            "Total Clean Records",
+            430,
+            80,
+            380,
+            110,
+            "Clean Records Loaded",
+        ),
+        make_card_container(
+            "CardPreservationRate",
+            "DataQualityReconciliation",
+            "Overall Preservation Rate %",
+            840,
+            80,
+            420,
+            110,
+            "Data Preservation Rate %",
+        ),
+        make_table_container(
+            "ReconciliationMatrixTable",
+            [
+                ("DataQualityReconciliation", "table_name", False),
+                ("DataQualityReconciliation", "raw_ingested", False),
+                ("DataQualityReconciliation", "exact_duplicates_dropped", False),
+                ("DataQualityReconciliation", "quarantined_rejected", False),
+                ("DataQualityReconciliation", "merged_deduplicated", False),
+                ("DataQualityReconciliation", "clean_loaded", False),
+                ("DataQualityReconciliation", "preservation_rate", False),
+                ("DataQualityReconciliation", "reconciliation_status", False),
+            ],
+            20,
+            210,
+            1240,
+            480,
+            "End-to-End Pipeline Reconciliation Matrix",
+        ),
     ]
 
     sections = [
@@ -431,7 +528,7 @@ def build_full_report_json():
             "width": 1280,
             "height": 720,
             "config": json.dumps({"visibility": 0}),
-            "visualContainers": p1_visuals
+            "visualContainers": p1_visuals,
         },
         {
             "name": "ReportSection_MarginInvestigation",
@@ -439,7 +536,7 @@ def build_full_report_json():
             "width": 1280,
             "height": 720,
             "config": json.dumps({"visibility": 0}),
-            "visualContainers": p2_visuals
+            "visualContainers": p2_visuals,
         },
         {
             "name": "ReportSection_InventoryDecisions",
@@ -447,7 +544,7 @@ def build_full_report_json():
             "width": 1280,
             "height": 720,
             "config": json.dumps({"visibility": 0}),
-            "visualContainers": p3_visuals
+            "visualContainers": p3_visuals,
         },
         {
             "name": "ReportSection_DataIntegrity",
@@ -455,8 +552,8 @@ def build_full_report_json():
             "width": 1280,
             "height": 720,
             "config": json.dumps({"visibility": 0}),
-            "visualContainers": p4_visuals
-        }
+            "visualContainers": p4_visuals,
+        },
     ]
 
     report_config = {
@@ -464,27 +561,25 @@ def build_full_report_json():
         "themeCollection": {
             "baseTheme": {
                 "name": "CY24SU10",
-                "reportVersionAtImport": {
-                    "visual": "1.8.89",
-                    "report": "2.0.89",
-                    "page": "1.3.89"
-                },
-                "type": "SharedResources"
+                "reportVersionAtImport": {"visual": "1.8.89", "report": "2.0.89", "page": "1.3.89"},
+                "type": "SharedResources",
             }
         },
-        "activeSectionIndex": 0
+        "activeSectionIndex": 0,
     }
 
     report_data = {
         "config": json.dumps(report_config),
         "layoutOptimization": 0,
-        "sections": sections
+        "sections": sections,
     }
 
     with open(REPORT_FILE, "w", encoding="utf-8") as f:
         json.dump(report_data, f, indent=2)
 
-    print(f"Successfully generated {REPORT_FILE} with {len(sections)} sections and {sum(len(s['visualContainers']) for s in sections)} visuals!")
+    print(
+        f"Successfully generated {REPORT_FILE} with {len(sections)} sections and {sum(len(s['visualContainers']) for s in sections)} visuals!"
+    )
     return REPORT_FILE
 
 

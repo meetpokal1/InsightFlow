@@ -278,9 +278,15 @@ def style_chart(
         height=height,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#ffffff",
-        font=dict(family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif", color="#1e293b", size=12),
+        font=dict(
+            family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif",
+            color="#1e293b",
+            size=12,
+        ),
         title=dict(
-            font=dict(size=14, color="#0f172a", family="Inter, -apple-system, Segoe UI, sans-serif"),
+            font=dict(
+                size=14, color="#0f172a", family="Inter, -apple-system, Segoe UI, sans-serif"
+            ),
             x=0.02,
             xanchor="left",
             y=0.96,
@@ -390,7 +396,9 @@ if page == "Executive Overview":
             labels={"region": "Region", "net_revenue": "Net revenue (₹)"},
             color_discrete_sequence=["#2563eb"],
         )
-        fig.update_traces(hovertemplate="<b>%{y} Region</b><br>Net Revenue: ₹%{x:,.0f}<extra></extra>")
+        fig.update_traces(
+            hovertemplate="<b>%{y} Region</b><br>Net Revenue: ₹%{x:,.0f}<extra></extra>"
+        )
         st.plotly_chart(style_chart(fig), use_container_width=True)
 
     left, right = st.columns([1, 1.25])
@@ -463,9 +471,7 @@ if page == "Executive Overview":
         top["Net revenue"] = top["net_revenue"].map(format_inr)
         top["Gross profit"] = top["gross_profit"].map(format_inr)
         top["Units sold"] = top["units"].map(lambda v: f"{v:,}")
-        top = top.rename(
-            columns={"product_name": "Product", "category_name": "Category"}
-        )
+        top = top.rename(columns={"product_name": "Product", "category_name": "Category"})
         st.dataframe(
             top[["Product", "Category", "Units sold", "Net revenue", "Gross profit", "Margin %"]],
             use_container_width=True,
@@ -509,7 +515,9 @@ elif page == "Sales & Products":
                 labels={"month": "Month", "revenue": "Net revenue (₹)"},
                 color_discrete_sequence=["#2563eb"],
             )
-            fig.update_traces(hovertemplate="<b>%{x|%B %Y}</b><br>Revenue: ₹%{y:,.0f}<extra></extra>")
+            fig.update_traces(
+                hovertemplate="<b>%{x|%B %Y}</b><br>Revenue: ₹%{y:,.0f}<extra></extra>"
+            )
             st.plotly_chart(style_chart(fig), use_container_width=True)
         with right:
             fig = px.line(
@@ -578,7 +586,16 @@ elif page == "Sales & Products":
             }
         )
         st.dataframe(
-            display[["Product", "Category", "Units sold", "Net revenue (₹)", "Gross profit (₹)", "Margin (%)"]],
+            display[
+                [
+                    "Product",
+                    "Category",
+                    "Units sold",
+                    "Net revenue (₹)",
+                    "Gross profit (₹)",
+                    "Margin (%)",
+                ]
+            ],
             use_container_width=True,
             hide_index=True,
         )
@@ -689,12 +706,36 @@ elif page == "Sales & Products":
         # Visual Scenario Comparison Chart
         sim_chart_df = pd.DataFrame(
             [
-                {"Metric": "Net Revenue", "Scenario": "Baseline", "Amount": sim_res["baseline"]["revenue"]},
-                {"Metric": "Net Revenue", "Scenario": "Modeled", "Amount": sim_res["modeled"]["revenue"]},
-                {"Metric": "Cost of Goods (COGS)", "Scenario": "Baseline", "Amount": sim_res["baseline"]["cogs"]},
-                {"Metric": "Cost of Goods (COGS)", "Scenario": "Modeled", "Amount": sim_res["modeled"]["cogs"]},
-                {"Metric": "Gross Profit", "Scenario": "Baseline", "Amount": sim_res["baseline"]["gross_profit"]},
-                {"Metric": "Gross Profit", "Scenario": "Modeled", "Amount": sim_res["modeled"]["gross_profit"]},
+                {
+                    "Metric": "Net Revenue",
+                    "Scenario": "Baseline",
+                    "Amount": sim_res["baseline"]["revenue"],
+                },
+                {
+                    "Metric": "Net Revenue",
+                    "Scenario": "Modeled",
+                    "Amount": sim_res["modeled"]["revenue"],
+                },
+                {
+                    "Metric": "Cost of Goods (COGS)",
+                    "Scenario": "Baseline",
+                    "Amount": sim_res["baseline"]["cogs"],
+                },
+                {
+                    "Metric": "Cost of Goods (COGS)",
+                    "Scenario": "Modeled",
+                    "Amount": sim_res["modeled"]["cogs"],
+                },
+                {
+                    "Metric": "Gross Profit",
+                    "Scenario": "Baseline",
+                    "Amount": sim_res["baseline"]["gross_profit"],
+                },
+                {
+                    "Metric": "Gross Profit",
+                    "Scenario": "Modeled",
+                    "Amount": sim_res["modeled"]["gross_profit"],
+                },
             ]
         )
         fig_sim = px.bar(
@@ -710,8 +751,13 @@ elif page == "Sales & Products":
                 "Modeled": "#2563eb" if sim_res["delta"]["gross_profit"] >= 0 else "#dc2626",
             },
         )
-        fig_sim.update_traces(hovertemplate="<b>%{x} (%{data.name})</b><br>Amount: ₹%{y:,.0f}<extra></extra>")
-        st.plotly_chart(style_chart(fig_sim, height=300, show_legend=True, legend_position="top-right"), use_container_width=True)
+        fig_sim.update_traces(
+            hovertemplate="<b>%{x} (%{data.name})</b><br>Amount: ₹%{y:,.0f}<extra></extra>"
+        )
+        st.plotly_chart(
+            style_chart(fig_sim, height=300, show_legend=True, legend_position="top-right"),
+            use_container_width=True,
+        )
 
         be_pct = sim_res["break_even_volume_decline_pct"]
         if be_pct is not None and be_pct > 0:
@@ -813,9 +859,7 @@ elif page == "Inventory Intelligence":
     cols2[1].metric(
         "Replenishment Cost Estimate", format_inr(inv_stats["replenishment_cost_estimate"])
     )
-    cols2[2].metric(
-        "Stock Gap Retail Valuation", format_inr(inv_stats["stock_gap_retail_val"])
-    )
+    cols2[2].metric("Stock Gap Retail Valuation", format_inr(inv_stats["stock_gap_retail_val"]))
 
     st.markdown(
         '<div class="if-note" style="margin-top: 0.5rem; margin-bottom: 1rem;">'
@@ -904,13 +948,17 @@ elif page == "Inventory Intelligence":
             filtered_queue = filtered_queue.loc[filtered_queue["stock_status"] == "Low stock"]
 
         display = filtered_queue.copy()
-        display["Replenish cost (₹)"] = display["replenishment_cost_estimate"].map(lambda x: f"₹{x:,.2f}")
+        display["Replenish cost (₹)"] = display["replenishment_cost_estimate"].map(
+            lambda x: f"₹{x:,.2f}"
+        )
         display["On hand"] = display["quantity_on_hand"].map(lambda x: f"{x:,}")
         display["Reorder level"] = display["reorder_level"].map(lambda x: f"{x:,}")
         display["Buffer deficit"] = display["replenishment_qty_required"].map(lambda x: f"{x:,}")
         display["Suggested order"] = display["suggested_order_qty"].map(lambda x: f"{x:,}")
         display["Avg units/day"] = display["avg_daily_units"].map(lambda x: f"{x:.2f}")
-        display["Days of cover"] = display["days_of_cover"].map(lambda x: f"{x:.1f}" if pd.notnull(x) else "—")
+        display["Days of cover"] = display["days_of_cover"].map(
+            lambda x: f"{x:.1f}" if pd.notnull(x) else "—"
+        )
         display["Product"] = display["product_name"]
         display["Category"] = display["category_name"]
         display["Location"] = display["location_name"]
@@ -979,10 +1027,16 @@ else:
 
     st.markdown("### Pipeline Assurance & Reconciliation Balance")
     pa_cols = st.columns(5)
-    pa_cols[0].metric("Raw Ingested Records", "49,975", help="Audited total across all 8 source exports")
-    pa_cols[1].metric("Clean Records Loaded", "47,814", help="Transformed & persisted into star schema")
+    pa_cols[0].metric(
+        "Raw Ingested Records", "49,975", help="Audited total across all 8 source exports"
+    )
+    pa_cols[1].metric(
+        "Clean Records Loaded", "47,814", help="Transformed & persisted into star schema"
+    )
     pa_cols[2].metric("Preservation Rate", "95.7%", help="47,814 / 49,975 conservation efficiency")
-    pa_cols[3].metric("Quarantined Rows", "1,609", help="Anomalous records safely isolated with reason codes")
+    pa_cols[3].metric(
+        "Quarantined Rows", "1,609", help="Anomalous records safely isolated with reason codes"
+    )
     pa_cols[4].metric("Duplicates Dropped", "512", help="Identical duplicate records eliminated")
 
     left, right = st.columns(2)
@@ -1025,20 +1079,26 @@ else:
                 "Corporate": "#7c3aed",
             },
         )
-        fig.update_traces(hovertemplate="<b>%{y}</b> (%{data.name})<br>Revenue: ₹%{x:,.0f}<extra></extra>")
+        fig.update_traces(
+            hovertemplate="<b>%{y}</b> (%{data.name})<br>Revenue: ₹%{x:,.0f}<extra></extra>"
+        )
         st.plotly_chart(
             style_chart(fig, show_legend=True, legend_position="top-right"),
             use_container_width=True,
         )
     st.subheader("Data quality actions")
-    quality_display = quality_log.sort_values("rows_affected", ascending=False).rename(
-        columns={
-            "table_name": "Source table",
-            "issue": "Issue detected",
-            "rows_affected": "Rows affected",
-            "action": "Action taken",
-        }
-    ).copy()
+    quality_display = (
+        quality_log.sort_values("rows_affected", ascending=False)
+        .rename(
+            columns={
+                "table_name": "Source table",
+                "issue": "Issue detected",
+                "rows_affected": "Rows affected",
+                "action": "Action taken",
+            }
+        )
+        .copy()
+    )
     quality_display["Rows affected"] = quality_display["Rows affected"].map(lambda x: f"{x:,}")
     st.dataframe(quality_display, use_container_width=True, hide_index=True)
     st.subheader("Raw source profile")

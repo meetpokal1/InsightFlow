@@ -51,7 +51,7 @@ rel_errors = []
 for r in relationships:
     from_tbl, from_col = r["from"].split(".")
     to_tbl, to_col = r["to"].split(".")
-    
+
     if from_tbl not in model_fields or from_col not in model_fields[from_tbl]["columns"]:
         rel_errors.append(f"Relationship {r['name']}: fromColumn {r['from']} missing in model!")
     if to_tbl not in model_fields or to_col not in model_fields[to_tbl]["columns"]:
@@ -93,16 +93,24 @@ for p_name in page_order:
         ref_details = []
 
         if v_type == "textbox":
-            tb_val = v_data.get("visual", {}).get("objects", {}).get("general", [{}])[0].get("properties", {}).get("paragraphs", [{}])[0].get("textRuns", [{}])[0].get("value", "")
-            print(f"  - [{v_type:12}] {v_name:25} | Title: \"{tb_val}\"")
+            tb_val = (
+                v_data.get("visual", {})
+                .get("objects", {})
+                .get("general", [{}])[0]
+                .get("properties", {})
+                .get("paragraphs", [{}])[0]
+                .get("textRuns", [{}])[0]
+                .get("value", "")
+            )
+            print(f'  - [{v_type:12}] {v_name:25} | Title: "{tb_val}"')
             continue
 
-        for role, role_dict in query_state.items():
+        for _role, role_dict in query_state.items():
             for proj in role_dict.get("projections", []):
                 projections_count += 1
                 q_ref = proj.get("queryRef", "")
                 field = proj.get("field", {})
-                
+
                 # Check Measure or Column
                 if "Measure" in field:
                     entity = field["Measure"]["Expression"]["SourceRef"]["Entity"]
@@ -111,7 +119,9 @@ for p_name in page_order:
                     if entity not in model_fields:
                         unresolved_references.append(f"{v_name}: Entity '{entity}' not in model")
                     elif prop not in model_fields[entity]["measures"]:
-                        unresolved_references.append(f"{v_name}: Measure '{prop}' not in table '{entity}'")
+                        unresolved_references.append(
+                            f"{v_name}: Measure '{prop}' not in table '{entity}'"
+                        )
                     ref_details.append(f"Measure({expected_ref})")
                 elif "Column" in field:
                     entity = field["Column"]["Expression"]["SourceRef"]["Entity"]
@@ -120,7 +130,9 @@ for p_name in page_order:
                     if entity not in model_fields:
                         unresolved_references.append(f"{v_name}: Entity '{entity}' not in model")
                     elif prop not in model_fields[entity]["columns"]:
-                        unresolved_references.append(f"{v_name}: Column '{prop}' not in table '{entity}'")
+                        unresolved_references.append(
+                            f"{v_name}: Column '{prop}' not in table '{entity}'"
+                        )
                     ref_details.append(f"Column({expected_ref})")
                 else:
                     unresolved_references.append(f"{v_name}: Unknown field projection: {field}")

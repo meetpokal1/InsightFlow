@@ -98,7 +98,9 @@ def build_executive_summary_sheet(wb: openpyxl.Workbook):
     # Title
     ws["B2"] = "InsightFlow Retail Intelligence — Data Assurance Workpaper"
     ws["B2"].font = TITLE_FONT
-    ws["B3"] = "Pipeline Integrity, Cleaning Reconciliation & Quality Assurance Audit (As of 30 Sept 2026)"
+    ws["B3"] = (
+        "Pipeline Integrity, Cleaning Reconciliation & Quality Assurance Audit (As of 30 Sept 2026)"
+    )
     ws["B3"].font = SUBTITLE_FONT
 
     # KPI Summary Cards
@@ -116,7 +118,9 @@ def build_executive_summary_sheet(wb: openpyxl.Workbook):
 
     for idx, (title, val, num_fmt) in enumerate(cards):
         c_idx = 2 + idx
-        ws.cell(row=5, column=c_idx, value=title).font = Font(name="Segoe UI", size=9, bold=True, color="595959")
+        ws.cell(row=5, column=c_idx, value=title).font = Font(
+            name="Segoe UI", size=9, bold=True, color="595959"
+        )
         ws.cell(row=5, column=c_idx).alignment = Alignment(horizontal="center", vertical="center")
         ws.cell(row=5, column=c_idx).fill = SUBHEADER_FILL
         ws.cell(row=5, column=c_idx).border = THIN_BORDER
@@ -133,11 +137,26 @@ def build_executive_summary_sheet(wb: openpyxl.Workbook):
     ws["B8"].font = Font(name="Segoe UI", size=12, bold=True, color="1F4E78")
 
     overview_text = [
-        ("Pipeline Scope", "Enterprise-grade retail transactional ingestion covering 8 relational entities: orders, line items, customers, products, inventory, suppliers, locations, and categories."),
-        ("Data Provenance", "Synthetic retail data generated with systematic, realistic anomalies (stray whitespace, case errors, corrupt sign typing, date corruptions, orphan foreign keys, and duplicate signups)."),
-        ("Assurance Objective", "Provide rigorous verification that every corrupted row is either remediated deterministically according to documented business rules, or quarantined into review tables without data loss."),
-        ("Reconciliation Law", "Raw Records Ingested (49,975) = Exact Duplicates Dropped (512) + Quarantined/Rejected Records (1,609) + Merged Records (40) + Clean Records Loaded (47,814)."),
-        ("Revenue Preservation", "Net completed sales revenue preserved: ₹209,034,798.31 (96.72% of uncorrupted ground-truth completed net revenue of ₹216,134,944.45). Total clean revenue across all order statuses: ₹233,116,318.67."),
+        (
+            "Pipeline Scope",
+            "Enterprise-grade retail transactional ingestion covering 8 relational entities: orders, line items, customers, products, inventory, suppliers, locations, and categories.",
+        ),
+        (
+            "Data Provenance",
+            "Synthetic retail data generated with systematic, realistic anomalies (stray whitespace, case errors, corrupt sign typing, date corruptions, orphan foreign keys, and duplicate signups).",
+        ),
+        (
+            "Assurance Objective",
+            "Provide rigorous verification that every corrupted row is either remediated deterministically according to documented business rules, or quarantined into review tables without data loss.",
+        ),
+        (
+            "Reconciliation Law",
+            "Raw Records Ingested (49,975) = Exact Duplicates Dropped (512) + Quarantined/Rejected Records (1,609) + Merged Records (40) + Clean Records Loaded (47,814).",
+        ),
+        (
+            "Revenue Preservation",
+            "Net completed sales revenue preserved: ₹209,034,798.31 (96.72% of uncorrupted ground-truth completed net revenue of ₹216,134,944.45). Total clean revenue across all order statuses: ₹233,116,318.67.",
+        ),
     ]
     for r_idx, (lbl, desc) in enumerate(overview_text, start=9):
         ws.cell(row=r_idx, column=2, value=lbl).font = BOLD_FONT
@@ -152,15 +171,40 @@ def build_executive_summary_sheet(wb: openpyxl.Workbook):
 
     controls = [
         ("Control Domain", "Testing Mechanism", "Observed Outcome", "Audit Conclusion"),
-        ("Referential Integrity", "Orphan order items and unknown product/customer foreign keys quarantined", "1,116 orphan items and 72 orphan orders quarantined", "PASS — Zero foreign key orphans in clean tables"),
-        ("Price / Cost Logic", "Swapped cost/selling prices detected; list price fallback applied", "3 inverted price pairs corrected; missing costs imputed", "PASS — 100% products satisfy cost <= selling price"),
-        ("Quantity Constraints", "Typing error sign flips (negative qty) vs invalid zeroes quarantined", "230 negative sign typos flipped; 78 zero-qty rows quarantined", "PASS — Clean quantity range strictly 1 to 500"),
-        ("Customer Identity", "Email and Phone+Name deterministic match merging", "40 duplicate registrations merged into primary ID", "PASS — Unified order history preserved"),
-        ("Inventory Realism", "Snapshot buffer replenishment distinguished from demand forecasting", "96 low stock positions; ₹9.66 L capital required", "PASS — Clear separation of capital vs valuation"),
+        (
+            "Referential Integrity",
+            "Orphan order items and unknown product/customer foreign keys quarantined",
+            "1,116 orphan items and 72 orphan orders quarantined",
+            "PASS — Zero foreign key orphans in clean tables",
+        ),
+        (
+            "Price / Cost Logic",
+            "Swapped cost/selling prices detected; list price fallback applied",
+            "3 inverted price pairs corrected; missing costs imputed",
+            "PASS — 100% products satisfy cost <= selling price",
+        ),
+        (
+            "Quantity Constraints",
+            "Typing error sign flips (negative qty) vs invalid zeroes quarantined",
+            "230 negative sign typos flipped; 78 zero-qty rows quarantined",
+            "PASS — Clean quantity range strictly 1 to 500",
+        ),
+        (
+            "Customer Identity",
+            "Email and Phone+Name deterministic match merging",
+            "40 duplicate registrations merged into primary ID",
+            "PASS — Unified order history preserved",
+        ),
+        (
+            "Inventory Realism",
+            "Snapshot buffer replenishment distinguished from demand forecasting",
+            "96 low stock positions; ₹9.66 L capital required",
+            "PASS — Clear separation of capital vs valuation",
+        ),
     ]
 
     for r_idx, row_data in enumerate(controls, start=16):
-        is_hdr = (r_idx == 15)
+        is_hdr = r_idx == 15
         for c_idx, val in enumerate(row_data, start=2):
             cell = ws.cell(row=r_idx, column=c_idx, value=val)
             if is_hdr:
@@ -185,7 +229,9 @@ def build_reconciliation_sheet(wb: openpyxl.Workbook):
 
     ws["A1"] = "InsightFlow — Entity Pipeline Reconciliation Matrix"
     ws["A1"].font = TITLE_FONT
-    ws["A2"] = "Verification of conservation law: Raw Ingested - Duplicates Dropped - Quarantined/Rejected - Merged Records = Clean Loaded"
+    ws["A2"] = (
+        "Verification of conservation law: Raw Ingested - Duplicates Dropped - Quarantined/Rejected - Merged Records = Clean Loaded"
+    )
     ws["A2"].font = SUBTITLE_FONT
 
     headers = [
@@ -257,7 +303,9 @@ def build_reconciliation_sheet(wb: openpyxl.Workbook):
         cell.number_format = "#,##0"
         cell.border = TOTAL_BORDER
 
-    tot_status = ws.cell(row=tot_row, column=9, value=f'=IF(H{tot_row}=0, "PERFECTLY BALANCED", "DISCREPANCY")')
+    tot_status = ws.cell(
+        row=tot_row, column=9, value=f'=IF(H{tot_row}=0, "PERFECTLY BALANCED", "DISCREPANCY")'
+    )
     tot_status.font = BOLD_FONT
     tot_status.fill = ALERT_GREEN
     tot_status.alignment = Alignment(horizontal="center")
@@ -278,7 +326,9 @@ def build_quality_findings_sheet(wb: openpyxl.Workbook, processed_dir: pathlib.P
 
     ws["A1"] = "InsightFlow — Comprehensive Quality Findings & Remediation Log"
     ws["A1"].font = TITLE_FONT
-    ws["A2"] = "Complete register of anomalies identified by validation rules, remedial action taken, and risk classification"
+    ws["A2"] = (
+        "Complete register of anomalies identified by validation rules, remedial action taken, and risk classification"
+    )
     ws["A2"].font = SUBTITLE_FONT
 
     headers = [
@@ -297,6 +347,7 @@ def build_quality_findings_sheet(wb: openpyxl.Workbook, processed_dir: pathlib.P
     findings_file = p_dir / "data_quality_report.csv"
     if findings_file.exists():
         import csv
+
         with open(findings_file, mode="r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             row_idx = 4
@@ -318,11 +369,15 @@ def build_quality_findings_sheet(wb: openpyxl.Workbook, processed_dir: pathlib.P
                 elif "swapped" in action.lower() or "flipped" in action.lower():
                     severity = "High"
                     fill = ALERT_RED
-                    impact = "Severe margin distortion prevention; typographic sign errors repaired."
+                    impact = (
+                        "Severe margin distortion prevention; typographic sign errors repaired."
+                    )
                 else:
                     severity = "Low"
                     fill = ALERT_GREEN
-                    impact = "Missing value imputation using median or default category attribution."
+                    impact = (
+                        "Missing value imputation using median or default category attribution."
+                    )
 
                 ws.cell(row=row_idx, column=1, value=tbl).font = BOLD_FONT
                 ws.cell(row=row_idx, column=2, value=issue).font = CODE_FONT
@@ -345,7 +400,7 @@ def build_quality_findings_sheet(wb: openpyxl.Workbook, processed_dir: pathlib.P
 
             # Summary row
             ws.cell(row=row_idx, column=1, value="TOTAL ANOMALIES REMEDIATED").font = BOLD_FONT
-            tot_cnt = ws.cell(row=row_idx, column=4, value=f"=SUM(D4:D{row_idx-1})")
+            tot_cnt = ws.cell(row=row_idx, column=4, value=f"=SUM(D4:D{row_idx - 1})")
             tot_cnt.font = BOLD_FONT
             tot_cnt.number_format = "#,##0"
             tot_cnt.border = TOTAL_BORDER
@@ -360,7 +415,9 @@ def build_rejected_records_sheet(wb: openpyxl.Workbook, rejected_dir: pathlib.Pa
 
     ws["A1"] = "InsightFlow — Quarantined Record Audit Register"
     ws["A1"].font = TITLE_FONT
-    ws["A2"] = "Sample and audit log of quarantined transactional rows with primary keys and rejection justifications"
+    ws["A2"] = (
+        "Sample and audit log of quarantined transactional rows with primary keys and rejection justifications"
+    )
     ws["A2"].font = SUBTITLE_FONT
 
     headers = [
@@ -389,12 +446,28 @@ def build_rejected_records_sheet(wb: openpyxl.Workbook, rejected_dir: pathlib.Pa
                 if i >= 100:  # Cap at 100 sample rows for readability
                     break
                 ws.cell(row=row_idx, column=1, value="orders").font = BOLD_FONT
-                ws.cell(row=row_idx, column=2, value=int(r.get("source_row", 0))).number_format = "#,##0"
-                ws.cell(row=row_idx, column=3, value=sanitize_text(r.get("order_id", ""))).font = CODE_FONT
-                ws.cell(row=row_idx, column=4, value=sanitize_text(r.get("customer_id", ""))).font = CODE_FONT
-                ws.cell(row=row_idx, column=5, value=f"Date: {r.get('order_date','')} | Total: {r.get('order_total','')}").font = REGULAR_FONT
-                ws.cell(row=row_idx, column=6, value=sanitize_text(r.get("reject_reason", ""))).font = BOLD_FONT
-                ws.cell(row=row_idx, column=7, value="Quarantined to data/processed/rejected/orders_rejected.csv").font = REGULAR_FONT
+                ws.cell(
+                    row=row_idx, column=2, value=int(r.get("source_row", 0))
+                ).number_format = "#,##0"
+                ws.cell(
+                    row=row_idx, column=3, value=sanitize_text(r.get("order_id", ""))
+                ).font = CODE_FONT
+                ws.cell(
+                    row=row_idx, column=4, value=sanitize_text(r.get("customer_id", ""))
+                ).font = CODE_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=5,
+                    value=f"Date: {r.get('order_date', '')} | Total: {r.get('order_total', '')}",
+                ).font = REGULAR_FONT
+                ws.cell(
+                    row=row_idx, column=6, value=sanitize_text(r.get("reject_reason", ""))
+                ).font = BOLD_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=7,
+                    value="Quarantined to data/processed/rejected/orders_rejected.csv",
+                ).font = REGULAR_FONT
 
                 for c in range(1, 8):
                     ws.cell(row=row_idx, column=c).border = THIN_BORDER
@@ -409,12 +482,30 @@ def build_rejected_records_sheet(wb: openpyxl.Workbook, rejected_dir: pathlib.Pa
                 if i >= 100:  # Sample 100 items
                     break
                 ws.cell(row=row_idx, column=1, value="order_items").font = BOLD_FONT
-                ws.cell(row=row_idx, column=2, value=int(r.get("source_row", 0))).number_format = "#,##0"
-                ws.cell(row=row_idx, column=3, value=sanitize_text(r.get("order_item_id", ""))).font = CODE_FONT
-                ws.cell(row=row_idx, column=4, value=f"Order: {sanitize_text(r.get('order_id', ''))} | Prod: {sanitize_text(r.get('product_id', ''))}").font = CODE_FONT
-                ws.cell(row=row_idx, column=5, value=f"Qty: {r.get('quantity','')} | Price: {r.get('unit_price','')}").font = REGULAR_FONT
-                ws.cell(row=row_idx, column=6, value=sanitize_text(r.get("reject_reason", ""))).font = BOLD_FONT
-                ws.cell(row=row_idx, column=7, value="Quarantined to data/processed/rejected/order_items_rejected.csv").font = REGULAR_FONT
+                ws.cell(
+                    row=row_idx, column=2, value=int(r.get("source_row", 0))
+                ).number_format = "#,##0"
+                ws.cell(
+                    row=row_idx, column=3, value=sanitize_text(r.get("order_item_id", ""))
+                ).font = CODE_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=4,
+                    value=f"Order: {sanitize_text(r.get('order_id', ''))} | Prod: {sanitize_text(r.get('product_id', ''))}",
+                ).font = CODE_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=5,
+                    value=f"Qty: {r.get('quantity', '')} | Price: {r.get('unit_price', '')}",
+                ).font = REGULAR_FONT
+                ws.cell(
+                    row=row_idx, column=6, value=sanitize_text(r.get("reject_reason", ""))
+                ).font = BOLD_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=7,
+                    value="Quarantined to data/processed/rejected/order_items_rejected.csv",
+                ).font = REGULAR_FONT
 
                 for c in range(1, 8):
                     ws.cell(row=row_idx, column=c).border = THIN_BORDER
@@ -427,12 +518,30 @@ def build_rejected_records_sheet(wb: openpyxl.Workbook, rejected_dir: pathlib.Pa
             reader = csv.DictReader(f)
             for r in reader:
                 ws.cell(row=row_idx, column=1, value="inventory").font = BOLD_FONT
-                ws.cell(row=row_idx, column=2, value=int(r.get("source_row", 0))).number_format = "#,##0"
-                ws.cell(row=row_idx, column=3, value=sanitize_text(r.get("inventory_id", ""))).font = CODE_FONT
-                ws.cell(row=row_idx, column=4, value=f"Prod: {sanitize_text(r.get('product_id', ''))} | Loc: {sanitize_text(r.get('location_id', ''))}").font = CODE_FONT
-                ws.cell(row=row_idx, column=5, value=f"Stock: {r.get('quantity_on_hand','')} | Reorder: {r.get('reorder_level','')}").font = REGULAR_FONT
-                ws.cell(row=row_idx, column=6, value=sanitize_text(r.get("reject_reason", ""))).font = BOLD_FONT
-                ws.cell(row=row_idx, column=7, value="Quarantined to data/processed/rejected/inventory_rejected.csv").font = REGULAR_FONT
+                ws.cell(
+                    row=row_idx, column=2, value=int(r.get("source_row", 0))
+                ).number_format = "#,##0"
+                ws.cell(
+                    row=row_idx, column=3, value=sanitize_text(r.get("inventory_id", ""))
+                ).font = CODE_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=4,
+                    value=f"Prod: {sanitize_text(r.get('product_id', ''))} | Loc: {sanitize_text(r.get('location_id', ''))}",
+                ).font = CODE_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=5,
+                    value=f"Stock: {r.get('quantity_on_hand', '')} | Reorder: {r.get('reorder_level', '')}",
+                ).font = REGULAR_FONT
+                ws.cell(
+                    row=row_idx, column=6, value=sanitize_text(r.get("reject_reason", ""))
+                ).font = BOLD_FONT
+                ws.cell(
+                    row=row_idx,
+                    column=7,
+                    value="Quarantined to data/processed/rejected/inventory_rejected.csv",
+                ).font = REGULAR_FONT
 
                 for c in range(1, 8):
                     ws.cell(row=row_idx, column=c).border = THIN_BORDER
@@ -448,7 +557,9 @@ def build_validation_checks_sheet(wb: openpyxl.Workbook):
 
     ws["A1"] = "InsightFlow — Automated Integrity & Schema Audit"
     ws["A1"].font = TITLE_FONT
-    ws["A2"] = "Verification of primary key uniqueness, foreign key integrity, domain boundaries, and business constraints"
+    ws["A2"] = (
+        "Verification of primary key uniqueness, foreign key integrity, domain boundaries, and business constraints"
+    )
     ws["A2"].font = SUBTITLE_FONT
 
     headers = [
@@ -465,21 +576,141 @@ def build_validation_checks_sheet(wb: openpyxl.Workbook):
     style_header_row(ws, 3, 1, len(headers))
 
     checks = [
-        ("CHK-PK-01", "customers", "Primary Key Uniqueness", "customer_id must be unique across all rows", 0, "PASS", "Zero duplicate customer IDs detected."),
-        ("CHK-PK-02", "products", "Primary Key Uniqueness", "product_id must be unique across all rows", 0, "PASS", "Exact duplicate products deduplicated; 60 unique remain."),
-        ("CHK-PK-03", "orders", "Primary Key Uniqueness", "order_id must be unique across all rows", 0, "PASS", "107 duplicate orders removed; 8,734 clean orders unique."),
-        ("CHK-PK-04", "order_items", "Primary Key Uniqueness", "order_item_id must be unique across all lines", 0, "PASS", "391 duplicate item lines removed; 37,744 unique."),
-        ("CHK-PK-05", "inventory", "Primary Key Uniqueness", "inventory_id must be unique across positions", 0, "PASS", "449 stock positions unique."),
-        ("CHK-FK-01", "orders -> customers", "Referential Integrity", "orders.customer_id must exist in customers", 0, "PASS", "All orphan customer references quarantined."),
-        ("CHK-FK-02", "orders -> locations", "Referential Integrity", "orders.location_id must exist in locations", 0, "PASS", "All orphan location references quarantined."),
-        ("CHK-FK-03", "order_items -> orders", "Referential Integrity", "order_items.order_id must exist in orders", 0, "PASS", "964 orphan items without parent orders quarantined."),
-        ("CHK-FK-04", "order_items -> products", "Referential Integrity", "order_items.product_id must exist in products", 0, "PASS", "152 items with unknown product IDs quarantined."),
-        ("CHK-FK-05", "inventory -> products", "Referential Integrity", "inventory.product_id must exist in products", 0, "PASS", "5 unknown inventory products quarantined."),
-        ("CHK-DOM-01", "order_items.quantity", "Domain Value Boundary", "quantity must be integer between 1 and 500", 0, "PASS", "Sign errors repaired; zeroes & outliers quarantined."),
-        ("CHK-DOM-02", "order_items.discount_pct", "Domain Value Boundary", "discount_pct must be between 0.0 and 100.0", 0, "PASS", "Invalid/missing discounts reset to 0.0%."),
-        ("CHK-DOM-03", "products.pricing", "Domain Value Boundary", "cost_price <= selling_price", 0, "PASS", "Inverted price pairs corrected; ratios preserved."),
-        ("CHK-DOM-04", "inventory.quantity_on_hand", "Domain Value Boundary", "quantity_on_hand >= 0", 0, "PASS", "Negative stock counts reset to empty shelf (0)."),
-        ("CHK-TIME-01", "orders.order_date", "Temporal Validity", "order_date between 2024-01-01 and 2026-09-30", 0, "PASS", "Corrupted future dates and ancient years quarantined."),
+        (
+            "CHK-PK-01",
+            "customers",
+            "Primary Key Uniqueness",
+            "customer_id must be unique across all rows",
+            0,
+            "PASS",
+            "Zero duplicate customer IDs detected.",
+        ),
+        (
+            "CHK-PK-02",
+            "products",
+            "Primary Key Uniqueness",
+            "product_id must be unique across all rows",
+            0,
+            "PASS",
+            "Exact duplicate products deduplicated; 60 unique remain.",
+        ),
+        (
+            "CHK-PK-03",
+            "orders",
+            "Primary Key Uniqueness",
+            "order_id must be unique across all rows",
+            0,
+            "PASS",
+            "107 duplicate orders removed; 8,734 clean orders unique.",
+        ),
+        (
+            "CHK-PK-04",
+            "order_items",
+            "Primary Key Uniqueness",
+            "order_item_id must be unique across all lines",
+            0,
+            "PASS",
+            "391 duplicate item lines removed; 37,744 unique.",
+        ),
+        (
+            "CHK-PK-05",
+            "inventory",
+            "Primary Key Uniqueness",
+            "inventory_id must be unique across positions",
+            0,
+            "PASS",
+            "449 stock positions unique.",
+        ),
+        (
+            "CHK-FK-01",
+            "orders -> customers",
+            "Referential Integrity",
+            "orders.customer_id must exist in customers",
+            0,
+            "PASS",
+            "All orphan customer references quarantined.",
+        ),
+        (
+            "CHK-FK-02",
+            "orders -> locations",
+            "Referential Integrity",
+            "orders.location_id must exist in locations",
+            0,
+            "PASS",
+            "All orphan location references quarantined.",
+        ),
+        (
+            "CHK-FK-03",
+            "order_items -> orders",
+            "Referential Integrity",
+            "order_items.order_id must exist in orders",
+            0,
+            "PASS",
+            "964 orphan items without parent orders quarantined.",
+        ),
+        (
+            "CHK-FK-04",
+            "order_items -> products",
+            "Referential Integrity",
+            "order_items.product_id must exist in products",
+            0,
+            "PASS",
+            "152 items with unknown product IDs quarantined.",
+        ),
+        (
+            "CHK-FK-05",
+            "inventory -> products",
+            "Referential Integrity",
+            "inventory.product_id must exist in products",
+            0,
+            "PASS",
+            "5 unknown inventory products quarantined.",
+        ),
+        (
+            "CHK-DOM-01",
+            "order_items.quantity",
+            "Domain Value Boundary",
+            "quantity must be integer between 1 and 500",
+            0,
+            "PASS",
+            "Sign errors repaired; zeroes & outliers quarantined.",
+        ),
+        (
+            "CHK-DOM-02",
+            "order_items.discount_pct",
+            "Domain Value Boundary",
+            "discount_pct must be between 0.0 and 100.0",
+            0,
+            "PASS",
+            "Invalid/missing discounts reset to 0.0%.",
+        ),
+        (
+            "CHK-DOM-03",
+            "products.pricing",
+            "Domain Value Boundary",
+            "cost_price <= selling_price",
+            0,
+            "PASS",
+            "Inverted price pairs corrected; ratios preserved.",
+        ),
+        (
+            "CHK-DOM-04",
+            "inventory.quantity_on_hand",
+            "Domain Value Boundary",
+            "quantity_on_hand >= 0",
+            0,
+            "PASS",
+            "Negative stock counts reset to empty shelf (0).",
+        ),
+        (
+            "CHK-TIME-01",
+            "orders.order_date",
+            "Temporal Validity",
+            "order_date between 2024-01-01 and 2026-09-30",
+            0,
+            "PASS",
+            "Corrupted future dates and ancient years quarantined.",
+        ),
     ]
 
     for idx, (cid, ent, cat, rule, def_cnt, status, notes) in enumerate(checks, start=4):
@@ -512,7 +743,9 @@ def build_definitions_sheet(wb: openpyxl.Workbook):
 
     ws["A1"] = "InsightFlow — Analytical KPI Definitions & Audit Limitations"
     ws["A1"].font = TITLE_FONT
-    ws["A2"] = "Technical documentation of financial metrics, inventory formulas, and dataset limitations"
+    ws["A2"] = (
+        "Technical documentation of financial metrics, inventory formulas, and dataset limitations"
+    )
     ws["A2"].font = SUBTITLE_FONT
 
     headers = [
@@ -527,15 +760,69 @@ def build_definitions_sheet(wb: openpyxl.Workbook):
     style_header_row(ws, 3, 1, len(headers))
 
     defs = [
-        ("Net Revenue", "SUM(quantity * unit_price * (1 - discount_pct / 100))", "vw_fact_sales.net_revenue", "₹209.03 M (₹209,034,798.31)", "Completed customer orders only (7,878 orders, 34,007 lines); excludes returns, cancellations, and quarantined rows."),
-        ("Cost of Goods Sold (COGS)", "SUM(quantity * cost_price)", "vw_fact_sales.cost_of_goods", "₹166.68 M (₹166,679,469.22)", "Direct purchase cost of products sold based on catalog cost price."),
-        ("Gross Profit", "Net Revenue - Cost of Goods Sold", "vw_fact_sales.gross_profit", "₹42.36 M (₹42,355,329.09)", "Gross profit contribution before operating overhead, logistics, and administrative expenses."),
-        ("Gross Margin %", "(Gross Profit / Net Revenue) * 100", "[Gross Margin %]", "20.26%", "Portfolio overall gross margin percentage across completed orders."),
-        ("Replenishment Qty Required", "GREATEST(reorder_level - quantity_on_hand, 0)", "vw_fact_inventory.replenishment_quantity_required", "5,791 units across 96 positions", "Units required to bring depleted inventory positions back to safety reorder threshold."),
-        ("Replenishment Cost Estimate", "Replenishment Qty * cost_price", "vw_fact_inventory.replenishment_cost_estimate", "₹9.66 L (₹966,026.68)", "Working capital required at purchase cost to restore buffer stock to reorder level."),
-        ("Stock Gap Retail Valuation", "Replenishment Qty * selling_price", "vw_fact_inventory.stock_gap_retail_valuation", "₹13.41 L (₹1,340,814.00)", "Retail catalog valuation of buffer deficit units. NOT confirmed lost sales revenue."),
-        ("True Out-of-Stock Positions", "quantity_on_hand == 0", "vw_fact_inventory.is_stockout", "40 positions (8.91% of stock)", "Positions with completely empty shelves subject to immediate stockout risk."),
-        ("Break-Even Volume Decline", "1 - (Baseline Profit / ((Baseline Rev * (1+p)) - Baseline COGS))", "demo.simulate_price_sensitivity", "58.26% for Basmati Rice at +3% price", "Maximum percentage volume drop permissible before gross profit drops below baseline."),
+        (
+            "Net Revenue",
+            "SUM(quantity * unit_price * (1 - discount_pct / 100))",
+            "vw_fact_sales.net_revenue",
+            "₹209.03 M (₹209,034,798.31)",
+            "Completed customer orders only (7,878 orders, 34,007 lines); excludes returns, cancellations, and quarantined rows.",
+        ),
+        (
+            "Cost of Goods Sold (COGS)",
+            "SUM(quantity * cost_price)",
+            "vw_fact_sales.cost_of_goods",
+            "₹166.68 M (₹166,679,469.22)",
+            "Direct purchase cost of products sold based on catalog cost price.",
+        ),
+        (
+            "Gross Profit",
+            "Net Revenue - Cost of Goods Sold",
+            "vw_fact_sales.gross_profit",
+            "₹42.36 M (₹42,355,329.09)",
+            "Gross profit contribution before operating overhead, logistics, and administrative expenses.",
+        ),
+        (
+            "Gross Margin %",
+            "(Gross Profit / Net Revenue) * 100",
+            "[Gross Margin %]",
+            "20.26%",
+            "Portfolio overall gross margin percentage across completed orders.",
+        ),
+        (
+            "Replenishment Qty Required",
+            "GREATEST(reorder_level - quantity_on_hand, 0)",
+            "vw_fact_inventory.replenishment_quantity_required",
+            "5,791 units across 96 positions",
+            "Units required to bring depleted inventory positions back to safety reorder threshold.",
+        ),
+        (
+            "Replenishment Cost Estimate",
+            "Replenishment Qty * cost_price",
+            "vw_fact_inventory.replenishment_cost_estimate",
+            "₹9.66 L (₹966,026.68)",
+            "Working capital required at purchase cost to restore buffer stock to reorder level.",
+        ),
+        (
+            "Stock Gap Retail Valuation",
+            "Replenishment Qty * selling_price",
+            "vw_fact_inventory.stock_gap_retail_valuation",
+            "₹13.41 L (₹1,340,814.00)",
+            "Retail catalog valuation of buffer deficit units. NOT confirmed lost sales revenue.",
+        ),
+        (
+            "True Out-of-Stock Positions",
+            "quantity_on_hand == 0",
+            "vw_fact_inventory.is_stockout",
+            "40 positions (8.91% of stock)",
+            "Positions with completely empty shelves subject to immediate stockout risk.",
+        ),
+        (
+            "Break-Even Volume Decline",
+            "1 - (Baseline Profit / ((Baseline Rev * (1+p)) - Baseline COGS))",
+            "demo.simulate_price_sensitivity",
+            "58.26% for Basmati Rice at +3% price",
+            "Maximum percentage volume drop permissible before gross profit drops below baseline.",
+        ),
     ]
 
     for idx, (kpi, form, imp, val, desc) in enumerate(defs, start=4):
@@ -550,18 +837,32 @@ def build_definitions_sheet(wb: openpyxl.Workbook):
 
     # Limitations section
     lim_start = 15
-    ws.cell(row=lim_start, column=1, value="TECHNICAL & METHODOLOGICAL LIMITATIONS").font = BOLD_FONT
+    ws.cell(
+        row=lim_start, column=1, value="TECHNICAL & METHODOLOGICAL LIMITATIONS"
+    ).font = BOLD_FONT
     ws.merge_cells(start_row=lim_start, start_column=1, end_row=lim_start, end_column=5)
     ws.cell(row=lim_start, column=1).fill = SUBHEADER_FILL
 
     limitations = [
-        ("Synthetic Data Caveat", "All customer entities, orders, suppliers, and transactions are synthetic artifacts created for demonstration and stress-testing. No customer PII is present."),
-        ("Static Stock Snapshot", "Inventory balances reflect a single static snapshot as of 30 September 2026. Inventory turnover is computed annualized from the preceding 12 months rather than multi-snapshot moving averages."),
-        ("Assumed Elasticity", "Price sensitivity simulations employ user-configured demand elasticity parameters for scenario modeling; they do not represent econometric causal regressions."),
-        ("Stock Gap Semantics", "Buffer deficits below reorder levels reflect inventory health risk, not realized lost sales, because backorders and unmet demand are unrecorded in baseline transactions."),
+        (
+            "Synthetic Data Caveat",
+            "All customer entities, orders, suppliers, and transactions are synthetic artifacts created for demonstration and stress-testing. No customer PII is present.",
+        ),
+        (
+            "Static Stock Snapshot",
+            "Inventory balances reflect a single static snapshot as of 30 September 2026. Inventory turnover is computed annualized from the preceding 12 months rather than multi-snapshot moving averages.",
+        ),
+        (
+            "Assumed Elasticity",
+            "Price sensitivity simulations employ user-configured demand elasticity parameters for scenario modeling; they do not represent econometric causal regressions.",
+        ),
+        (
+            "Stock Gap Semantics",
+            "Buffer deficits below reorder levels reflect inventory health risk, not realized lost sales, because backorders and unmet demand are unrecorded in baseline transactions.",
+        ),
     ]
 
-    for idx, (lim_title, lim_desc) in enumerate(limitations, start=lim_start+1):
+    for idx, (lim_title, lim_desc) in enumerate(limitations, start=lim_start + 1):
         ws.cell(row=idx, column=1, value=lim_title).font = BOLD_FONT
         ws.cell(row=idx, column=1).border = THIN_BORDER
         ws.cell(row=idx, column=2, value=lim_desc).font = REGULAR_FONT

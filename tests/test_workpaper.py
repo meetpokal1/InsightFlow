@@ -1,7 +1,5 @@
 """Unit tests for the Data Assurance Workpaper (.xlsx) generation and structure."""
 
-from pathlib import Path
-
 import openpyxl
 import pytest
 

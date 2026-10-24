@@ -8,6 +8,7 @@ from pandas.errors import DatabaseError
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
+from src.database.connection import run_sql_file
 from src.database.loader import load_tables
 from tests.helpers import completed_sales_lines
 
@@ -206,19 +207,31 @@ def test_customer_segments_follow_the_rfm_rules(database, cleaned):
 
 
 def test_data_assurance_reconciliation_view_matches_tables_and_log(database):
-    recon = pd.read_sql_query('SELECT * FROM data_assurance_reconciliation', database)
+    recon = pd.read_sql_query("SELECT * FROM data_assurance_reconciliation", database)
     assert len(recon) == 8
     expected_tables = [
-        'categories',
-        'suppliers',
-        'locations',
-        'products',
-        'customers',
-        'orders',
-        'order_items',
-        'inventory',
+        "categories",
+        "suppliers",
+        "locations",
+        "products",
+        "customers",
+        "orders",
+        "order_items",
+        "inventory",
     ]
-    assert list(recon['table_name']) == expected_tables
-    assert (recon['reconciliation_status'] == 'BALANCED').all()
-    assert (recon['raw_ingested'] >= recon['clean_loaded']).all()
-    assert (recon['preservation_rate'] > 0).all()
+    assert list(recon["table_name"]) == expected_tables
+    assert (recon["reconciliation_status"] == "BALANCED").all()
+    assert (recon["raw_ingested"] >= recon["clean_loaded"]).all()
+    assert (recon["preservation_rate"] > 0).all()
+
+
+def test_run_sql_file_handles_literal_percent_without_driver_error(database, tmp_path):
+    sql_file = tmp_path / "literal_percent_test.sql"
+    sql_file.write_text(
+        "CREATE TEMPORARY TABLE temp_pct_check AS "
+        "SELECT 1 AS id, 'merged_record' AS note;\n"
+        "SELECT * FROM temp_pct_check WHERE note LIKE '%merged%';\n",
+        encoding="utf-8",
+    )
+    # Must execute cleanly through PostgreSQL/psycopg2 without TypeError on parameter mapping
+    run_sql_file(database, sql_file)
