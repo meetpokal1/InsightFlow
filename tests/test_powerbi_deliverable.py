@@ -181,7 +181,9 @@ def test_inventory_currency_cards_use_display_only_measures():
         assert name in inv_measures, f"Missing card display measure: {name}"
         assert fragment in inv_measures[name]["expression"]
 
-    tmdl_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "definition" / "tables" / "Inventory.tmdl"
+    tmdl_file = (
+        POWERBI_DIR / "InsightFlow.SemanticModel" / "definition" / "tables" / "Inventory.tmdl"
+    )
     tmdl = tmdl_file.read_text(encoding="utf-8")
     for name, expression in expected_numeric.items():
         assert f"measure '{name}' = {expression}" in tmdl
