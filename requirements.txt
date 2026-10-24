@@ -15,5 +15,5 @@ black>=24.0
 ruff>=0.5
 
 # Interactive, no-database demo dashboard
-streamlit>=1.40,<2
+streamlit>=1.49,<2
 plotly>=5.20,<7
