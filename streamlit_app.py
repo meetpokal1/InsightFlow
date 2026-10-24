@@ -609,7 +609,7 @@ elif page == "Sales & Products":
                 "InsightFlow's #1 revenue driver with a slim 2.15% margin.</p>",
                 unsafe_allow_html=True,
             )
-    
+
             sim_col1, sim_col2 = st.columns([1, 1])
             available_prods = (
                 filtered_sales[["product_id", "product_name", "category_name"]]
@@ -620,12 +620,12 @@ elif page == "Sales & Products":
                 f"{row.product_name} ({row.product_id})": row.product_id
                 for _, row in available_prods.iterrows()
             }
-    
+
             default_idx = 0
             p0010_label = next((k for k, v in prod_options.items() if v == "P0010"), None)
             if p0010_label and p0010_label in prod_options:
                 default_idx = list(prod_options.keys()).index(p0010_label)
-    
+
             with sim_col1:
                 selected_label = st.selectbox(
                     "Select product to simulate",
@@ -642,7 +642,7 @@ elif page == "Sales & Products":
                     step=0.5,
                     key="sim_price_slider",
                 )
-    
+
             with sim_col2:
                 demand_mode = st.radio(
                     "Demand response model",
@@ -681,7 +681,7 @@ elif page == "Sales & Products":
                         price_change_pct=price_change,
                         volume_change_pct=vol_change,
                     )
-    
+
             scols = st.columns(4)
             scols[0].metric(
                 "Modeled Net Revenue",
@@ -703,7 +703,7 @@ elif page == "Sales & Products":
                 f"{sim_res['modeled']['units']:,}",
                 delta=f"{sim_res['modeled']['units'] - sim_res['baseline']['units']:+,} units",
             )
-    
+
             # Visual Scenario Comparison Chart
             sim_chart_df = pd.DataFrame(
                 [
@@ -759,7 +759,7 @@ elif page == "Sales & Products":
                 style_chart(fig_sim, height=300, show_legend=True, legend_position="top-right"),
                 use_container_width=True,
             )
-    
+
             be_pct = sim_res["break_even_volume_decline_pct"]
             if be_pct is not None and be_pct > 0:
                 st.success(
@@ -769,7 +769,7 @@ elif page == "Sales & Products":
                 st.warning(
                     f"**Margin Dilution:** At {price_change:+.1f}% price, volume would need to increase by {-be_pct:.1f}% to preserve current profit."
                 )
-    
+
             sim_summary_df = pd.DataFrame(
                 [
                     {
