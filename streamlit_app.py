@@ -1,5 +1,6 @@
 """Interactive InsightFlow demo dashboard; requires no PostgreSQL credentials."""
 
+import math
 from datetime import date
 
 import pandas as pd
@@ -61,14 +62,26 @@ st.markdown(
       }
       [data-testid="stMetric"] {
         background: #ffffff; border: 1px solid #e2e8f0; border-top: 3px solid #2563eb;
-        border-radius: 10px; padding: 14px 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        min-width: 0;
       }
       [data-testid="stMetricLabel"] {
-        color: #64748b !important; font-size: 0.80rem !important; font-weight: 650 !important;
+        color: #64748b !important; font-size: 0.78rem !important; font-weight: 650 !important;
         text-transform: uppercase; letter-spacing: 0.03em;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       }
       [data-testid="stMetricValue"] {
         color: #0f172a !important; font-weight: 750 !important; letter-spacing: -0.02em !important;
+        font-size: clamp(1.2rem, 1.45vw, 1.6rem) !important;
+        line-height: 1.25 !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+      }
+      [data-testid="stMetricValue"] > div {
+        font-size: inherit !important;
+        line-height: inherit !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
       }
       div[data-testid="stPlotlyChart"] {
         background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px;
@@ -254,17 +267,41 @@ st.markdown(
 )
 
 
+def format_exact_inr(value: float | int | None) -> str:
+    """Format an exact currency amount in INR for tooltips and inspectable details."""
+    if value is None or (isinstance(value, float) and math.isnan(value)):
+        return "—"
+    return f"₹{float(value):,.2f}"
+
+
 def metric_row(frame: pd.DataFrame) -> None:
     summary = sales_summary(frame)
     cols = st.columns(5)
-    cols[0].metric("Net revenue", format_inr(summary["revenue"]))
-    cols[1].metric("Gross profit", format_inr(summary["gross_profit"]))
+    cols[0].metric(
+        "Net revenue",
+        format_inr(summary["revenue"]),
+        help=f"Audited net turnover: {format_exact_inr(summary['revenue'])}",
+    )
+    cols[1].metric(
+        "Gross profit",
+        format_inr(summary["gross_profit"]),
+        help=f"Audited gross profit: {format_exact_inr(summary['gross_profit'])}",
+    )
     cols[2].metric(
         "Gross margin",
         f"{summary['margin_pct']:.1f}%" if summary["margin_pct"] is not None else "—",
+        help="Gross Profit ÷ Net Revenue across fulfilled orders",
     )
-    cols[3].metric("Completed orders", f"{summary['orders']:,}")
-    cols[4].metric("Average order value", format_inr(summary["average_order_value"]))
+    cols[3].metric(
+        "Completed orders",
+        f"{summary['orders']:,}",
+        help=f"Total fulfilled customer orders: {summary['orders']:,}",
+    )
+    cols[4].metric(
+        "Average order value",
+        format_inr(summary["average_order_value"]),
+        help=f"Audited average order value: {format_exact_inr(summary['average_order_value'])}",
+    )
 
 
 def style_chart(
@@ -852,18 +889,38 @@ elif page == "Inventory Intelligence":
     needs_action = filtered_inventory.loc[filtered_inventory["stock_status"].isin(action_statuses)]
 
     cols1 = st.columns(3)
-    cols1[0].metric("Total Inventory Value", format_inr(inv_stats["total_inventory_value"]))
-    cols1[1].metric("True Out of Stock (0 units)", f"{inv_stats['stockout_positions']:,}")
-    cols1[2].metric("Positions Below Reorder Level", f"{inv_stats['below_reorder_positions']:,}")
+    cols1[0].metric(
+        "Total Inventory Value",
+        format_inr(inv_stats["total_inventory_value"]),
+        help=f"Audited inventory value at cost: {format_exact_inr(inv_stats['total_inventory_value'])}",
+    )
+    cols1[1].metric(
+        "True Out of Stock (0 units)",
+        f"{inv_stats['stockout_positions']:,}",
+        help="Stock positions with exactly 0 units on hand",
+    )
+    cols1[2].metric(
+        "Positions Below Reorder Level",
+        f"{inv_stats['below_reorder_positions']:,}",
+        help="Stock positions where quantity on hand is below safety reorder threshold",
+    )
 
     cols2 = st.columns(3)
     cols2[0].metric(
-        "Replenishment Units Required", f"{inv_stats['replenishment_units_required']:,}"
+        "Replenishment Units Required",
+        f"{inv_stats['replenishment_units_required']:,}",
+        help="Total units required to restore depleted buffers to safety levels",
     )
     cols2[1].metric(
-        "Replenishment Cost Estimate", format_inr(inv_stats["replenishment_cost_estimate"])
+        "Replenishment Cost Estimate",
+        format_inr(inv_stats["replenishment_cost_estimate"]),
+        help=f"Audited working capital required at purchase cost: {format_exact_inr(inv_stats['replenishment_cost_estimate'])}",
     )
-    cols2[2].metric("Stock Gap Retail Valuation", format_inr(inv_stats["stock_gap_retail_val"]))
+    cols2[2].metric(
+        "Stock Gap Retail Valuation",
+        format_inr(inv_stats["stock_gap_retail_val"]),
+        help=f"Retail catalog list valuation of deficit units: {format_exact_inr(inv_stats['stock_gap_retail_val'])}",
+    )
 
     st.markdown(
         '<div class="if-note" style="margin-top: 0.5rem; margin-bottom: 1rem;">'

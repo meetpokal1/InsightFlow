@@ -26,7 +26,8 @@
                   "Property": "table_name"
                 }
               },
-              "queryRef": "DataQualityReconciliation.table_name"
+              "queryRef": "DataQualityReconciliation.table_name",
+              "displayName": "Source Table"
             },
             {
               "field": {
@@ -39,7 +40,8 @@
                   "Property": "raw_ingested"
                 }
               },
-              "queryRef": "DataQualityReconciliation.raw_ingested"
+              "queryRef": "DataQualityReconciliation.raw_ingested",
+              "displayName": "Raw Ingested"
             },
             {
               "field": {
@@ -52,7 +54,8 @@
                   "Property": "exact_duplicates_dropped"
                 }
               },
-              "queryRef": "DataQualityReconciliation.exact_duplicates_dropped"
+              "queryRef": "DataQualityReconciliation.exact_duplicates_dropped",
+              "displayName": "Duplicates Dropped"
             },
             {
               "field": {
@@ -65,7 +68,8 @@
                   "Property": "quarantined_rejected"
                 }
               },
-              "queryRef": "DataQualityReconciliation.quarantined_rejected"
+              "queryRef": "DataQualityReconciliation.quarantined_rejected",
+              "displayName": "Quarantined Rows"
             },
             {
               "field": {
@@ -78,7 +82,8 @@
                   "Property": "merged_deduplicated"
                 }
               },
-              "queryRef": "DataQualityReconciliation.merged_deduplicated"
+              "queryRef": "DataQualityReconciliation.merged_deduplicated",
+              "displayName": "Merged Profiles"
             },
             {
               "field": {
@@ -91,7 +96,8 @@
                   "Property": "clean_loaded"
                 }
               },
-              "queryRef": "DataQualityReconciliation.clean_loaded"
+              "queryRef": "DataQualityReconciliation.clean_loaded",
+              "displayName": "Clean Loaded"
             },
             {
               "field": {
@@ -104,7 +110,8 @@
                   "Property": "preservation_rate"
                 }
               },
-              "queryRef": "DataQualityReconciliation.preservation_rate"
+              "queryRef": "DataQualityReconciliation.preservation_rate",
+              "displayName": "Preservation Rate"
             },
             {
               "field": {
@@ -117,7 +124,8 @@
                   "Property": "reconciliation_status"
                 }
               },
-              "queryRef": "DataQualityReconciliation.reconciliation_status"
+              "queryRef": "DataQualityReconciliation.reconciliation_status",
+              "displayName": "Reconciliation Status"
             }
           ]
         }

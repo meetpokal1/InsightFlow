@@ -26,7 +26,8 @@
                   "Property": "Orders"
                 }
               },
-              "queryRef": "Sales.Orders"
+              "queryRef": "Sales.Orders",
+              "displayName": "Completed Orders"
             }
           ]
         }

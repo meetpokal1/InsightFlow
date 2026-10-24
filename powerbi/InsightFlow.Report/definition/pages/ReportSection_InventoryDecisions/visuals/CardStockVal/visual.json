@@ -23,10 +23,11 @@
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "Stock Value"
+                  "Property": "Stock Value Display"
                 }
               },
-              "queryRef": "Inventory.Stock Value"
+              "queryRef": "Inventory.Stock Value Display",
+              "displayName": "Total Stock Value"
             }
           ]
         }

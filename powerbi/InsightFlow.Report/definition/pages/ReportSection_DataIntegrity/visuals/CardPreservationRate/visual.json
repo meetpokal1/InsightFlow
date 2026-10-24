@@ -26,7 +26,8 @@
                   "Property": "Overall Preservation Rate %"
                 }
               },
-              "queryRef": "DataQualityReconciliation.Overall Preservation Rate %"
+              "queryRef": "DataQualityReconciliation.Overall Preservation Rate %",
+              "displayName": "Data Preservation Rate %"
             }
           ]
         }

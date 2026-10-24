@@ -26,7 +26,8 @@
                   "Property": "Total Clean Records"
                 }
               },
-              "queryRef": "DataQualityReconciliation.Total Clean Records"
+              "queryRef": "DataQualityReconciliation.Total Clean Records",
+              "displayName": "Clean Records Loaded"
             }
           ]
         }

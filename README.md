@@ -55,7 +55,7 @@ gives a different number depending on who built the spreadsheet.
   customer and data-quality views with filters and CSV exports. It runs against the cleaned synthetic
   dataset without a database connection.
 - **Power BI Project (`InsightFlow.pbip`).** A version-controlled Microsoft Fabric / Power BI Desktop project
-  with a star schema, 45+ DAX measures, local data extracts, and 4 report pages (`Executive Profitability`,
+  with a star schema, 27 implemented measures (24 numeric plus 3 card display measures), local data extracts, and 4 report pages (`Executive Profitability`,
   `Margin Investigation`, `Inventory Decisions`, `Data Integrity & Pipeline Assurance`).
 - **Tests what matters.** Automated tests cover data cleaning, inventory replenishment boundaries, price sensitivity, Excel workpaper integrity, PBIP semantic-model structure, raw-SQL execution, and Date-key coverage. GitHub Actions provisions PostgreSQL, runs the pipeline and export, then runs the complete suite plus blocking Ruff lint and formatting checks. Offline runs skip explicitly database-dependent tests.
 
@@ -116,7 +116,7 @@ and Power BI all read those views, so they show the same numbers. More in
 | Streamlit, Plotly | the interactive no-database demo dashboard |
 | pytest, httpx | tests |
 | ruff, black | formatting and linting |
-| Power BI Desktop | interactive 4-page report deliverable (`powerbi/InsightFlow.pbip`), star schema semantic model, and 45+ DAX measures |
+| Power BI Desktop | interactive 4-page PBIP report and star-schema semantic model with 27 implemented measures; the DAX catalog documents additional definitions |
 | Git | version control |
 
 These are the versions the project was built and tested with, on Linux. `requirements.txt` allows
@@ -395,7 +395,7 @@ python scripts/export_powerbi_data.py
 python -m pytest tests/ -k "not test_database and not test_api" -v
 ```
 
-Generate the local synthetic pipeline outputs and Power BI CSV extracts before running the self-contained offline test suite. Database/API tests are excluded from that command; the GitHub Actions job provisions PostgreSQL and runs the full suite. The latest verified CI run on 24 October 2026 passed 233 tests, followed by successful Ruff lint and formatting checks:
+Generate the local synthetic pipeline outputs and Power BI CSV extracts before running the self-contained offline test suite. Database/API tests are excluded from that command; the GitHub Actions job provisions PostgreSQL and runs the full suite. The latest verified CI run on 24 October 2026 passed 234 tests, followed by successful Ruff lint and formatting checks:
 
 | Area | What is checked | Test Module |
 |---|---|---|
@@ -465,7 +465,7 @@ InsightFlow/
 ├── powerbi/                  version-controlled PBIP report, semantic model, DAX, queries, and theme
 │   ├── InsightFlow.pbip      Power BI Project entry point (double-click in Windows)
 │   ├── InsightFlow.Report/   Fabric PBIR visual layer definitions and queryState bindings
-│   ├── InsightFlow.SemanticModel/ Tabular model (model.bim), star schema, and 45+ DAX measures
+│   ├── InsightFlow.SemanticModel/ Tabular model (model.bim), star schema, and 27 implemented measures
 │   └── data/                 production CSV extracts generated for offline desktop loading
 ├── documentation/            architecture, data flow, schema, API, KPIs, data quality, workpapers
 │   └── diagrams/             Mermaid sources and PNG images

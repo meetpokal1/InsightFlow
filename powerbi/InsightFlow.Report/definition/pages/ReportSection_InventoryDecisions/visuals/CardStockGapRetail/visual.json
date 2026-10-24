@@ -23,10 +23,11 @@
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "Stock Gap Retail Valuation"
+                  "Property": "Stock Gap Retail Valuation Display"
                 }
               },
-              "queryRef": "Inventory.Stock Gap Retail Valuation"
+              "queryRef": "Inventory.Stock Gap Retail Valuation Display",
+              "displayName": "Stock Gap Retail Valuation"
             }
           ]
         }

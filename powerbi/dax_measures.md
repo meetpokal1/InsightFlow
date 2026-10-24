@@ -1,12 +1,14 @@
 # DAX measures
 
-The report uses 44 measures and 2 calculated columns. They assume the table names from
+This reference documents 44 DAX measure definitions and 2 calculated columns. The checked-in PBIP model currently implements 24 numeric measures plus 3 text-only card display measures; other definitions in this catalog are available for extending the report. The names below assume the tables from
 [README.md](README.md): `Sales`, `Inventory`, `Date`, `Product`, `Customer` and `Location`.
 
-The measures were written for Power BI Desktop and could not be run in the environment where
-this project was built, because Power BI Desktop only runs on Windows. Every measure below has
-an expected value, calculated in PostgreSQL from the same views, so you can check each one
-after you create it ([Checking the measures](#checking-the-measures)).
+The analytical measures were written for Power BI Desktop and could not be run in the
+environment where this project was built, because Power BI Desktop only runs on Windows. Each
+numeric analytical measure has an expected value calculated in PostgreSQL from the same views, so
+you can check it after you create it ([Checking the measures](#checking-the-measures)). The
+three card-only currency display measures are text labels and are intentionally excluded from the
+numeric benchmark table.
 
 Create a measure with **Home > New measure** (or right-click a table > New measure) and paste
 the code. Keeping them all in the `Sales` table is fine. In the Model view, a *display folder*
@@ -334,6 +336,27 @@ Days of Inventory = DIVIDE(365 * [Stock Value], [Cost of Goods Last 12 Months])
 Turnover and days of inventory use the single stock snapshot in place of the average stock, as
 in `sql/analytics/09_inventory_turnover.sql`. They respond to `Product` and `Location` slicers
 but not to the date slicer.
+
+### Card-only currency display measures
+
+The three cards on the Inventory Decisions page use text-only display measures to show Indian-scale units (crore/lakh). Keep the underlying money measures numeric: other calculations, sort logic, and future analyses must use `Stock Value`, `Replenishment Cost Estimate`, and `Stock Gap Retail Valuation`, not these display labels.
+
+```dax
+Stock Value Display =
+"₹" & FORMAT(DIVIDE([Stock Value], 10000000), "0.00") & " Cr"
+```
+
+```dax
+Replenishment Cost Estimate Display =
+"₹" & FORMAT(DIVIDE([Replenishment Cost Estimate], 100000), "0.00") & " L"
+```
+
+```dax
+Stock Gap Retail Valuation Display =
+"₹" & FORMAT(DIVIDE([Stock Gap Retail Valuation], 100000), "0.00") & " L"
+```
+
+These are presentation-only strings for cards. They are not numeric measures and must not be used for further arithmetic.
 
 ## Checking the measures
 

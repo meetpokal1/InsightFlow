@@ -26,7 +26,8 @@
                   "Property": "Basmati Break Even Volume Decline %"
                 }
               },
-              "queryRef": "Sales.Basmati Break Even Volume Decline %"
+              "queryRef": "Sales.Basmati Break Even Volume Decline %",
+              "displayName": "Volume Decline Tolerance"
             }
           ]
         }

@@ -147,6 +147,66 @@ def test_semantic_model_star_schema_and_measures():
     assert "Stockout Positions" in inv_measures
 
 
+def test_inventory_currency_cards_use_display_only_measures():
+    """Keep currency measures numeric while card-specific measures render INR lakh/crore labels."""
+    model_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "model.bim"
+    with open(model_file, "r", encoding="utf-8") as f:
+        model_data = json.load(f)
+
+    tables = {table["name"]: table for table in model_data["model"]["tables"]}
+    inv_measures = {measure["name"]: measure for measure in tables["Inventory"].get("measures", [])}
+
+    # Canonical measures must remain numeric so ratios, totals and future analysis are valid.
+    expected_numeric = {
+        "Stock Value": "SUM(Inventory[inventory_value])",
+        "Replenishment Cost Estimate": "SUM(Inventory[replenishment_cost_estimate])",
+        "Stock Gap Retail Valuation": "SUM(Inventory[stock_gap_retail_valuation])",
+    }
+    for name, expression in expected_numeric.items():
+        assert inv_measures[name]["expression"] == expression, (
+            f"Inventory.{name} must remain a numeric aggregation"
+        )
+
+    # Human-readable rupee units belong in separate text-only card measures.
+    expected_display = {
+        "Stock Value Display": 'FORMAT(DIVIDE([Stock Value], 10000000), "0.00")',
+        "Replenishment Cost Estimate Display": (
+            'FORMAT(DIVIDE([Replenishment Cost Estimate], 100000), "0.00")'
+        ),
+        "Stock Gap Retail Valuation Display": (
+            'FORMAT(DIVIDE([Stock Gap Retail Valuation], 100000), "0.00")'
+        ),
+    }
+    for name, fragment in expected_display.items():
+        assert name in inv_measures, f"Missing card display measure: {name}"
+        assert fragment in inv_measures[name]["expression"]
+
+    tmdl_file = (
+        POWERBI_DIR / "InsightFlow.SemanticModel" / "definition" / "tables" / "Inventory.tmdl"
+    )
+    tmdl = tmdl_file.read_text(encoding="utf-8")
+    for name, expression in expected_numeric.items():
+        assert f"measure '{name}' = {expression}" in tmdl
+    for name in expected_display:
+        assert f"measure '{name}' =" in tmdl
+
+    # Each rupee card must query its display-only measure, never the numeric amount.
+    card_bindings = {
+        "CardStockVal": "Stock Value Display",
+        "CardReplenishCost": "Replenishment Cost Estimate Display",
+        "CardStockGapRetail": "Stock Gap Retail Valuation Display",
+    }
+    pages_dir = POWERBI_DIR / "InsightFlow.Report" / "definition" / "pages"
+    for visual_name, measure_name in card_bindings.items():
+        visual_file = next(pages_dir.glob(f"*/visuals/{visual_name}/visual.json"))
+        with open(visual_file, "r", encoding="utf-8") as f:
+            visual_data = json.load(f)
+        projections = visual_data["visual"]["query"]["queryState"]["Data"]["projections"]
+        assert len(projections) == 1
+        assert projections[0]["field"]["Measure"]["Property"] == measure_name
+        assert projections[0]["queryRef"] == f"Inventory.{measure_name}"
+
+
 def test_powerbi_data_csvs_exist_and_non_empty():
     """Verify that powerbi/data contains all required CSVs for local desktop loading."""
     data_dir = POWERBI_DIR / "data"

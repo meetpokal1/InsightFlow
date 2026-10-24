@@ -97,8 +97,14 @@ def run_ui_qa():
             page.locator('[data-testid="stSidebar"]').get_by_text(
                 "Sales & Products", exact=True
             ).click()
-            page.wait_for_selector("text=Price & Margin Sensitivity Simulator", timeout=15000)
-            page.wait_for_timeout(2000)
+            page.wait_for_selector("text=Sales & Product Performance", timeout=15000)
+            page.wait_for_timeout(1500)
+
+            # Capture Sales & Products at top position showing KPIs and charts
+            page.locator("text=Sales & Product Performance").scroll_into_view_if_needed()
+            page.wait_for_timeout(1000)
+            page.screenshot(path=str(OUTPUT_DIR / "02_sales_and_products.png"))
+            print("Captured fresh 02_sales_and_products.png at top position")
 
             # Check initial simulator display (defaults to Basmati Rice P0010)
             sim_metrics_before = page.locator('[data-testid="stMetricValue"]').all_text_contents()
@@ -120,15 +126,12 @@ def run_ui_qa():
                 page.wait_for_timeout(2000)
                 print("Clicked Explicit volume change mode.")
 
-            # Capture focused simulator view
+            # Capture focused simulator component
             sim_section = page.locator("div.st-key-price-sensitivity-simulator")
             sim_section.scroll_into_view_if_needed()
             page.wait_for_timeout(1000)
             sim_section.screenshot(path=str(OUTPUT_DIR / "02_price_sensitivity_simulator.png"))
             print("Captured fresh 02_price_sensitivity_simulator.png")
-
-            page.screenshot(path=str(OUTPUT_DIR / "02_sales_and_products.png"), full_page=True)
-            print("Captured fresh 02_sales_and_products.png")
 
             # ---------------------------------------------------------
             # 3. Inventory Intelligence
@@ -138,7 +141,7 @@ def run_ui_qa():
                 "Inventory Intelligence", exact=True
             ).click()
             page.wait_for_selector("text=Priority review queue", timeout=20000)
-            page.wait_for_timeout(2500)
+            page.wait_for_timeout(1500)
 
             inv_metric_vals = page.locator('[data-testid="stMetricValue"]').all_text_contents()
             inv_metric_labels = page.locator('[data-testid="stMetricLabel"]').all_text_contents()
@@ -160,8 +163,11 @@ def run_ui_qa():
             print("Table has Replenish cost column:", has_replenish_cost)
             results["table_has_replenish_fields"] = has_buffer_deficit and has_replenish_cost
 
-            page.screenshot(path=str(OUTPUT_DIR / "03_inventory_intelligence.png"), full_page=True)
-            print("Captured fresh 03_inventory_intelligence.png")
+            # Capture Inventory Intelligence from top position showing key inventory cards & charts
+            page.get_by_text("Total Inventory Value", exact=True).first.scroll_into_view_if_needed()
+            page.wait_for_timeout(1000)
+            page.screenshot(path=str(OUTPUT_DIR / "03_inventory_intelligence.png"))
+            print("Captured fresh 03_inventory_intelligence.png at top position")
 
             # ---------------------------------------------------------
             # 4. Customers & Data Quality
@@ -171,7 +177,7 @@ def run_ui_qa():
                 "Customers & Data Quality", exact=True
             ).click()
             page.wait_for_selector("text=Data quality actions", timeout=20000)
-            page.wait_for_timeout(2500)
+            page.wait_for_timeout(1500)
 
             dq_metric_vals = page.locator('[data-testid="stMetricValue"]').all_text_contents()
             dq_metric_labels = page.locator('[data-testid="stMetricLabel"]').all_text_contents()
@@ -179,10 +185,13 @@ def run_ui_qa():
             print("Data Quality metrics displayed:", dq_metrics)
             results["data_quality_metrics"] = dq_metrics
 
-            page.screenshot(
-                path=str(OUTPUT_DIR / "04_customers_and_data_quality.png"), full_page=True
-            )
-            print("Captured fresh 04_customers_and_data_quality.png")
+            # Capture Customers & Data Quality from top header showing reconciliation metrics
+            page.locator(
+                "text=Pipeline Assurance & Reconciliation Balance"
+            ).scroll_into_view_if_needed()
+            page.wait_for_timeout(1000)
+            page.screenshot(path=str(OUTPUT_DIR / "04_customers_and_data_quality.png"))
+            print("Captured fresh 04_customers_and_data_quality.png at top position")
 
             browser.close()
             print(

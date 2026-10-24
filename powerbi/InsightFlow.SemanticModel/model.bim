@@ -75,7 +75,7 @@
             "name": "unit_price",
             "dataType": "double",
             "sourceColumn": "unit_price",
-            "formatString": "\"\u20b9\"#,##0.00"
+            "formatString": "\"₹\"#,##0.00"
           },
           {
             "name": "discount_pct",
@@ -87,38 +87,38 @@
             "name": "net_revenue",
             "dataType": "double",
             "sourceColumn": "net_revenue",
-            "formatString": "\"\u20b9\"#,##0.00"
+            "formatString": "\"₹\"#,##0.00"
           },
           {
             "name": "cost_of_goods",
             "dataType": "double",
             "sourceColumn": "cost_of_goods",
-            "formatString": "\"\u20b9\"#,##0.00"
+            "formatString": "\"₹\"#,##0.00"
           },
           {
             "name": "gross_profit",
             "dataType": "double",
             "sourceColumn": "gross_profit",
-            "formatString": "\"\u20b9\"#,##0.00"
+            "formatString": "\"₹\"#,##0.00"
           }
         ],
         "measures": [
           {
             "name": "Revenue",
             "expression": "SUM(Sales[net_revenue])",
-            "formatString": "\"\u20b9\"#,##0",
+            "formatString": "\"₹\"#,##0",
             "description": "Total net revenue across completed customer orders"
           },
           {
             "name": "Cost of Goods",
             "expression": "SUM(Sales[cost_of_goods])",
-            "formatString": "\"\u20b9\"#,##0",
+            "formatString": "\"₹\"#,##0",
             "description": "Total catalog cost of goods sold"
           },
           {
             "name": "Gross Profit",
             "expression": "[Revenue] - [Cost of Goods]",
-            "formatString": "\"\u20b9\"#,##0",
+            "formatString": "\"₹\"#,##0",
             "description": "Gross margin profit contribution (Revenue - COGS)"
           },
           {
@@ -136,7 +136,7 @@
           {
             "name": "Average Order Value",
             "expression": "DIVIDE([Revenue], [Orders])",
-            "formatString": "\"\u20b9\"#,##0",
+            "formatString": "\"₹\"#,##0",
             "description": "Net revenue per completed order"
           },
           {
@@ -154,13 +154,13 @@
           {
             "name": "Basmati Rice Net Revenue",
             "expression": "CALCULATE([Revenue], Product[product_id] = \"P0010\")",
-            "formatString": "\"\u20b9\"#,##0",
+            "formatString": "\"₹\"#,##0",
             "description": "Net revenue for flagship product P0010 Basmati Rice 5kg"
           },
           {
             "name": "Basmati Rice Gross Profit",
             "expression": "CALCULATE([Gross Profit], Product[product_id] = \"P0010\")",
-            "formatString": "\"\u20b9\"#,##0",
+            "formatString": "\"₹\"#,##0",
             "description": "Gross profit for flagship product P0010 Basmati Rice 5kg"
           },
           {
@@ -256,7 +256,7 @@
             "name": "inventory_value",
             "dataType": "double",
             "sourceColumn": "inventory_value",
-            "formatString": "\"\u20b9\"#,##0.00"
+            "formatString": "\"₹\"#,##0.00"
           },
           {
             "name": "units_sold_90d",
@@ -293,13 +293,13 @@
             "name": "replenishment_cost_estimate",
             "dataType": "double",
             "sourceColumn": "replenishment_cost_estimate",
-            "formatString": "\"\u20b9\"#,##0.00"
+            "formatString": "\"₹\"#,##0.00"
           },
           {
             "name": "stock_gap_retail_valuation",
             "dataType": "double",
             "sourceColumn": "stock_gap_retail_valuation",
-            "formatString": "\"\u20b9\"#,##0.00"
+            "formatString": "\"₹\"#,##0.00"
           },
           {
             "name": "is_stockout",
@@ -316,8 +316,13 @@
           {
             "name": "Stock Value",
             "expression": "SUM(Inventory[inventory_value])",
-            "formatString": "\"\u20b9\"#,##0",
-            "description": "Total valuation of stock on hand at cost price (\u20b922.49M)"
+            "formatString": "\"₹\"#,##0",
+            "description": "Total valuation of stock on hand at cost price (₹22.49M)"
+          },
+          {
+            "name": "Stock Value Display",
+            "expression": "\"₹\" & FORMAT(DIVIDE([Stock Value], 10000000), \"0.00\") & \" Cr\"",
+            "description": "Presentation-only Indian-unit label; use Stock Value for numeric calculations"
           },
           {
             "name": "Stock Positions",
@@ -358,14 +363,24 @@
           {
             "name": "Replenishment Cost Estimate",
             "expression": "SUM(Inventory[replenishment_cost_estimate])",
-            "formatString": "\"\u20b9\"#,##0",
-            "description": "Working capital required at purchase cost to restore buffer stock (\u20b99.66 L)"
+            "formatString": "\"₹\"#,##0",
+            "description": "Working capital required at purchase cost to restore buffer stock (₹9.66 L)"
+          },
+          {
+            "name": "Replenishment Cost Estimate Display",
+            "expression": "\"₹\" & FORMAT(DIVIDE([Replenishment Cost Estimate], 100000), \"0.00\") & \" L\"",
+            "description": "Presentation-only Indian-unit label; use Replenishment Cost Estimate for numeric calculations"
           },
           {
             "name": "Stock Gap Retail Valuation",
             "expression": "SUM(Inventory[stock_gap_retail_valuation])",
-            "formatString": "\"\u20b9\"#,##0",
-            "description": "Catalog retail valuation of buffer deficit units; NOT lost revenue (\u20b913.41 L)"
+            "formatString": "\"₹\"#,##0",
+            "description": "Catalog retail valuation of buffer deficit units; NOT lost revenue (₹13.41 L)"
+          },
+          {
+            "name": "Stock Gap Retail Valuation Display",
+            "expression": "\"₹\" & FORMAT(DIVIDE([Stock Gap Retail Valuation], 100000), \"0.00\") & \" L\"",
+            "description": "Presentation-only Indian-unit label; use Stock Gap Retail Valuation for numeric calculations"
           }
         ],
         "partitions": [

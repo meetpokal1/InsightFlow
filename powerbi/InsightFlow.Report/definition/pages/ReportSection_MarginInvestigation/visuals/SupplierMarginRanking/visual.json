@@ -26,7 +26,8 @@
                   "Property": "supplier_name"
                 }
               },
-              "queryRef": "Product.supplier_name"
+              "queryRef": "Product.supplier_name",
+              "displayName": "Supplier"
             }
           ]
         },
@@ -43,7 +44,8 @@
                   "Property": "Gross Margin %"
                 }
               },
-              "queryRef": "Sales.Gross Margin %"
+              "queryRef": "Sales.Gross Margin %",
+              "displayName": "Gross Margin %"
             }
           ]
         }

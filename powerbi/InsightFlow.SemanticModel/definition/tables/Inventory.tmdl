@@ -7,6 +7,10 @@ table Inventory
 		formatString: "₹"#,##0
 		lineageTag: 28129eed-62af-4ac4-973d-730938fa6576
 
+	/// Presentation-only currency label; the canonical Stock Value measure remains numeric.
+	measure 'Stock Value Display' = "₹" & FORMAT(DIVIDE([Stock Value], 10000000), "0.00") & " Cr"
+		lineageTag: 7cdb76c4-3f66-4d1b-8d1c-1f71d8b1a001
+
 	/// Total tracked product-location inventory positions (449)
 	measure 'Stock Positions' = COUNTROWS(Inventory)
 		formatString: #,0
@@ -42,10 +46,18 @@ table Inventory
 		formatString: "₹"#,##0
 		lineageTag: 55d4ba0a-8533-44e5-93fb-90fe72792fec
 
+	/// Presentation-only currency label; the canonical cost estimate remains numeric.
+	measure 'Replenishment Cost Estimate Display' = "₹" & FORMAT(DIVIDE([Replenishment Cost Estimate], 100000), "0.00") & " L"
+		lineageTag: 7cdb76c4-3f66-4d1b-8d1c-1f71d8b1a002
+
 	/// Catalog retail valuation of buffer deficit units; NOT lost revenue (₹13.41 L)
 	measure 'Stock Gap Retail Valuation' = SUM(Inventory[stock_gap_retail_valuation])
 		formatString: "₹"#,##0
 		lineageTag: 7b12bb69-80d2-4aa9-af3d-df27e29fc91e
+
+	/// Presentation-only currency label; the canonical retail valuation remains numeric.
+	measure 'Stock Gap Retail Valuation Display' = "₹" & FORMAT(DIVIDE([Stock Gap Retail Valuation], 100000), "0.00") & " L"
+		lineageTag: 7cdb76c4-3f66-4d1b-8d1c-1f71d8b1a003
 
 	column inventory_id
 		dataType: string

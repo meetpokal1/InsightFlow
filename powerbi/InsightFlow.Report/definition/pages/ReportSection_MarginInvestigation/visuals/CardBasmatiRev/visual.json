@@ -26,7 +26,8 @@
                   "Property": "Basmati Rice Net Revenue"
                 }
               },
-              "queryRef": "Sales.Basmati Rice Net Revenue"
+              "queryRef": "Sales.Basmati Rice Net Revenue",
+              "displayName": "Net Revenue (Basmati Rice)"
             }
           ]
         }
