@@ -1,8 +1,8 @@
 # Report pages
 
-Four pages, each answering one question. Build them in Power BI Desktop after the model and the
-measures are in place ([README.md](README.md), [dax_measures.md](dax_measures.md)). The
-screenshots in `screenshots/` are layout wireframes until you replace them with real exports.
+Four pages, each answering one question. The report pages and semantic model are fully authored in
+`InsightFlow.pbip` ([README.md](README.md), [dax_measures.md](dax_measures.md)), with verified runtime
+captures saved in `screenshots/powerbi/`.
 
 ## Rules for every page
 
@@ -123,5 +123,5 @@ matrix off from the cards with **Edit interactions** so the cards keep showing a
    revenue card.
 3. Select one month. `[Revenue MoM %]` in the tooltip of the monthly chart is the change against
    the month before.
-4. Export each finished page (File > Export, or a screenshot) and save it over the wireframe in
-   `screenshots/` under the same file name.
+4. Export or capture each finished page and verify against the baseline captures in
+   `screenshots/powerbi/` under the corresponding page name.

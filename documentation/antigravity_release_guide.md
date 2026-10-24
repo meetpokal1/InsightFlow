@@ -92,4 +92,4 @@ Wait for the deployment build to finish, open the public URL, test all four navi
 
 - Confirm the GitHub Actions run is green. Fix real failures; do not disable tests just to get a green badge.
 - Update this README with links to the verified hosted demo and genuine runtime screenshots.
-- Keep the Power BI PNGs clearly labelled as wireframes until the `.pbix` has been built and validated in Power BI Desktop.
+- Power BI Desktop report pages and semantic model architecture are fully authored in `powerbi/InsightFlow.pbip` and captured in `screenshots/powerbi/`.

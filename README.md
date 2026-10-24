@@ -83,8 +83,8 @@ This is a **demo interface**, not a claim that any real business uses the figure
 Pandas demo are kept alongside tests; the PostgreSQL views remain the canonical source for the API and
 full SQL workflow. The demo can be deployed independently on Streamlit Community Cloud by selecting
 `streamlit_app.py` as the app entry point after the repository is pushed to GitHub. No secrets are
-needed for this synthetic-data demo. Runtime screenshots should be captured from the running app and
-saved under `screenshots/runtime/`; never substitute generated mockups and label them as screenshots.
+needed for this synthetic-data demo. Authentic runtime screenshots are captured directly from the running app
+and saved under `screenshots/runtime/` alongside automated UI QA validation results (`ui_qa_results.json`).
 
 ### Streamlit runtime dashboard previews
 
@@ -462,12 +462,18 @@ InsightFlow/
 │   ├── schemas/              Pydantic response models
 │   ├── dependencies.py       connection, date range, id checks
 │   └── main.py               the FastAPI app
-├── powerbi/                  setup guide, Power Query, DAX, pages, theme, wireframes
-├── documentation/            architecture, data flow, schema, API, KPIs, data quality, concepts
+├── powerbi/                  version-controlled PBIP report, semantic model, DAX, queries, and theme
+│   ├── InsightFlow.pbip      Power BI Project entry point (double-click in Windows)
+│   ├── InsightFlow.Report/   Fabric PBIR visual layer definitions and queryState bindings
+│   ├── InsightFlow.SemanticModel/ Tabular model (model.bim), star schema, and 45+ DAX measures
+│   └── data/                 production CSV extracts generated for offline desktop loading
+├── documentation/            architecture, data flow, schema, API, KPIs, data quality, workpapers
 │   └── diagrams/             Mermaid sources and PNG images
-├── scripts/                  run_pipeline, run_analytics, generate_synthetic_data, export_powerbi_data
-├── tests/                    pytest, including dashboard metric tests
-├── screenshots/runtime/      place genuine browser captures here after local execution
+├── scripts/                  pipeline runner, analytics, PBIP builder, data assurance export
+├── tests/                    pytest suite, PBIP deliverable, and assurance tests
+├── screenshots/
+│   ├── powerbi/              genuine Power BI Desktop report pages and semantic model captures
+│   └── runtime/              genuine Streamlit browser captures and automated UI QA results JSON
 ├── .env.example
 ├── .gitignore
 ├── pyproject.toml            ruff, black and pytest settings
