@@ -802,6 +802,20 @@ elif page == "Sales & Products":
 
             be_pct = sim_res["break_even_volume_decline_pct"]
             if be_pct is not None and be_pct > 0:
+                st.markdown(
+                    f"""
+                    <div style="background: rgba(16, 185, 129, 0.08); border-left: 4px solid #059669; border-radius: 6px; padding: 12px 18px; margin: 12px 0 14px 0;">
+                        <div style="display: flex; align-items: baseline; gap: 12px;">
+                            <span style="font-size: 1.5rem; font-weight: 700; color: #047857; line-height: 1;">{be_pct:.1f}%</span>
+                            <span style="font-size: 0.95rem; font-weight: 600; color: #065f46;">Break-Even Volume Drop Buffer</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #374151; margin-top: 4px;">
+                            At a <strong>{price_change:+.1f}%</strong> price adjustment, customer sales volume can contract by up to <strong>{be_pct:.1f}%</strong> before baseline gross profit (₹{sim_res["baseline"]["gross_profit"]:,.2f}) is compromised.
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
                 st.success(
                     f"**Break-Even Tolerance:** At a **{price_change:+.1f}%** price adjustment, unit sales volume can decline by up to **{be_pct:.1f}%** before gross profit falls below the current baseline (₹{sim_res['baseline']['gross_profit']:,.2f})."
                 )
@@ -1023,7 +1037,14 @@ elif page == "Inventory Intelligence":
         display["Product"] = display["product_name"]
         display["Category"] = display["category_name"]
         display["Location"] = display["location_name"]
-        display["Status"] = display["stock_status"]
+        status_badges = {
+            "Out of stock": "🔴 Out of stock",
+            "Stock-out risk": "🟠 Stock-out risk",
+            "Low stock": "🟡 Low stock",
+            "Healthy": "🟢 Healthy",
+            "Overstocked": "🔵 Overstocked",
+        }
+        display["Status"] = display["stock_status"].map(lambda x: status_badges.get(x, x))
 
         table_cols = [
             "Product",
