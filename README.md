@@ -57,8 +57,7 @@ gives a different number depending on who built the spreadsheet.
 - **Power BI Project (`InsightFlow.pbip`).** A version-controlled Microsoft Fabric / Power BI Desktop project
   with a star schema, 45+ DAX measures, local data extracts, and 4 report pages (`Executive Profitability`,
   `Margin Investigation`, `Inventory Decisions`, `Data Integrity & Pipeline Assurance`).
-- **Tests what matters.** 161 automated tests passing without PostgreSQL (69 database tests skipped when offline; 230 total) covering data cleaning rules, inventory replenishment boundaries,
-  price sensitivity modeling, Excel workpaper integrity, and PBIP semantic model structures. Some database tests require PostgreSQL.
+- **Tests what matters.** Automated tests cover data cleaning, inventory replenishment boundaries, price sensitivity, Excel workpaper integrity, PBIP semantic-model structure, raw-SQL execution, and Date-key coverage. GitHub Actions provisions PostgreSQL, runs the pipeline and export, then runs the complete suite plus blocking Ruff lint and formatting checks. Offline runs skip explicitly database-dependent tests.
 
 ## Interactive demo dashboard
 
@@ -210,7 +209,7 @@ The semantic model implements a validated single-direction star schema centered 
 
 - **Star Schema Integrity:** Four core dimensions (`Product`, `Customer`, `Location`, `Date`) filter facts via 1:N single-direction relationships with 100% foreign key coverage across all 34,007 sales records.
 - **Calculated at Source:** Net revenue, gross margins, inventory health statuses, and customer RFM profiles are standardized across PostgreSQL views, Streamlit, and Power BI DAX.
-- **Continuous Date Calendar:** Marked `Date` dimension with 1,004 days (2024-01-01 to 2026-09-30) supporting time-intelligence measures with 100% key alignment to `Sales.order_date`.
+- **Continuous Date Calendar:** The source CSV contains 2,192 daily rows (2023-01-01 through 2028-12-31). Power Query filters the imported `Date` table to whole months spanning the current sales dataset (730 days, 2024-10-01 through 2026-09-30), with 100% sales date-key coverage against the source calendar.
 - **Type-Safe Data Quality Reconciliations:** Standalone verification entity tracking raw ingestion against clean loads with automated checksum validation.
 
 ---
@@ -392,10 +391,12 @@ The KPI formulas are in [kpi_definitions.md](documentation/kpi_definitions.md).
 ## Tests
 
 ```bash
+python scripts/run_pipeline.py --skip-db
+python scripts/export_powerbi_data.py
 python -m pytest tests/ -k "not test_database and not test_api" -v
 ```
 
-161 automated unit tests pass without requiring a running database service (69 database/API tests skipped when offline; 230 total):
+Generate the local synthetic pipeline outputs and Power BI CSV extracts before running the self-contained offline test suite. Database/API tests are excluded from that command; the GitHub Actions job provisions PostgreSQL and runs the full suite. The latest verified CI run on 24 October 2026 passed 233 tests, followed by successful Ruff lint and formatting checks:
 
 | Area | What is checked | Test Module |
 |---|---|---|
