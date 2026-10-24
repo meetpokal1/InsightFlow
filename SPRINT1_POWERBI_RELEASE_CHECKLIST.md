@@ -1,6 +1,7 @@
 # InsightFlow Power BI Deliverable — Release Checklist & Gate
 
 **Audit Date:** October 23, 2026  
+**CI Revalidation:** October 24, 2026 — [GitHub Actions run #11](https://github.com/meetpokal1/InsightFlow/actions/runs/40068679173) passed with 233 tests and successful Ruff lint/format checks. The source CSV calendar now has 2,192 rows (2023-01-01 through 2028-12-31); Power Query filters the model to 730 dates for the current sales period.  
 **Project:** InsightFlow Retail Analytics Decision-Support Product  
 **Project Directory:** `powerbi/`  
 **Power BI Project:** `powerbi/InsightFlow.pbip`  
@@ -12,7 +13,7 @@
 
 | Checklist Category | Item Description | Verification Method | Status | Notes |
 |---|---|---|---|---|
-| **Data Extracts & Refresh** | All 7 production CSV extracts present in `powerbi/data/` | File system inspection & row count check | **PASS** | `Sales` (34,007 rows), `Inventory` (449 rows), `Product` (60 rows), `Customer` (800 rows), `Location` (8 rows), `Date` (1,004 rows), `DataQualityReconciliation` (8 rows) verified. |
+| **Data Extracts & Refresh** | All 7 production CSV extracts present in `powerbi/data/` | File system inspection & row count check | **PASS** | `Sales` (34,007 rows), `Inventory` (449 rows), `Product` (60 rows), `Customer` (800 rows), `Location` (8 rows), `Date` (2,192 source rows; 730 rows retained in the report after Power Query filtering), `DataQualityReconciliation` (8 rows) verified. |
 | **Data Extracts & Refresh** | Local CSV data refresh inside Power BI Desktop | Analysis Services cache verification | **PASS** | `cache.abf` populated; Power BI Desktop successfully loads and synchronizes all tables. |
 | **Parameter Architecture** | Portability of `DataFolder` Power Query parameter | Model inspection & test assertion | **PASS** | Configured under `expressions.tmdl` / `model.bim`; handles paths with/without trailing slash; editable via Desktop UI or `build_powerbi_pbip.py`. |
 | **Model Relationships** | 6 active single-direction star-schema relationships | TMDL & relationship integrity script | **PASS** | 0 orphan foreign keys; dimension primary keys are 100% unique; data types match. |
@@ -24,7 +25,7 @@
 | **Date Dimension Keys** | Date dimension key typing (`dim_date.csv` `date_key`) & `Sales_Date` relationship | Power Query M date typing & VertiPaq relationship integrity | **PASS** | Resolved `Revenue by year_month` single `(Blank)` point issue. `Date.date_key` typed to `date` / `dateTime` in M and TMDL, matching `Sales.order_date` (100% key match, 34,007 rows). |
 | **Data Assurance Types** | `DataQualityReconciliation` numeric typing (`int64`, `double`) & M transformation | Live SSAS query & unit test assertions | **PASS** | Resolved Page 4 card visual errors. Columns `raw_ingested`, `exact_duplicates_dropped`, `quarantined_rejected`, `merged_deduplicated`, `clean_loaded` typed to `int64` and `preservation_rate` to `double` in TMDL and M partition. |
 | **Automated Tests** | Power BI deliverable unit test suite | `pytest tests/test_powerbi_deliverable.py` | **PASS** | 12 passed in 0.24s, 0 failures (includes data assurance type validation). |
-| **Full Regression Suite**| Full repository test suite | `pytest tests/ -v` | **PASS** | 160 passed, 69 skipped (Postgres container offline), 0 failures. |
+| **Full Regression Suite**| Full repository test suite | `pytest tests/ -v` | **PASS** | Original offline snapshot: 160 passed and 69 skipped because PostgreSQL was unavailable. The database-enabled GitHub Actions run on 24 October 2026 passed 233 tests with zero failures; blocking Ruff lint and formatting checks passed. |
 | **Interactive Slicers** | Cross-filtering & visual interactions | Model schema & PBIR layout | **PASS** | Dimensional relationships filter facts as intended; date slicer reaches Sales and is isolated from Inventory snapshot. |
 | **VertiPaq Cache Persistence** | Retention of local database `.pbi/cache.abf` across project rebuilds | Build script verification & FS inspection | **PASS** | `build_powerbi_pbip.py` preserves local VertiPaq cache by default, preventing repeated uncalculated table/relationship warnings. |
 | **Relationship Parity** | Parity of 6 model relationships before and after save/refresh | TMDL & model comparison | **PASS** | 0 relationships altered; yellow warning was an artifact of uncalculated relationships in an empty VertiPaq DB. |
@@ -145,7 +146,7 @@ When opening the PBIP project in Power BI Desktop (v2.159.883.0 / October 2026),
    - Preserved all 28 modern PBIR `visual.json` files in `definition/pages/*/visuals/` for environments where the enhanced report format preview is enabled.
 3. **Automated Verification**:
    - All 11 Power BI deliverable tests in `tests/test_powerbi_deliverable.py` pass.
-   - Full test suite passes: 160 passed, 69 skipped, 0 failures.
+   - The original offline run skipped database-dependent tests; the database-enabled GitHub Actions revalidation on 24 October 2026 passed 233 tests with zero failures.
 
 ---
 
@@ -301,7 +302,7 @@ Using a direct ADOMD connection to the running Analysis Services instance (`msmd
    - Dual report definition architecture (`report.json` with VertiPaq `prototypeQuery` + modern PBIR `definition/`) ensures out-of-the-box rendering in Power BI Desktop.
    - All 6 star-schema relationships are active with matching types and 0 orphan keys.
    - VertiPaq cache persistence issue resolved; `cache.abf` is retained across PBIP rebuilds, preventing repeated refresh warnings on launch.
-   - All 161 automated unit, deliverable, and regression tests pass cleanly (0 failed, 69 skipped for offline Postgres container).
+   - Historical offline test counts are superseded by the database-enabled GitHub Actions run on 24 October 2026: 233 tests passed, zero failures, and Ruff lint/format checks passed.
 2. **Desktop Visual Verification Complete:**
    - User confirmed live visual rendering in Power BI Desktop.
    - All four report pages successfully captured via Power BI Desktop Bridge CLI into `screenshots/powerbi/` and visually inspected with 0 errors, 0 blank cards, and populated data across all tables and charts.
