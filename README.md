@@ -395,7 +395,7 @@ python scripts/export_powerbi_data.py
 python -m pytest tests/ -k "not test_database and not test_api" -v
 ```
 
-Generate the local synthetic pipeline outputs and Power BI CSV extracts before running the self-contained offline test suite. Database/API tests are excluded from that command; the GitHub Actions job provisions PostgreSQL and runs the full suite. The latest verified CI run on 24 October 2026 passed 233 tests, followed by successful Ruff lint and formatting checks:
+Generate the local synthetic pipeline outputs and Power BI CSV extracts before running the self-contained offline test suite. Database/API tests are excluded from that command; the GitHub Actions job provisions PostgreSQL and runs the full suite. The latest verified CI run on 24 October 2026 passed 234 tests, followed by successful Ruff lint and formatting checks:
 
 | Area | What is checked | Test Module |
 |---|---|---|
