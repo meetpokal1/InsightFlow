@@ -1,0 +1,146 @@
+/// Line-level completed order transactions
+table Sales
+	lineageTag: 79b54730-b861-43fd-89d6-23a670b173a6
+
+	/// Total net revenue across completed customer orders
+	measure Revenue = SUM(Sales[net_revenue])
+		formatString: "₹"#,##0
+		lineageTag: 21efbcb8-c69d-4293-b7fb-42452c6782a0
+
+	/// Total catalog cost of goods sold
+	measure 'Cost of Goods' = SUM(Sales[cost_of_goods])
+		formatString: "₹"#,##0
+		lineageTag: 7e1546e5-b294-4d55-9ea1-5b1419f1fe90
+
+	/// Gross margin profit contribution (Revenue - COGS)
+	measure 'Gross Profit' = [Revenue] - [Cost of Goods]
+		formatString: "₹"#,##0
+		lineageTag: b6649779-b35f-4f91-ad9c-07211ba17e45
+
+	/// Gross profit percentage of net revenue
+	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Revenue])
+		formatString: 0.0%
+		lineageTag: e07e6768-016c-4e5c-bf00-cac4b1752487
+
+	/// Count of distinct completed orders
+	measure Orders = DISTINCTCOUNT(Sales[order_id])
+		formatString: #,0
+		lineageTag: a571b73b-d787-443e-a76a-e57eaf73c6a6
+
+	/// Net revenue per completed order
+	measure 'Average Order Value' = DIVIDE([Revenue], [Orders])
+		formatString: "₹"#,##0
+		lineageTag: e03d9e0c-110e-4bf6-9ed6-642251c1e81f
+
+	/// Total item units sold
+	measure 'Units Sold' = SUM(Sales[quantity])
+		formatString: #,0
+		lineageTag: ea7a9fec-c46b-4759-a1b6-2f0e2267a8dd
+
+	/// Distinct buying customers
+	measure 'Active Customers' = DISTINCTCOUNT(Sales[customer_id])
+		formatString: #,0
+		lineageTag: 6411d451-4372-4d1d-920f-29b8defa8f90
+
+	/// Net revenue for flagship product P0010 Basmati Rice 5kg
+	measure 'Basmati Rice Net Revenue' = CALCULATE([Revenue], Product[product_id] = "P0010")
+		formatString: "₹"#,##0
+		lineageTag: c18c0b7c-bff4-42f2-bc92-95e01555b580
+
+	/// Gross profit for flagship product P0010 Basmati Rice 5kg
+	measure 'Basmati Rice Gross Profit' = CALCULATE([Gross Profit], Product[product_id] = "P0010")
+		formatString: "₹"#,##0
+		lineageTag: 12f19da7-a1e5-4194-aa08-99efd0ed38eb
+
+	/// Gross margin for flagship product P0010 Basmati Rice 5kg (2.15%)
+	measure 'Basmati Rice Margin %' = CALCULATE([Gross Margin %], Product[product_id] = "P0010")
+		formatString: 0.0%
+		lineageTag: a22e759f-9af9-4962-b9db-ea4eb539ece6
+
+	/// Break-even volume decline tolerance for Basmati Rice at +3% price increase (58.3%)
+	measure 'Basmati Break Even Volume Decline %' = 1 - DIVIDE(CALCULATE([Gross Profit], Product[product_id] = "P0010"), (CALCULATE([Revenue], Product[product_id] = "P0010") * 1.03) - CALCULATE([Cost of Goods], Product[product_id] = "P0010"))
+		formatString: 0.0%
+		lineageTag: 38a7dae9-653c-4fe5-a333-15ed04d38806
+
+	column order_item_id
+		dataType: string
+		lineageTag: 5f54a23e-ff06-4a2e-b09f-c6de1e49e41c
+		sourceColumn: order_item_id
+
+	column order_id
+		dataType: string
+		lineageTag: 166b7dda-0e79-4262-92d4-400a7761fed7
+		sourceColumn: order_id
+
+	column order_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: b6e17f4c-c73d-4231-a874-bbbaae06e0ff
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: 1216547d-7eca-494d-8e4f-7c1d6e7cd497
+		sourceColumn: customer_id
+
+	column location_id
+		dataType: string
+		lineageTag: be9474d7-1bce-484e-a319-27408dfcf727
+		sourceColumn: location_id
+
+	column product_id
+		dataType: string
+		lineageTag: ad928710-b88e-400e-bce1-341edcd46c51
+		sourceColumn: product_id
+
+	column quantity
+		dataType: int64
+		formatString: #,0
+		lineageTag: 4a35d68e-06a8-425c-9ea4-235b148ba7e0
+		sourceColumn: quantity
+
+	column unit_price
+		dataType: double
+		formatString: "₹"#,##0.00
+		lineageTag: 6fe5df13-2024-448a-978b-717558c5254b
+		sourceColumn: unit_price
+
+	column discount_pct
+		dataType: double
+		formatString: 0.0%
+		lineageTag: b87d31e8-86a8-4326-be86-a134f9994648
+		sourceColumn: discount_pct
+
+	column net_revenue
+		dataType: double
+		formatString: "₹"#,##0.00
+		lineageTag: 7ba54beb-e4fe-4061-85a9-e5bb49736bc8
+		sourceColumn: net_revenue
+
+	column cost_of_goods
+		dataType: double
+		formatString: "₹"#,##0.00
+		lineageTag: 6a2cff77-5fa7-451e-8d95-c9ece33ec8f6
+		sourceColumn: cost_of_goods
+
+	column gross_profit
+		dataType: double
+		formatString: "₹"#,##0.00
+		lineageTag: cde4ea38-1783-4c56-a190-2801aabe6660
+		sourceColumn: gross_profit
+
+	partition SalesPartition = m
+		source =
+				let
+				    FolderPath = if Text.EndsWith(DataFolder, "\") or Text.EndsWith(DataFolder, "/") then DataFolder else DataFolder & "\",
+				    Source = Csv.Document(File.Contents(FolderPath & "vw_fact_sales.csv"), [Delimiter=",", Columns=12, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_item_id", type text}, {"order_id", type text}, {"order_date", type date}, {"customer_id", type text}, {"location_id", type text}, {"product_id", type text}, {"quantity", Int64.Type}, {"unit_price", type number}, {"discount_pct", type number}, {"net_revenue", type number}, {"cost_of_goods", type number}, {"gross_profit", type number}})
+				in
+				    #"Changed Type"
+

@@ -1,0 +1,92 @@
+/// Marked calendar date dimension
+table Date
+	lineageTag: 922d2cd5-ce9c-459b-9ff1-339549ec03e6
+
+	column date_key
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: fdba0ce3-c440-40d3-bfb5-740a962f8ced
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation UnderlyingDateTimeDataType = Date
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		lineageTag: 0ab98c76-c0ef-4ba1-a249-ed627e5e9c29
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: int64
+		lineageTag: 02d66da4-1497-45cd-bb5e-74d1cbf55815
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter_name
+		dataType: string
+		lineageTag: 6b076e68-decd-4e8b-8066-b954d260a7a5
+		sourceColumn: quarter_name
+
+	column month
+		dataType: int64
+		lineageTag: 9519a974-881f-418f-9e0c-348bf5d5f29b
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: a4a9f317-46a1-4c1d-b6d5-6f5a3a393d6b
+		sourceColumn: month_name
+
+	column year_month
+		dataType: string
+		lineageTag: 775ca94d-555f-4c0c-823d-0f3ec2cc6827
+		summarizeBy: none
+		sourceColumn: year_month
+
+	column day
+		dataType: int64
+		lineageTag: 04edc1ae-2b25-4495-bfc5-1f969ca6e07b
+		summarizeBy: none
+		sourceColumn: day
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week
+		dataType: int64
+		lineageTag: 63a26ea9-9569-4126-8fa5-2207d6cec164
+		summarizeBy: none
+		sourceColumn: day_of_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: e3a096c0-44fa-4724-8111-182a725d99dd
+		sourceColumn: day_name
+
+	column is_weekend
+		dataType: boolean
+		lineageTag: 7e1fc5b4-e0e1-404c-ac72-e4cf08c75bd2
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DatePartition = m
+		source =
+				let
+				    FolderPath = if Text.EndsWith(DataFolder, "\") or Text.EndsWith(DataFolder, "/") then DataFolder else DataFolder & "\",
+				    Source = Csv.Document(File.Contents(FolderPath & "dim_date.csv"), [Delimiter=",", Columns=11, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"date_key", type date}, {"year", Int64.Type}, {"quarter", Int64.Type}, {"quarter_name", type text}, {"month", Int64.Type}, {"month_name", type text}, {"year_month", type text}, {"day", Int64.Type}, {"day_of_week", Int64.Type}, {"day_name", type text}, {"is_weekend", type logical}}, "en-US")
+				in
+				    #"Changed Type"

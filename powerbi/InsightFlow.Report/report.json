@@ -1,0 +1,266 @@
+{
+  "config": "{\"version\": \"5.50\", \"themeCollection\": {\"baseTheme\": {\"name\": \"CY24SU10\", \"reportVersionAtImport\": {\"visual\": \"1.8.89\", \"report\": \"2.0.89\", \"page\": \"1.3.89\"}, \"type\": \"SharedResources\"}}, \"activeSectionIndex\": 0}",
+  "layoutOptimization": 0,
+  "sections": [
+    {
+      "name": "ReportSection_ExecProfitability",
+      "displayName": "Executive Profitability",
+      "width": 1280,
+      "height": 720,
+      "config": "{\"visibility\": 0}",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 1240,
+          "height": 50,
+          "config": "{\"name\": \"PageHeader\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 1240, \"height\": 50}}], \"singleVisual\": {\"visualType\": \"textbox\", \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Executive Profitability Overview\", \"textStyle\": {\"fontFamily\": \"'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif\", \"fontSize\": \"16pt\", \"color\": \"#111827\"}}]}]}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardRevenue\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Revenue\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Revenue\"}, \"Name\": \"Sales.Revenue\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Net Revenue'\"}}}}}]}}}"
+        },
+        {
+          "x": 270,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardGrossProfit\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 270, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Gross Profit\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Gross Profit\"}, \"Name\": \"Sales.Gross Profit\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Gross Profit'\"}}}}}]}}}"
+        },
+        {
+          "x": 520,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardGrossMargin\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 520, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Gross Margin %\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Gross Margin %\"}, \"Name\": \"Sales.Gross Margin %\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Gross Margin %'\"}}}}}]}}}"
+        },
+        {
+          "x": 770,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardOrders\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 770, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Orders\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Orders\"}, \"Name\": \"Sales.Orders\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Completed Orders'\"}}}}}]}}}"
+        },
+        {
+          "x": 1020,
+          "y": 80,
+          "z": 1000,
+          "width": 240,
+          "height": 110,
+          "config": "{\"name\": \"CardAOV\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 1020, \"y\": 80, \"z\": 1000, \"width\": 240, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Average Order Value\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Average Order Value\"}, \"Name\": \"Sales.Average Order Value\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Average Order Value'\"}}}}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 210,
+          "z": 2000,
+          "width": 780,
+          "height": 480,
+          "config": "{\"name\": \"MonthlyRevenueTrend\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 210, \"z\": 2000, \"width\": 780, \"height\": 480}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"Date.year_month\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sales.Revenue\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"d\", \"Entity\": \"Date\", \"Type\": 0}, {\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"d\"}}, \"Property\": \"year_month\"}, \"Name\": \"Date.year_month\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Revenue\"}, \"Name\": \"Sales.Revenue\"}], \"OrderBy\": [{\"Direction\": 1, \"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"d\"}}, \"Property\": \"year_month\"}}}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Monthly Net Revenue Trend'\"}}}}}]}}}"
+        },
+        {
+          "x": 820,
+          "y": 210,
+          "z": 2000,
+          "width": 440,
+          "height": 480,
+          "config": "{\"name\": \"CategoryRevenueBreakdown\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 820, \"y\": 210, \"z\": 2000, \"width\": 440, \"height\": 480}}], \"singleVisual\": {\"visualType\": \"barChart\", \"projections\": {\"Category\": [{\"queryRef\": \"Product.category_name\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sales.Revenue\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"p\", \"Entity\": \"Product\", \"Type\": 0}, {\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"p\"}}, \"Property\": \"category_name\"}, \"Name\": \"Product.category_name\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Revenue\"}, \"Name\": \"Sales.Revenue\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Net Revenue by Product Category'\"}}}}}]}}}"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection_MarginInvestigation",
+      "displayName": "Margin Investigation",
+      "width": 1280,
+      "height": 720,
+      "config": "{\"visibility\": 0}",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 1240,
+          "height": 50,
+          "config": "{\"name\": \"HeaderMargin\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 1240, \"height\": 50}}], \"singleVisual\": {\"visualType\": \"textbox\", \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Product Margin Investigation & Flagship Elasticity\", \"textStyle\": {\"fontFamily\": \"'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif\", \"fontSize\": \"16pt\", \"color\": \"#111827\"}}]}]}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 80,
+          "z": 1000,
+          "width": 290,
+          "height": 110,
+          "config": "{\"name\": \"CardBasmatiRev\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 80, \"z\": 1000, \"width\": 290, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Basmati Rice Net Revenue\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Basmati Rice Net Revenue\"}, \"Name\": \"Sales.Basmati Rice Net Revenue\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Basmati Rice Net Revenue (P0010)'\"}}}}}]}}}"
+        },
+        {
+          "x": 330,
+          "y": 80,
+          "z": 1000,
+          "width": 290,
+          "height": 110,
+          "config": "{\"name\": \"CardBasmatiGP\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 330, \"y\": 80, \"z\": 1000, \"width\": 290, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Basmati Rice Gross Profit\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Basmati Rice Gross Profit\"}, \"Name\": \"Sales.Basmati Rice Gross Profit\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Basmati Rice Gross Profit'\"}}}}}]}}}"
+        },
+        {
+          "x": 640,
+          "y": 80,
+          "z": 1000,
+          "width": 290,
+          "height": 110,
+          "config": "{\"name\": \"CardBasmatiMargin\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 640, \"y\": 80, \"z\": 1000, \"width\": 290, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Basmati Rice Margin %\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Basmati Rice Margin %\"}, \"Name\": \"Sales.Basmati Rice Margin %\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Basmati Rice Gross Margin %'\"}}}}}]}}}"
+        },
+        {
+          "x": 950,
+          "y": 80,
+          "z": 1000,
+          "width": 310,
+          "height": 110,
+          "config": "{\"name\": \"CardBasmatiTolerance\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 950, \"y\": 80, \"z\": 1000, \"width\": 310, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Sales.Basmati Break Even Volume Decline %\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Basmati Break Even Volume Decline %\"}, \"Name\": \"Sales.Basmati Break Even Volume Decline %\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Volume Decline Tolerance (+3% Price)'\"}}}}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 210,
+          "z": 2000,
+          "width": 780,
+          "height": 480,
+          "config": "{\"name\": \"MarginScatter\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 210, \"z\": 2000, \"width\": 780, \"height\": 480}}], \"singleVisual\": {\"visualType\": \"scatterChart\", \"projections\": {\"Details\": [{\"queryRef\": \"Product.product_name\"}], \"X\": [{\"queryRef\": \"Sales.Revenue\"}], \"Y\": [{\"queryRef\": \"Sales.Gross Profit\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"p\", \"Entity\": \"Product\", \"Type\": 0}, {\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"p\"}}, \"Property\": \"product_name\"}, \"Name\": \"Product.product_name\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Revenue\"}, \"Name\": \"Sales.Revenue\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Gross Profit\"}, \"Name\": \"Sales.Gross Profit\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Product Net Revenue vs Gross Profit'\"}}}}}]}}}"
+        },
+        {
+          "x": 820,
+          "y": 210,
+          "z": 2000,
+          "width": 440,
+          "height": 480,
+          "config": "{\"name\": \"SupplierMarginRanking\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 820, \"y\": 210, \"z\": 2000, \"width\": 440, \"height\": 480}}], \"singleVisual\": {\"visualType\": \"barChart\", \"projections\": {\"Category\": [{\"queryRef\": \"Product.supplier_name\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sales.Gross Margin %\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"p\", \"Entity\": \"Product\", \"Type\": 0}, {\"Name\": \"s\", \"Entity\": \"Sales\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"p\"}}, \"Property\": \"supplier_name\"}, \"Name\": \"Product.supplier_name\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"s\"}}, \"Property\": \"Gross Margin %\"}, \"Name\": \"Sales.Gross Margin %\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Gross Margin % by Supplier'\"}}}}}]}}}"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection_InventoryDecisions",
+      "displayName": "Inventory Decisions",
+      "width": 1280,
+      "height": 720,
+      "config": "{\"visibility\": 0}",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 1240,
+          "height": 50,
+          "config": "{\"name\": \"HeaderInventory\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 1240, \"height\": 50}}], \"singleVisual\": {\"visualType\": \"textbox\", \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Inventory Intelligence & Capital Replenishment\", \"textStyle\": {\"fontFamily\": \"'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif\", \"fontSize\": \"16pt\", \"color\": \"#111827\"}}]}]}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardStockVal\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Stock Value\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stock Value\"}, \"Name\": \"Inventory.Stock Value\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Total Stock Value'\"}}}}}]}}}"
+        },
+        {
+          "x": 270,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardStockouts\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 270, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Stockout Positions\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stockout Positions\"}, \"Name\": \"Inventory.Stockout Positions\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Out of Stock Positions'\"}}}}}]}}}"
+        },
+        {
+          "x": 520,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardBelowReorder\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 520, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Positions Below Reorder\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Positions Below Reorder\"}, \"Name\": \"Inventory.Positions Below Reorder\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Positions Below Reorder'\"}}}}}]}}}"
+        },
+        {
+          "x": 770,
+          "y": 80,
+          "z": 1000,
+          "width": 230,
+          "height": 110,
+          "config": "{\"name\": \"CardReplenishCost\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 770, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Replenishment Cost Estimate\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Replenishment Cost Estimate\"}, \"Name\": \"Inventory.Replenishment Cost Estimate\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Replenishment Working Capital'\"}}}}}]}}}"
+        },
+        {
+          "x": 1020,
+          "y": 80,
+          "z": 1000,
+          "width": 240,
+          "height": 110,
+          "config": "{\"name\": \"CardStockGapRetail\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 1020, \"y\": 80, \"z\": 1000, \"width\": 240, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Stock Gap Retail Valuation\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stock Gap Retail Valuation\"}, \"Name\": \"Inventory.Stock Gap Retail Valuation\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Stock Gap Retail Valuation'\"}}}}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 210,
+          "z": 2000,
+          "width": 580,
+          "height": 480,
+          "config": "{\"name\": \"StockStatusMix\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 210, \"z\": 2000, \"width\": 580, \"height\": 480}}], \"singleVisual\": {\"visualType\": \"pieChart\", \"projections\": {\"Category\": [{\"queryRef\": \"Inventory.stock_status\", \"active\": true}], \"Y\": [{\"queryRef\": \"Inventory.Stock Positions\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"stock_status\"}, \"Name\": \"Inventory.stock_status\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stock Positions\"}, \"Name\": \"Inventory.Stock Positions\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Stock Positions by Health Status'\"}}}}}]}}}"
+        },
+        {
+          "x": 620,
+          "y": 210,
+          "z": 2000,
+          "width": 640,
+          "height": 480,
+          "config": "{\"name\": \"ReplenishmentQueueTable\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 620, \"y\": 210, \"z\": 2000, \"width\": 640, \"height\": 480}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"Product.product_name\"}, {\"queryRef\": \"Location.location_name\"}, {\"queryRef\": \"Inventory.quantity_on_hand\"}, {\"queryRef\": \"Inventory.reorder_level\"}, {\"queryRef\": \"Inventory.replenishment_quantity_required\"}, {\"queryRef\": \"Inventory.replenishment_cost_estimate\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"p\", \"Entity\": \"Product\", \"Type\": 0}, {\"Name\": \"l\", \"Entity\": \"Location\", \"Type\": 0}, {\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"p\"}}, \"Property\": \"product_name\"}, \"Name\": \"Product.product_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"l\"}}, \"Property\": \"location_name\"}, \"Name\": \"Location.location_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"quantity_on_hand\"}, \"Name\": \"Inventory.quantity_on_hand\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"reorder_level\"}, \"Name\": \"Inventory.reorder_level\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"replenishment_quantity_required\"}, \"Name\": \"Inventory.replenishment_quantity_required\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"replenishment_cost_estimate\"}, \"Name\": \"Inventory.replenishment_cost_estimate\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Priority Stock Replenishment Queue'\"}}}}}]}}}"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection_DataIntegrity",
+      "displayName": "Data Integrity & Pipeline Assurance",
+      "width": 1280,
+      "height": 720,
+      "config": "{\"visibility\": 0}",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 1240,
+          "height": 50,
+          "config": "{\"name\": \"HeaderIntegrity\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 1240, \"height\": 50}}], \"singleVisual\": {\"visualType\": \"textbox\", \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Data Pipeline Assurance & Conservation Reconciliation Matrix\", \"textStyle\": {\"fontFamily\": \"'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif\", \"fontSize\": \"16pt\", \"color\": \"#111827\"}}]}]}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 80,
+          "z": 1000,
+          "width": 380,
+          "height": 110,
+          "config": "{\"name\": \"CardTotalRaw\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 80, \"z\": 1000, \"width\": 380, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"DataQualityReconciliation.Total Raw Records\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"r\", \"Entity\": \"DataQualityReconciliation\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"Total Raw Records\"}, \"Name\": \"DataQualityReconciliation.Total Raw Records\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Raw Records Ingested'\"}}}}}]}}}"
+        },
+        {
+          "x": 430,
+          "y": 80,
+          "z": 1000,
+          "width": 380,
+          "height": 110,
+          "config": "{\"name\": \"CardTotalClean\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 430, \"y\": 80, \"z\": 1000, \"width\": 380, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"DataQualityReconciliation.Total Clean Records\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"r\", \"Entity\": \"DataQualityReconciliation\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"Total Clean Records\"}, \"Name\": \"DataQualityReconciliation.Total Clean Records\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Clean Records Loaded'\"}}}}}]}}}"
+        },
+        {
+          "x": 840,
+          "y": 80,
+          "z": 1000,
+          "width": 420,
+          "height": 110,
+          "config": "{\"name\": \"CardPreservationRate\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 840, \"y\": 80, \"z\": 1000, \"width\": 420, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"DataQualityReconciliation.Overall Preservation Rate %\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"r\", \"Entity\": \"DataQualityReconciliation\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"Overall Preservation Rate %\"}, \"Name\": \"DataQualityReconciliation.Overall Preservation Rate %\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Data Preservation Rate %'\"}}}}}]}}}"
+        },
+        {
+          "x": 20,
+          "y": 210,
+          "z": 2000,
+          "width": 1240,
+          "height": 480,
+          "config": "{\"name\": \"ReconciliationMatrixTable\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 210, \"z\": 2000, \"width\": 1240, \"height\": 480}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"DataQualityReconciliation.table_name\"}, {\"queryRef\": \"DataQualityReconciliation.raw_ingested\"}, {\"queryRef\": \"DataQualityReconciliation.exact_duplicates_dropped\"}, {\"queryRef\": \"DataQualityReconciliation.quarantined_rejected\"}, {\"queryRef\": \"DataQualityReconciliation.merged_deduplicated\"}, {\"queryRef\": \"DataQualityReconciliation.clean_loaded\"}, {\"queryRef\": \"DataQualityReconciliation.preservation_rate\"}, {\"queryRef\": \"DataQualityReconciliation.reconciliation_status\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"r\", \"Entity\": \"DataQualityReconciliation\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"table_name\"}, \"Name\": \"DataQualityReconciliation.table_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"raw_ingested\"}, \"Name\": \"DataQualityReconciliation.raw_ingested\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"exact_duplicates_dropped\"}, \"Name\": \"DataQualityReconciliation.exact_duplicates_dropped\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"quarantined_rejected\"}, \"Name\": \"DataQualityReconciliation.quarantined_rejected\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"merged_deduplicated\"}, \"Name\": \"DataQualityReconciliation.merged_deduplicated\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"clean_loaded\"}, \"Name\": \"DataQualityReconciliation.clean_loaded\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"preservation_rate\"}, \"Name\": \"DataQualityReconciliation.preservation_rate\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"r\"}}, \"Property\": \"reconciliation_status\"}, \"Name\": \"DataQualityReconciliation.reconciliation_status\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'End-to-End Pipeline Reconciliation Matrix'\"}}}}}]}}}"
+        }
+      ]
+    }
+  ]
+}

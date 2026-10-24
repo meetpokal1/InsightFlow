@@ -1,0 +1,80 @@
+/// Product catalog dimension
+table Product
+	lineageTag: e6798194-dce8-4cab-bc1c-f86297631f8a
+
+	column product_id
+		dataType: string
+		lineageTag: 81dd6c32-a7f5-411a-8e95-b01df5d97ad2
+		sourceColumn: product_id
+
+	column product_name
+		dataType: string
+		lineageTag: 60f502b4-4917-4820-9d9b-20fd541b6997
+		sourceColumn: product_name
+
+	column category_id
+		dataType: string
+		lineageTag: 66bef6dd-85bb-4191-9e7a-74d037880271
+		sourceColumn: category_id
+
+	column category_name
+		dataType: string
+		lineageTag: df867b17-598c-4a53-8d12-52a68236a6fd
+		sourceColumn: category_name
+
+	column supplier_id
+		dataType: string
+		lineageTag: 85af355f-a87a-46fe-b7de-1146423d0b18
+		sourceColumn: supplier_id
+
+	column supplier_name
+		dataType: string
+		lineageTag: 12dfc294-cb86-419c-880f-e551162ff690
+		sourceColumn: supplier_name
+
+	column lead_time_days
+		dataType: string
+		lineageTag: 14b1e222-db2f-432d-bfa4-98993b2b6c90
+		summarizeBy: none
+		sourceColumn: lead_time_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit
+		dataType: string
+		lineageTag: 96ca89be-8e9c-4a30-99b4-3d1f1b0388ed
+		sourceColumn: unit
+
+	column cost_price
+		dataType: string
+		lineageTag: c73d3c34-e576-4460-b71f-912d064d9574
+		summarizeBy: none
+		sourceColumn: cost_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column selling_price
+		dataType: string
+		lineageTag: bbbab0ca-3185-412f-8cca-a18c39429b4b
+		summarizeBy: none
+		sourceColumn: selling_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column list_margin_pct
+		dataType: string
+		lineageTag: 43453828-e932-4048-bda1-65470f0750b0
+		summarizeBy: none
+		sourceColumn: list_margin_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ProductPartition = m
+		source =
+				let
+				    FolderPath = if Text.EndsWith(DataFolder, "\") or Text.EndsWith(DataFolder, "/") then DataFolder else DataFolder & "\",
+				    Source = Csv.Document(File.Contents(FolderPath & "vw_dim_product.csv"), [Delimiter=",", Columns=11, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+				in
+				    #"Promoted Headers"
+

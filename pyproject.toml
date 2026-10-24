@@ -8,8 +8,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B"]
-# FastAPI uses Depends(...) in argument defaults
-ignore = ["B008"]
+# FastAPI uses Depends(...) in argument defaults; line length is managed by ruff format
+ignore = ["B008", "E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "ReconciliationMatrixTable",
+  "position": {
+    "x": 20,
+    "y": 210,
+    "z": 2000,
+    "height": 480,
+    "width": 1240,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "table_name"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.table_name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "raw_ingested"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.raw_ingested"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "exact_duplicates_dropped"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.exact_duplicates_dropped"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "quarantined_rejected"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.quarantined_rejected"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "merged_deduplicated"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.merged_deduplicated"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "clean_loaded"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.clean_loaded"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "preservation_rate"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.preservation_rate"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "reconciliation_status"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.reconciliation_status"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'End-to-End Pipeline Reconciliation Matrix'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

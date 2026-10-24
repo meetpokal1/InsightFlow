@@ -1,0 +1,73 @@
+/// Customer dimension with RFM segmentation
+table Customer
+	lineageTag: 98f4f27a-57b7-471a-ab6e-1822681110f5
+
+	column customer_id
+		dataType: string
+		lineageTag: e1d9443c-f726-4570-934e-da84a439dd18
+		sourceColumn: customer_id
+
+	column customer_name
+		dataType: string
+		lineageTag: c556a717-279c-486c-9670-849380ad9930
+		sourceColumn: customer_name
+
+	column city
+		dataType: string
+		lineageTag: c5331d1b-2651-4d1b-a3dc-05f841c776b7
+		sourceColumn: city
+
+	column customer_type
+		dataType: string
+		lineageTag: 4335781a-3830-46c6-8e03-67009ddacbab
+		sourceColumn: customer_type
+
+	column signup_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 7c618e79-fb59-4e4a-a8c4-de4e51e02b44
+		summarizeBy: none
+		sourceColumn: signup_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_order_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: ed4c62dc-0160-48fd-bbe8-a82dec053cef
+		summarizeBy: none
+		sourceColumn: first_order_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_order_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 3b497d7c-da82-479e-93bf-18a8ec2a742e
+		summarizeBy: none
+		sourceColumn: last_order_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column segment
+		dataType: string
+		lineageTag: 6b1b4fd5-048d-4495-ac3b-37c60f9c8409
+		sourceColumn: segment
+
+	partition CustomerPartition = m
+		source =
+				let
+				    FolderPath = if Text.EndsWith(DataFolder, "\") or Text.EndsWith(DataFolder, "/") then DataFolder else DataFolder & "\",
+				    Source = Csv.Document(File.Contents(FolderPath & "vw_dim_customer.csv"), [Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Replaced Blank Dates" = Table.ReplaceValue(#"Promoted Headers", "", null, Replacer.ReplaceValue, {"signup_date", "first_order_date", "last_order_date"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Replaced Blank Dates", {{"customer_id", type text}, {"customer_name", type text}, {"city", type text}, {"customer_type", type text}, {"signup_date", type date}, {"first_order_date", type date}, {"last_order_date", type date}, {"segment", type text}}, "en-US")
+				in
+				    #"Changed Type"
+

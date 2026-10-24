@@ -1,0 +1,58 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "CardPreservationRate",
+  "position": {
+    "x": 840,
+    "y": 80,
+    "z": 1000,
+    "height": 110,
+    "width": 420,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DataQualityReconciliation"
+                    }
+                  },
+                  "Property": "Overall Preservation Rate %"
+                }
+              },
+              "queryRef": "DataQualityReconciliation.Overall Preservation Rate %"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Data Preservation Rate %'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

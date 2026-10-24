@@ -1,0 +1,7 @@
+expression DataFolder = "C:\Users\Meet Pokal\.gemini\antigravity\scratch\InsightFlow\powerbi\data" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 60a4f6bb-74f7-4dc5-b467-3dd30f555021
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

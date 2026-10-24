@@ -8,6 +8,7 @@ pandas functions make the interactive demo usable without PostgreSQL credentials
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -99,6 +100,19 @@ def build_inventory_view(
     )
     projected_need = np.ceil(view["avg_daily_units"] * (lead_time + 30)) - on_hand
     view["suggested_order_qty"] = np.maximum(projected_need, 0).astype(int)
+
+    # Replenishment requirements and stock gap valuations
+    view["replenishment_qty_required"] = np.maximum(
+        0, view["reorder_level"] - view["quantity_on_hand"]
+    ).astype(int)
+    view["replenishment_cost_estimate"] = (
+        view["replenishment_qty_required"] * view["cost_price"]
+    ).round(2)
+    view["stock_gap_retail_val"] = (
+        view["replenishment_qty_required"] * view["selling_price"]
+    ).round(2)
+    view["is_stockout"] = view["quantity_on_hand"].eq(0)
+    view["is_below_reorder"] = view["quantity_on_hand"].lt(view["reorder_level"])
     return view
 
 
@@ -197,3 +211,187 @@ def format_inr(value: float | int | None) -> str:
     if absolute >= 100_000:
         return f"₹{amount / 100_000:,.2f} L"
     return f"₹{amount:,.0f}"
+
+
+def inventory_summary(inventory_view: pd.DataFrame) -> dict[str, float | int]:
+    """Calculate summary statistics and capital requirements across inventory positions."""
+    if inventory_view.empty:
+        return {
+            "total_positions": 0,
+            "total_inventory_value": 0.0,
+            "stockout_positions": 0,
+            "below_reorder_positions": 0,
+            "replenishment_units_required": 0,
+            "replenishment_cost_estimate": 0.0,
+            "stock_gap_retail_val": 0.0,
+            "suggested_order_units": 0,
+        }
+
+    repl_units = (
+        int(inventory_view["replenishment_qty_required"].sum())
+        if "replenishment_qty_required" in inventory_view
+        else int(
+            np.maximum(
+                0, inventory_view["reorder_level"] - inventory_view["quantity_on_hand"]
+            ).sum()
+        )
+    )
+
+    repl_cost = (
+        round(float(inventory_view["replenishment_cost_estimate"].sum()), 2)
+        if "replenishment_cost_estimate" in inventory_view
+        else round(
+            float(
+                (
+                    np.maximum(
+                        0, inventory_view["reorder_level"] - inventory_view["quantity_on_hand"]
+                    )
+                    * inventory_view["cost_price"]
+                ).sum()
+            ),
+            2,
+        )
+    )
+
+    stock_gap_retail = (
+        round(float(inventory_view["stock_gap_retail_val"].sum()), 2)
+        if "stock_gap_retail_val" in inventory_view
+        else round(
+            float(
+                (
+                    np.maximum(
+                        0, inventory_view["reorder_level"] - inventory_view["quantity_on_hand"]
+                    )
+                    * inventory_view["selling_price"]
+                ).sum()
+            ),
+            2,
+        )
+    )
+
+    return {
+        "total_positions": int(len(inventory_view)),
+        "total_inventory_value": round(float(inventory_view["inventory_value"].sum()), 2),
+        "stockout_positions": int(inventory_view["quantity_on_hand"].eq(0).sum()),
+        "below_reorder_positions": int(
+            (inventory_view["quantity_on_hand"] < inventory_view["reorder_level"]).sum()
+        ),
+        "replenishment_units_required": repl_units,
+        "replenishment_cost_estimate": repl_cost,
+        "stock_gap_retail_val": stock_gap_retail,
+        "suggested_order_units": int(
+            inventory_view["suggested_order_qty"].sum()
+            if "suggested_order_qty" in inventory_view
+            else 0
+        ),
+    }
+
+
+def simulate_price_sensitivity(
+    sales_lines: pd.DataFrame,
+    product_id: str,
+    price_change_pct: float,
+    volume_change_pct: float | None = None,
+    elasticity: float | None = None,
+) -> dict[str, Any]:
+    """Model the financial impact of price changes on revenue and gross profit.
+
+    Parameters
+    ----------
+    sales_lines : pd.DataFrame
+        Cleaned sales lines containing completed orders.
+    product_id : str
+        Target product identifier (e.g. 'P0010').
+    price_change_pct : float
+        Percentage price increase/decrease (+3.0 for +3%).
+    volume_change_pct : float | None
+        Assumed percentage change in unit volume (-4.5 for -4.5%).
+    elasticity : float | None
+        Price elasticity of demand magnitude (e.g. 1.5 or -1.5).
+        If provided and volume_change_pct is None, volume change is modeled as
+        volume_change_pct = -abs(elasticity) * price_change_pct.
+
+    Returns
+    -------
+    dict[str, Any]
+        Dictionary with baseline and modeled metrics, deltas, and break-even volume decline.
+    """
+    prod_lines = sales_lines.loc[sales_lines["product_id"] == product_id]
+    if prod_lines.empty:
+        raise ValueError(f"Product '{product_id}' not found in sales lines.")
+
+    product_name = str(prod_lines["product_name"].iloc[0])
+    category_name = str(prod_lines["category_name"].iloc[0])
+
+    baseline_units = int(prod_lines["quantity"].sum())
+    baseline_revenue = round(float(prod_lines["net_revenue"].sum()), 2)
+    baseline_cogs = round(float((prod_lines["quantity"] * prod_lines["cost_price"]).sum()), 2)
+    baseline_profit = round(baseline_revenue - baseline_cogs, 2)
+    baseline_margin_pct = (
+        round(100.0 * baseline_profit / baseline_revenue, 2) if baseline_revenue > 0 else 0.0
+    )
+
+    p_pct = float(price_change_pct)
+    if volume_change_pct is not None:
+        v_pct = float(volume_change_pct)
+        assumed_elasticity = round(v_pct / p_pct, 2) if p_pct != 0 else 0.0
+    elif elasticity is not None:
+        e = -abs(float(elasticity))
+        v_pct = round(e * p_pct, 2)
+        assumed_elasticity = round(e, 2)
+    else:
+        v_pct = 0.0
+        assumed_elasticity = 0.0
+
+    p_factor = 1.0 + (p_pct / 100.0)
+    v_factor = 1.0 + (v_pct / 100.0)
+
+    modeled_units = max(0, int(round(baseline_units * v_factor)))
+    modeled_revenue = round(baseline_revenue * p_factor * v_factor, 2)
+    modeled_cogs = round(baseline_cogs * v_factor, 2)
+    modeled_profit = round(modeled_revenue - modeled_cogs, 2)
+    modeled_margin_pct = (
+        round(100.0 * modeled_profit / modeled_revenue, 2) if modeled_revenue > 0 else 0.0
+    )
+
+    delta_revenue = round(modeled_revenue - baseline_revenue, 2)
+    delta_profit = round(modeled_profit - baseline_profit, 2)
+    delta_margin_points = round(modeled_margin_pct - baseline_margin_pct, 2)
+
+    # Break-even volume decline:
+    # Modeled profit = [R0*(1+p) - C0] * (1 - decline) = G0
+    # decline = 1 - G0 / [R0*(1+p) - C0]
+    denom = (baseline_revenue * p_factor) - baseline_cogs
+    if denom > 0:
+        be_decline_pct = round((1.0 - (baseline_profit / denom)) * 100.0, 2)
+    else:
+        be_decline_pct = None
+
+    return {
+        "product_id": product_id,
+        "product_name": product_name,
+        "category_name": category_name,
+        "price_change_pct": p_pct,
+        "volume_change_pct": v_pct,
+        "assumed_elasticity": assumed_elasticity,
+        "baseline": {
+            "units": baseline_units,
+            "revenue": baseline_revenue,
+            "cogs": baseline_cogs,
+            "gross_profit": baseline_profit,
+            "margin_pct": baseline_margin_pct,
+        },
+        "modeled": {
+            "units": modeled_units,
+            "revenue": modeled_revenue,
+            "cogs": modeled_cogs,
+            "gross_profit": modeled_profit,
+            "margin_pct": modeled_margin_pct,
+        },
+        "delta": {
+            "revenue": delta_revenue,
+            "gross_profit": delta_profit,
+            "margin_points": delta_margin_points,
+        },
+        "break_even_volume_decline_pct": be_decline_pct,
+    }

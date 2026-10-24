@@ -1,0 +1,24 @@
+relationship Sales_Product
+	fromColumn: Sales.product_id
+	toColumn: Product.product_id
+
+relationship Sales_Customer
+	fromColumn: Sales.customer_id
+	toColumn: Customer.customer_id
+
+relationship Sales_Location
+	fromColumn: Sales.location_id
+	toColumn: Location.location_id
+
+relationship Sales_Date
+	fromColumn: Sales.order_date
+	toColumn: Date.date_key
+
+relationship Inventory_Product
+	fromColumn: Inventory.product_id
+	toColumn: Product.product_id
+
+relationship Inventory_Location
+	fromColumn: Inventory.location_id
+	toColumn: Location.location_id
+

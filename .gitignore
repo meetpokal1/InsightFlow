@@ -2,6 +2,11 @@
 .env
 .streamlit/secrets.toml
 
+# local temporary backups and caches
+backups/
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
 # python
 __pycache__/
 *.py[cod]

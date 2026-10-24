@@ -1,0 +1,43 @@
+/// Store and warehouse locations
+table Location
+	lineageTag: 3e6c39e2-7fd1-49d4-aa78-f46083e2c2c2
+
+	column location_id
+		dataType: string
+		lineageTag: 8ed781dc-b02b-410b-afc2-62353ad0427a
+		sourceColumn: location_id
+
+	column location_name
+		dataType: string
+		lineageTag: cd457dd8-954b-4e25-93f5-945cd383a7f0
+		sourceColumn: location_name
+
+	column city
+		dataType: string
+		lineageTag: b2af2aea-9b0a-4c58-8eb5-2ddb707250c4
+		sourceColumn: city
+
+	column state
+		dataType: string
+		lineageTag: 56d2c05d-53a3-4b59-866c-3550286f8a9a
+		sourceColumn: state
+
+	column region
+		dataType: string
+		lineageTag: 32baa550-5552-43a8-81ab-6825ca311559
+		sourceColumn: region
+
+	column location_type
+		dataType: string
+		lineageTag: a9e5b911-3add-47c3-9d1e-c8ec964844f6
+		sourceColumn: location_type
+
+	partition LocationPartition = m
+		source =
+				let
+				    FolderPath = if Text.EndsWith(DataFolder, "\") or Text.EndsWith(DataFolder, "/") then DataFolder else DataFolder & "\",
+				    Source = Csv.Document(File.Contents(FolderPath & "vw_dim_location.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+				in
+				    #"Promoted Headers"
+
