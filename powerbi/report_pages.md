@@ -1,127 +1,134 @@
-# Report pages
+# Report Pages
 
-Four pages, each answering one question. The report pages and semantic model are fully authored in
-`InsightFlow.pbip` ([README.md](README.md), [dax_measures.md](dax_measures.md)), with verified runtime
-captures saved in `screenshots/powerbi/`.
+Four analytical pages, each addressing a specific commercial and operational decision. The report visual layer and semantic model are fully authored in `InsightFlow.pbip` ([README.md](README.md), [dax_measures.md](dax_measures.md)), with verified runtime captures saved under `../screenshots/`.
 
-## Rules for every page
+## Report Design & Architecture Standards
 
-- Page size 16:9 (1280 x 720). Apply `theme.json` (View > Themes > Browse for themes).
-- One strip of slicers along the top, KPI cards under it, charts below. Page navigation buttons
-  (Insert > Buttons > Navigator > Page navigator) at the left or top.
-- Every visual has a title that says what it shows ("Revenue by month", not "Chart 1").
-- One axis per chart. Two measures of different size go in two charts, never on a second axis.
-  Revenue and the same month last year share a unit, so they can share a chart.
-- A single series needs no legend. Two or more get one. Bars start at zero and are sorted by
-  value unless the order has a meaning (months, stock status).
-- Put data labels on bars. They also keep the lighter theme colours readable. Every chart can be
-  shown as a table (visual menu > Show as a table).
-- Do not use pie or donut charts. The stock status colours (listed in [README.md](README.md))
-  are only for stock status and other warnings, never for ordinary categories.
-- Use **Edit interactions** where a visual should not react to another one (noted below).
+- **Canvas Dimensions:** Standard 16:9 layout (1280 x 720 px).
+- **Theme & Formatting:** Corporate color palette and typography configured via `theme.json` (View > Themes > Browse for themes).
+- **Visual Hierarchy:** Top header band displays page purpose and operational context; KPI cards surface headline figures; detailed analytical charts, scatter diagrams, and reconciliation tables occupy the primary viewing area.
+- **Color Semantics:** Status-based warning colors are strictly reserved for operational health indicators (Out of stock red `#D03B3B`, Stock-out risk orange `#EC835A`, Low stock yellow `#FAB219`, Overstocked blue `#2A78D6`, Healthy green `#0CA30C`), preventing misleading color coding in standard commercial categories.
+- **Measure Separation:** Canonical numeric aggregations are strictly separated from presentation-only card display measures (`* Display`) to preserve arithmetic integrity across analytical visuals.
 
-## Page 1: Executive Overview
+---
 
-*How is the business doing, and what needs attention?*
+## Page 1: Executive Profitability
 
-**Slicers.** Date (between, `Date[date_key]`), Region (`Location[region]`), Customer type
-(`Customer[customer_type]`), Category (`Product[category_name]`).
+*What is our overall commercial run-rate, 24-month revenue trajectory, margin health, and category revenue distribution?*
 
-**Cards.**
+### Slicers
+- Slicer strip along the top: Date range (`Date[date_key]`), Region (`Location[region]`), Customer Type (`Customer[customer_type]`), Category (`Product[category_name]`).
 
-| Card | Measure |
-|---|---|
-| Revenue | `[Revenue]`, display units millions |
-| Gross profit | `[Gross Profit]` |
-| Gross margin | `[Gross Margin %]` |
-| Orders | `[Orders]` |
-| Average order value | `[Average Order Value]` |
-| Active customers | `[Active Customers]` |
-| Growth, last 12 months | `[Revenue Growth Last 12 Months %]` (ignores the date slicer) |
-| Items needing action | `[Items Needing Action]` (stock, ignores the date and customer type slicers) |
+### KPI Cards
 
-**Charts.**
-
-| Visual | Fields | Notes |
+| Card Visual | Measure | Description & Audited Value (No Filters) |
 |---|---|---|
-| Line chart, "Revenue by month" | axis `Date[year_month]`, values `[Revenue]` and `[Revenue PY]` | the second line is the same month last year, set to grey `#898781` and dashed so it reads as the comparison; tooltips `[Revenue YoY %]`, `[Revenue MoM %]`, `[Gross Margin %]` |
-| Bar chart, "Revenue by location" | axis `Location[location_name]`, value `[Revenue]` | sorted descending, data labels |
-| Bar chart, "Revenue by category" | axis `Product[category_name]`, value `[Revenue]` | sorted descending, data labels |
-| Table, "Top 5 products" | `Product[product_name]`, `[Revenue]`, `[Gross Margin %]`, `[Revenue Share %]` | visual filter: Top N 5 by `[Revenue]` |
+| Net Revenue | `Sales[Revenue]` | Sum of completed order net sales: **₹209,034,798.31** (₹209.03M) |
+| Gross Profit | `Sales[Gross Profit]` | Net revenue minus cost of goods sold: **₹42,355,329.09** (₹42.36M) |
+| Gross Margin % | `Sales[Gross Margin %]` | Aggregate commercial profitability: **20.3%** |
+| Orders | `Sales[Orders]` | Distinct completed order count: **7,878** |
+| Average Order Value | `Sales[Average Order Value]` | Average net value per completed order: **₹26,533.99** |
 
-**What to expect with no slicers:** revenue 209.0M, profit 42.4M, margin 20.3%, 7,878 orders,
-average order 26,534, 780 active customers, growth 47.2%, 92 items needing action. Basmati Rice
-5kg is the largest product by revenue (16.5M) with a margin of 2.1%.
+### Analytical Visuals
 
-## Page 2: Sales Analysis
+| Visual Name | Visual Type | Data Fields | Analytical Purpose |
+|---|---|---|---|
+| Monthly Revenue Trend | Line Chart (`lineChart`) | Axis: `Date[year_month]`<br>Value: `Sales[Revenue]` | Tracks continuous 24-month revenue trajectories from October 2024 through September 2026, highlighting growth phases and seasonal demand. |
+| Category Revenue Breakdown | Horizontal Bar Chart (`clusteredBarChart`) | Axis: `Product[category_name]`<br>Value: `Sales[Revenue]` | Ranks revenue performance across all 7 product categories (led by Electronics Accessories, Personal Care, and Packaged Foods). |
 
-*Where does revenue come from, and how good is the margin?*
+### Runtime Reference
+![Executive Profitability](../screenshots/Executive%20Profitability.png)
 
-**Slicers.** Date, Location (`Location[location_name]`, dropdown), Customer type, Category.
+---
 
-| Visual | Fields | Notes |
+## Page 2: Margin Investigation & Flagship Elasticity
+
+*Where are our margin vulnerabilities, which suppliers drive profitability, and what is our volume tolerance on thin-margin flagship products?*
+
+### Slicers
+- Category (`Product[category_name]`), Supplier (`Product[supplier_name]`), Location (`Location[location_name]`).
+
+### Flagship Elasticity KPI Cards (Basmati Rice 5kg / `P0010`)
+
+| Card Visual | Measure | Description & Audited Value |
 |---|---|---|
-| Column chart, "Revenue by month" | axis `Date[year_month]`, value `[Revenue]` | |
-| Line chart, "Gross margin by month" | axis `Date[year_month]`, value `[Gross Margin %]` | set the value axis from 15% to 25% and say so in the title, because the margin moves in a narrow band |
-| Bar chart, "Revenue by customer type" | axis `Customer[customer_type]`, value `[Revenue]` | wholesale is 91.8% of revenue |
-| Bar chart, "Average order value by customer type" | axis `Customer[customer_type]`, value `[Average Order Value]` | matches `sql/analytics/07` |
-| Scatter chart, "Revenue and margin by product" | x `[Revenue]`, y `[Gross Margin %]`, details `Product[product_name]` | one colour; add a constant line on y at `[Company Gross Margin %]` (Analytics pane, fx); tooltips `[Units Sold]`, `Product[category_name]`. Products in the lower right sell a lot with a thin margin |
-| Matrix, "Product margins" | rows `Product[category_name]` then `Product[product_name]`; values `[Revenue]` (data bars), `[Revenue Share %]`, `[Gross Profit]`, `[Gross Margin %]` | conditional formatting on `[Gross Margin %]`: icon rule on `[Margin Gap (pts)]`, a warning icon when below 0 |
+| Flagship Net Revenue | `Sales[Basmati Rice Net Revenue]` | Net revenue generated by flagship Basmati Rice 5kg: **₹16,532,490.00** (₹16.53M) |
+| Flagship Gross Profit | `Sales[Basmati Rice Gross Profit]` | Realized gross margin dollars: **₹354,267.60** (₹354K) |
+| Flagship Margin % | `Sales[Basmati Rice Margin %]` | Commercial margin for volume leader: **2.15%** |
+| Break-Even Volume Tolerance | `Sales[Basmati Break Even Volume Decline %]` | Permissible volume loss under a +3% price increase before total gross profit declines: **58.3%** |
 
-Check: the product rows match `sql/analytics/03_top_products.sql` and `06_profit_margins.sql`.
+### Analytical Visuals
 
-## Page 3: Inventory Intelligence
+| Visual Name | Visual Type | Data Fields | Analytical Purpose |
+|---|---|---|---|
+| Product Net Revenue vs Gross Profit | Scatter Plot (`scatterChart`) | X-Axis: `Sales[Revenue]`<br>Y-Axis: `Sales[Gross Profit]`<br>Details: `Product[product_name]` | Exposes margin asymmetry: products in the bottom-right generate massive sales volume but meager gross profit (e.g. Basmati Rice 5kg). |
+| Gross Margin % by Supplier | Horizontal Bar Chart (`clusteredBarChart`) | Axis: `Product[supplier_name]`<br>Value: `Sales[Gross Margin %]` | Compares gross margin capture across suppliers, contrasting low-margin commodity vendors (3.2% Golden Harvest) against high-margin partners (35.4% Skyline Cosmetics). |
 
-*What will run out, what is stuck, and what should be ordered?*
+### Runtime Reference
+![Margin Investigation](../screenshots/Margin%20Investigation.png)
 
-**Slicers.** Region and Location (`Location[region]`, `Location[location_name]`), Category
-(`Product[category_name]`), Stock status (`Inventory[stock_status]`).
-**No date slicer.** Stock is one snapshot, and `Date` is not related to `Inventory`.
+---
 
-**Cards.** `[Stock Value]`, `[Items Needing Action]`, `[Out of Stock Items]`,
-`[Overstock Value]` with `[Overstock Share of Stock %]` in the subtitle, `[Days of Inventory]`.
+## Page 3: Inventory Decisions & Capital Replenishment
 
-| Visual | Fields | Notes |
+*What is our working capital exposure in stock, how severe are stockouts, and what capital is required to replenish critical lines?*
+
+### Slicers
+- Location (`Location[location_name]`), Category (`Product[category_name]`), Stock Status (`Inventory[stock_status]`).
+- *Note:* Stock represents an operational point-in-time snapshot (as-of 2026-09-30); the Date table is intentionally unlinked.
+
+### KPI Cards
+
+| Card Visual | Display Measure | Underlying Measure | Description & Audited Value |
+|---|---|---|---|
+| Total Stock Value | `Inventory[Stock Value Display]` | `Inventory[Stock Value]` | Total warehouse inventory valuation at cost: **₹2.25 Cr** (₹22.49M / ₹22,493,991.10) |
+| Stockout Positions | `Inventory[Stockout Positions]` | — | Critical positions with 0 units on hand: **40 positions** |
+| Positions Below Reorder | `Inventory[Positions Below Reorder]` | — | Stock lines requiring purchase intervention: **96 positions** |
+| Replenishment Capital | `Inventory[Replenishment Cost Estimate Display]` | `Inventory[Replenishment Cost Estimate]` | Working capital needed to restock depleted lines to target cover: **₹9.66 L** (₹965,992.50) |
+| Stock Gap Retail Value | `Inventory[Stock Gap Retail Valuation Display]` | `Inventory[Stock Gap Retail Valuation]` | Unrealized retail revenue potential represented by stock deficits: **₹13.41 L** (₹1,341,200.00) |
+
+### Operational Visuals
+
+| Visual Name | Visual Type | Data Fields | Analytical Purpose |
+|---|---|---|---|
+| Stock Positions by Health Status | Donut Chart (`pieChart`) | Legend: `Inventory[stock_status]`<br>Values: `Inventory[Stock Positions]` | Displays health status distribution across 449 positions, highlighting 40 Out of Stock, 39 Stock-out Risk, and 17 Low Stock items against Healthy and Overstocked lines. |
+| Priority Stock Replenishment Queue | Data Matrix (`tableEx`) | `Product[product_name]`, `Location[location_name]`, `Inventory[quantity_on_hand]`, `Inventory[reorder_level]`, `Inventory[replenishment_quantity_required]`, `Inventory[replenishment_cost_estimate]` | Actionable procurement table sorted by required replenishment capital descending, directing procurement budgets to highest-impact stockouts first. |
+
+### Runtime Reference
+![Inventory Decisions](../screenshots/Inventory%20Decisions.png)
+
+---
+
+## Page 4: Data Integrity & Pipeline Assurance
+
+*How reliable is the underlying pipeline, and can every ingested record be accounted for across deduplication, quarantine, and clean loads?*
+
+### Slicers
+- Table Name (`DataQualityReconciliation[table_name]`).
+
+### Conservation KPI Cards
+
+| Card Visual | Measure | Description & Audited Value |
 |---|---|---|
-| Bar chart, "Stock positions by status" | axis `Inventory[stock_status]` (sorted by `Status Order`), value `[Stock Positions]` | set the bar colours by hand: Out of stock red `#D03B3B`, Stock-out risk orange `#EC835A`, Low stock yellow `#FAB219`, Overstocked blue `#2A78D6`, Healthy green `#0CA30C`, No recent sales grey `#898781`; data labels on |
-| Stacked bar, "Stock status by location" | axis `Location[location_name]`, legend `Inventory[stock_status]`, value `[Stock Positions]` | same status colours, legend on |
-| Bar chart, "Days of inventory by category" | axis `Product[category_name]`, value `[Days of Inventory]` | sorted descending; matches `sql/analytics/09` |
-| Bar chart, "Stock value by category" | axis `Product[category_name]`, value `[Stock Value]` | |
-| Table, "Reorder list" | `Product[product_name]`, `Location[location_name]`, `Inventory[quantity_on_hand]`, `Inventory[reorder_level]`, `Inventory[days_of_cover]`, `Inventory[lead_time_days]`, `Inventory[stock_status]`, `Inventory[suggested_order_qty]` | visual filter: `stock_status` is Out of stock, Stock-out risk or Low stock; sort by `suggested_order_qty` descending; the status text stays visible next to its colour |
+| Total Raw Ingested | `DataQualityReconciliation[Total Raw Records]` | Aggregate records ingested from 8 raw source files: **49,975** |
+| Total Clean Loaded | `DataQualityReconciliation[Total Clean Records]` | Clean records validated and loaded into production tables: **47,814** |
+| Data Preservation Rate | `DataQualityReconciliation[Overall Preservation Rate %]` | End-to-end data conservation efficiency: **95.7%** |
 
-**What to expect with no slicers:** 449 stock positions, stock value 22.49M, 39 out of stock,
-39 at risk, 14 low (92 items needing action), 45 overstocked holding 12.69M (56.4% of the
-stock value), 83 days of inventory. The reorder list has 92 rows, the same as
-`sql/analytics/11_low_stock_products.sql`.
+### Assurance Visuals
 
-## Page 4: Customer Analysis
+| Visual Name | Visual Type | Data Fields | Analytical Purpose |
+|---|---|---|---|
+| End-to-End Pipeline Reconciliation Matrix | Data Table (`tableEx`) | `table_name`, `raw_ingested`, `exact_duplicates_dropped`, `quarantined_rejected`, `merged_deduplicated`, `clean_loaded`, `reconciliation_status`, `preservation_rate` | Auditable matrix verifying that raw records across all 8 entities balance exactly: $\text{Raw} - \text{Duplicates} - \text{Quarantined} - \text{Merged} = \text{Clean}$. 100% of rows pass reconciliation. |
 
-*Who are our customers, and who is slipping away?*
+### Runtime Reference
+![Data Integrity & Pipeline Assurance](../screenshots/Data%20Integrity%20and%20Pipeline%20Assurance.png)
 
-**Slicers.** Date, Customer type (`Customer[customer_type]`), City (`Customer[city]`, dropdown),
-Segment (`Customer[segment]`).
+---
 
-**Cards.** `[Active Customers]`, `[Repeat Customer Rate %]`, `[Revenue per Customer]`,
-`[Orders per Customer]`, `[Top 10 Customers Revenue Share %]`, `[New Customers]`.
+## Visual Audit Checklist
 
-| Visual | Fields | Notes |
-|---|---|---|
-| Matrix, "Customer segments" | rows `Customer[segment]` (sorted by `Segment Order`); values `[Customers]`, `[Customer Share %]`, `[Revenue]`, `[Revenue Share %]`, `[Orders per Customer]` | Champions are 311 customers and 95.6% of revenue |
-| Column chart, "New customers by month" | axis `Date[year_month]`, value `[New Customers]` | |
-| Line chart, "Active customers by month" | axis `Date[year_month]`, value `[Active Customers]` | |
-| Table, "Top 10 customers" | `Customer[customer_name]`, `Customer[customer_type]`, `Customer[city]`, `[Orders]`, `[Revenue]`, `[Revenue Share %]`, `Customer[last_order_date]` | visual filter: Top N 10 by `[Revenue]` |
-| Table, "At risk: win back" | `Customer[customer_name]`, `Customer[city]`, `Customer[customer_type]`, `Customer[last_order_date]`, `[Orders]`, `[Revenue]` | visual filter: `segment` is At risk (111 customers) |
-
-Selecting a segment in the matrix filters the two tables, which is the intent. Switch the
-matrix off from the cards with **Edit interactions** so the cards keep showing all customers.
-
-## Checking a finished page
-
-1. With no slicer selected, every card should equal the numbers above and in
-   [dax_measures.md](dax_measures.md).
-2. Select one location. The total of the location bar chart on page 1 must still equal the
-   revenue card.
-3. Select one month. `[Revenue MoM %]` in the tooltip of the monthly chart is the change against
-   the month before.
-4. Export or capture each finished page and verify against the baseline captures in
-   `screenshots/powerbi/` under the corresponding page name.
+When reviewing the refreshed Power BI Desktop report or exporting captures:
+1. **Zero Blank Visuals:** With no slicers selected, all KPI cards must show populated metrics matching the expected figures above and in [dax_measures.md](dax_measures.md).
+2. **Relationship Integrity:** Dimension slicers (Location, Product Category) must dynamically update both `Sales` and `Inventory` visuals consistently.
+3. **Card Formatting Standards:** Inventory currency cards must display INR units (`Cr` / `L`) via dedicated display measures while core calculations remain clean `NUMERIC` values.
+4. **Reconciliation Balancing:** The Page 4 reconciliation matrix must verify that no record is unaccounted for across the entire ETL pipeline.

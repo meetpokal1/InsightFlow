@@ -198,13 +198,13 @@ Instead of an opaque binary `.pbix` file, the tabular semantic model and report 
 > python scripts/run_pipeline.py --skip-db
 > python scripts/export_powerbi_data.py
 > ```
-> Then open `powerbi/InsightFlow.pbip` in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) on Windows. If prompted or if the project folder was relocated on your workstation, configure the **`DataFolder`** parameter to your local `powerbi/data` directory via **Home > Transform data > Edit parameters** (or run `python scripts/build_powerbi_pbip.py` to auto-detect your local path), then click **Home > Refresh**. For an immediate interactive web demo without installing desktop software, launch the [Streamlit Live Demo](https://insightflow-portfolio.streamlit.app/).
+> Then open `powerbi/InsightFlow.pbip` in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) on Windows. If prompted or if the project folder was relocated on your workstation, configure the **`DataFolder`** parameter to your local `powerbi/data` directory via **Home > Transform data > Edit parameters** (or run `python scripts/build_powerbi_pbip.py` to auto-detect your local path), then click **Home > Refresh**. For an immediate interactive browser experience without installing desktop software, run the local Streamlit dashboard (`streamlit run streamlit_app.py`), which profiles, cleans, and analyzes the synthetic dataset entirely in memory without requiring a database service.
 
 ### Dimensional Model Architecture
 
 The semantic model implements a validated single-direction star schema centered on two fact tables (`Sales` and `Inventory`) with four core dimensions (`Date`, `Product`, `Customer`, `Location`) and a dedicated pipeline assurance matrix (`DataQualityReconciliation`):
 
-![Power BI Semantic Model Architecture](screenshots/powerbi/Semantic%20Model%20Architecture.png)
+![Power BI Semantic Model Architecture](screenshots/Semantic%20Model%20Architecture.png)
 
 - **Star Schema Integrity:** Four core dimensions (`Product`, `Customer`, `Location`, `Date`) filter facts via 1:N single-direction relationships with 100% foreign key coverage across all 34,007 sales records.
 - **Calculated at Source:** Net revenue, gross margins, inventory health statuses, and customer RFM profiles are standardized across PostgreSQL views, Streamlit, and Power BI DAX.
@@ -222,7 +222,7 @@ Captured directly from the active, fully refreshed Power BI Desktop instance via
 - **Audited Metrics:** ₹209.03M Net Revenue · ₹42.36M Gross Profit · 20.3% Gross Margin · 7,878 Completed Orders · ₹26,534 AOV
 - **Visuals:** 24-Month Monthly Revenue Trend (continuous 2024-10 to 2026-09 trajectory) & Net Revenue by Category (Electronics Accessories, Personal Care, Packaged Foods leading).
 
-![Executive Profitability](screenshots/powerbi/Executive%20Profitability.png)
+![Executive Profitability](screenshots/Executive%20Profitability.png)
 
 ---
 
@@ -231,7 +231,7 @@ Captured directly from the active, fully refreshed Power BI Desktop instance via
 - **Audited Metrics:** ₹16.53M Basmati Net Revenue · ₹354K Gross Profit · 2.15% Flagship Margin · 58.3% Break-Even Volume Tolerance (+3% price)
 - **Visuals:** Product Net Revenue vs Gross Profit scatter plot & Gross Margin % by Supplier (ranging from 3.2% Golden Harvest to 35.4% Skyline Cosmetics).
 
-![Margin Investigation](screenshots/powerbi/Margin%20Investigation.png)
+![Margin Investigation](screenshots/Margin%20Investigation.png)
 
 ---
 
@@ -240,7 +240,7 @@ Captured directly from the active, fully refreshed Power BI Desktop instance via
 - **Audited Metrics:** ₹22.49M Total Stock Valuation · 40 Stockout Positions · 96 Positions Below Reorder · ₹966K Capital Required to Replenish · ₹1.34M Catalog Stock Gap
 - **Visuals:** Stock Positions by Health Status mix (Healthy, Overstocked, Stock-out risk, Out of stock, Low stock) & Priority Stock Replenishment Queue table.
 
-![Inventory Decisions](screenshots/powerbi/Inventory%20Decisions.png)
+![Inventory Decisions](screenshots/Inventory%20Decisions.png)
 
 ---
 
@@ -249,7 +249,7 @@ Captured directly from the active, fully refreshed Power BI Desktop instance via
 - **Audited Metrics:** 49,975 Raw Records Ingested · 47,814 Clean Records Loaded · 512 Duplicates Dropped · 1,609 Quarantined/Rejected · 40 Merged Profiles · 95.7% Preservation Rate
 - **Visuals:** High-level conservation KPI cards & Complete End-to-End Pipeline Reconciliation Matrix across all 8 operational entities (all balanced: $\text{Raw} - \text{Duplicates} - \text{Quarantined} - \text{Merged} = \text{Clean}$).
 
-![Data Integrity & Pipeline Assurance](screenshots/powerbi/Data%20Integrity%20%26%20Pipeline%20Assurance.png)
+![Data Integrity & Pipeline Assurance](screenshots/Data%20Integrity%20and%20Pipeline%20Assurance.png)
 
 ## API
 
@@ -441,7 +441,6 @@ InsightFlow/
 ├── .dockerignore               excludes local secrets, caches and generated data
 ├── docker-compose.yml          local PostgreSQL + data load + API
 ├── .github/workflows/tests.yml PostgreSQL-backed CI test suite
-├── documentation/antigravity_release_guide.md  local publish and screenshot runbook
 ├── data/
 │   ├── raw/                  messy input files (3 Excel, 5 CSV) and the generation manifest
 │   └── processed/            pipeline output (not committed)
@@ -471,9 +470,8 @@ InsightFlow/
 │   └── diagrams/             Mermaid sources and PNG images
 ├── scripts/                  pipeline runner, analytics, PBIP builder, data assurance export
 ├── tests/                    pytest suite, PBIP deliverable, and assurance tests
-├── screenshots/
-│   ├── powerbi/              genuine Power BI Desktop report pages and semantic model captures
-│   └── runtime/              genuine Streamlit browser captures and automated UI QA results JSON
+├── screenshots/                  genuine Power BI Desktop report pages, semantic model captures, and UI evidence
+│   └── runtime/                  genuine Streamlit browser captures and automated UI QA results JSON
 ├── .env.example
 ├── .gitignore
 ├── pyproject.toml            ruff, black and pytest settings
@@ -493,6 +491,5 @@ InsightFlow/
 | [sql_analytics.md](documentation/sql_analytics.md) | the 17 queries, their techniques and results |
 | [api.md](documentation/api.md) | endpoints, parameters, responses and errors |
 | [kpi_definitions.md](documentation/kpi_definitions.md) | every KPI with its SQL, API and Power BI source |
-| [concepts_to_know.md](documentation/concepts_to_know.md) | the ideas behind the code, how to change it, practice questions |
-| [antigravity_release_guide.md](documentation/antigravity_release_guide.md) | safe GitHub publishing, local execution and genuine screenshot capture |
+| [concepts_to_know.md](documentation/concepts_to_know.md) | core engineering decisions, data quality mechanics and analytical methodology |
 | [powerbi/README.md](powerbi/README.md) | building the Power BI report |
