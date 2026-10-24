@@ -147,7 +147,6 @@ def test_semantic_model_star_schema_and_measures():
     assert "Stockout Positions" in inv_measures
 
 
-
 def test_inventory_currency_cards_use_display_only_measures():
     """Keep currency measures numeric while card-specific measures render INR lakh/crore labels."""
     model_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "model.bim"
