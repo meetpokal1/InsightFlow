@@ -154,10 +154,7 @@ def test_inventory_currency_cards_use_display_only_measures():
         model_data = json.load(f)
 
     tables = {table["name"]: table for table in model_data["model"]["tables"]}
-    inv_measures = {
-        measure["name"]: measure
-        for measure in tables["Inventory"].get("measures", [])
-    }
+    inv_measures = {measure["name"]: measure for measure in tables["Inventory"].get("measures", [])}
 
     # Canonical measures must remain numeric so ratios, totals and future analysis are valid.
     expected_numeric = {
@@ -184,13 +181,7 @@ def test_inventory_currency_cards_use_display_only_measures():
         assert name in inv_measures, f"Missing card display measure: {name}"
         assert fragment in inv_measures[name]["expression"]
 
-    tmdl_file = (
-        POWERBI_DIR
-        / "InsightFlow.SemanticModel"
-        / "definition"
-        / "tables"
-        / "Inventory.tmdl"
-    )
+    tmdl_file = POWERBI_DIR / "InsightFlow.SemanticModel" / "definition" / "tables" / "Inventory.tmdl"
     tmdl = tmdl_file.read_text(encoding="utf-8")
     for name, expression in expected_numeric.items():
         assert f"measure '{name}' = {expression}" in tmdl
