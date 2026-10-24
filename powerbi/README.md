@@ -10,7 +10,7 @@ Instead of an opaque binary `.pbix` file, the report and tabular semantic model 
 | `InsightFlow.Report/` | Report visual layer definition (`report.json`, `definition.pbir`) containing 4 interactive analytical pages. |
 | `InsightFlow.SemanticModel/` | Tabular model definition (`model.bim`, `definition.pbism`) containing the star schema, relationships, 24 numeric measures and 3 text-only card display measures. |
 | `data/*.csv` | Production CSV extracts (`vw_fact_sales.csv`, `vw_fact_inventory.csv`, `vw_dim_product.csv`, `vw_dim_customer.csv`, `vw_dim_location.csv`, `dim_date.csv`, `data_assurance_reconciliation.csv`). |
-| [dax_measures.md](dax_measures.md) | DAX reference catalog documenting 44 measure definitions and 2 calculated columns, including formulas available for extending the current model. |
+| [dax_measures.md](dax_measures.md) | DAX reference catalog documenting all 27 active measures in the PBIP model (29 in TMDL), alongside 22 catalog extension measures and 2 suggested calculated column formulas. |
 | [report_pages.md](report_pages.md) | Visual-by-visual layout specifications for all 4 pages. |
 | `theme.json` | Corporate color palette, accessible contrast ratios, and typography specifications. |
 | `star_schema.mmd`, `star_schema.png` | Architecture diagrams of the underlying dimensional model. |
