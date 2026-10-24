@@ -26,7 +26,8 @@
                   "Property": "product_name"
                 }
               },
-              "queryRef": "Product.product_name"
+              "queryRef": "Product.product_name",
+              "displayName": "Product"
             },
             {
               "field": {
@@ -39,7 +40,8 @@
                   "Property": "location_name"
                 }
               },
-              "queryRef": "Location.location_name"
+              "queryRef": "Location.location_name",
+              "displayName": "Location"
             },
             {
               "field": {
@@ -52,7 +54,8 @@
                   "Property": "quantity_on_hand"
                 }
               },
-              "queryRef": "Inventory.quantity_on_hand"
+              "queryRef": "Inventory.quantity_on_hand",
+              "displayName": "On Hand"
             },
             {
               "field": {
@@ -65,7 +68,8 @@
                   "Property": "reorder_level"
                 }
               },
-              "queryRef": "Inventory.reorder_level"
+              "queryRef": "Inventory.reorder_level",
+              "displayName": "Reorder Level"
             },
             {
               "field": {
@@ -78,7 +82,8 @@
                   "Property": "replenishment_quantity_required"
                 }
               },
-              "queryRef": "Inventory.replenishment_quantity_required"
+              "queryRef": "Inventory.replenishment_quantity_required",
+              "displayName": "Suggested Units"
             },
             {
               "field": {
@@ -91,10 +96,29 @@
                   "Property": "replenishment_cost_estimate"
                 }
               },
-              "queryRef": "Inventory.replenishment_cost_estimate"
+              "queryRef": "Inventory.replenishment_cost_estimate",
+              "displayName": "Estimated Cost"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Inventory"
+                  }
+                },
+                "Property": "replenishment_cost_estimate"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
       }
     },
     "visualContainerObjects": {

@@ -26,7 +26,8 @@
                   "Property": "Basmati Rice Gross Profit"
                 }
               },
-              "queryRef": "Sales.Basmati Rice Gross Profit"
+              "queryRef": "Sales.Basmati Rice Gross Profit",
+              "displayName": "Gross Profit (Basmati Rice)"
             }
           ]
         }

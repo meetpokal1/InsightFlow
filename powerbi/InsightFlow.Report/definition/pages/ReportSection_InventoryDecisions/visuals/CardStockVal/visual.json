@@ -26,7 +26,8 @@
                   "Property": "Stock Value"
                 }
               },
-              "queryRef": "Inventory.Stock Value"
+              "queryRef": "Inventory.Stock Value",
+              "displayName": "Total Stock Value"
             }
           ]
         }

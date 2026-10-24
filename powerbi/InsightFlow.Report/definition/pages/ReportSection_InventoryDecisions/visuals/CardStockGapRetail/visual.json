@@ -26,7 +26,8 @@
                   "Property": "Stock Gap Retail Valuation"
                 }
               },
-              "queryRef": "Inventory.Stock Gap Retail Valuation"
+              "queryRef": "Inventory.Stock Gap Retail Valuation",
+              "displayName": "Stock Gap Retail Valuation"
             }
           ]
         }

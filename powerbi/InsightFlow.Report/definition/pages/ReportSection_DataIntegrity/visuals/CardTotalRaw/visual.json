@@ -26,7 +26,8 @@
                   "Property": "Total Raw Records"
                 }
               },
-              "queryRef": "DataQualityReconciliation.Total Raw Records"
+              "queryRef": "DataQualityReconciliation.Total Raw Records",
+              "displayName": "Raw Records Ingested"
             }
           ]
         }

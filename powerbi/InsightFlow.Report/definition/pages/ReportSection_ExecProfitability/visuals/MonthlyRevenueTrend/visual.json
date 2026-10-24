@@ -26,7 +26,8 @@
                   "Property": "year_month"
                 }
               },
-              "queryRef": "Date.year_month"
+              "queryRef": "Date.year_month",
+              "displayName": "Month"
             }
           ]
         },
@@ -43,7 +44,8 @@
                   "Property": "Revenue"
                 }
               },
-              "queryRef": "Sales.Revenue"
+              "queryRef": "Sales.Revenue",
+              "displayName": "Net Revenue"
             }
           ]
         }

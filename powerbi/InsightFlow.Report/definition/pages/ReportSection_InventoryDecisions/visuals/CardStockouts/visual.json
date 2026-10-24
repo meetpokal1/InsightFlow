@@ -26,7 +26,8 @@
                   "Property": "Stockout Positions"
                 }
               },
-              "queryRef": "Inventory.Stockout Positions"
+              "queryRef": "Inventory.Stockout Positions",
+              "displayName": "Out of Stock Positions"
             }
           ]
         }

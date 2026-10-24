@@ -26,7 +26,8 @@
                   "Property": "Average Order Value"
                 }
               },
-              "queryRef": "Sales.Average Order Value"
+              "queryRef": "Sales.Average Order Value",
+              "displayName": "Average Order Value"
             }
           ]
         }

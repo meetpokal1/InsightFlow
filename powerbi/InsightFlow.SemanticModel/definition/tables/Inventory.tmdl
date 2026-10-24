@@ -3,7 +3,7 @@ table Inventory
 	lineageTag: 05672b54-f8be-41b6-a172-2583c3f86a37
 
 	/// Total valuation of stock on hand at cost price (₹22.49M)
-	measure 'Stock Value' = SUM(Inventory[inventory_value])
+	measure 'Stock Value' = "₹" & FORMAT(DIVIDE(SUM(Inventory[inventory_value]), 10000000), "0.00") & " Cr"
 		formatString: "₹"#,##0
 		lineageTag: 28129eed-62af-4ac4-973d-730938fa6576
 
@@ -38,12 +38,12 @@ table Inventory
 		lineageTag: c686f0b5-5ff2-4901-b7f5-316b4ddb928c
 
 	/// Working capital required at purchase cost to restore buffer stock (₹9.66 L)
-	measure 'Replenishment Cost Estimate' = SUM(Inventory[replenishment_cost_estimate])
+	measure 'Replenishment Cost Estimate' = "₹" & FORMAT(DIVIDE(SUM(Inventory[replenishment_cost_estimate]), 100000), "0.00") & " L"
 		formatString: "₹"#,##0
 		lineageTag: 55d4ba0a-8533-44e5-93fb-90fe72792fec
 
 	/// Catalog retail valuation of buffer deficit units; NOT lost revenue (₹13.41 L)
-	measure 'Stock Gap Retail Valuation' = SUM(Inventory[stock_gap_retail_valuation])
+	measure 'Stock Gap Retail Valuation' = "₹" & FORMAT(DIVIDE(SUM(Inventory[stock_gap_retail_valuation]), 100000), "0.00") & " L"
 		formatString: "₹"#,##0
 		lineageTag: 7b12bb69-80d2-4aa9-af3d-df27e29fc91e
 

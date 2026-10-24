@@ -26,7 +26,8 @@
                   "Property": "Basmati Rice Margin %"
                 }
               },
-              "queryRef": "Sales.Basmati Rice Margin %"
+              "queryRef": "Sales.Basmati Rice Margin %",
+              "displayName": "Gross Margin %"
             }
           ]
         }
