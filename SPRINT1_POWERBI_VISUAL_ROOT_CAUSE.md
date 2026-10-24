@@ -6,6 +6,8 @@
 **Power BI Project:** `powerbi/InsightFlow.pbip`  
 **Git Branch:** `feature/sprint1-analytics-upgrade`  
 
+> **Historical snapshot note (24 October 2026):** This report preserves observations from the original 23 October investigation, including its 1,004-row Date extract. The current SQL/CSV/PBIP contract uses a 2,192-row source calendar covering 2023-01-01 through 2028-12-31; Power Query filters the report's Date table to the full months in the current sales period (730 rows). Current database-enabled CI run [#11](https://github.com/meetpokal1/InsightFlow/actions/runs/40068679173) passed 233 tests with Ruff lint and formatting checks passing. Historical measurements below are not the latest source CSV row count.
+
 ---
 
 ## 1. Executive Summary & Root-Cause Diagnosis
