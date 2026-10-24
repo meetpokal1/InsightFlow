@@ -601,212 +601,213 @@ elif page == "Sales & Products":
         )
 
         st.divider()
-        st.subheader("Price & Margin Sensitivity Simulator")
-        st.markdown(
-            '<p class="if-section-note">Model the bottom-line financial impact of hypothetical price '
-            "adjustments and customer demand responses. Initial defaults feature <strong>Basmati Rice 5kg (P0010)</strong>, "
-            "InsightFlow's #1 revenue driver with a slim 2.15% margin.</p>",
-            unsafe_allow_html=True,
-        )
-
-        sim_col1, sim_col2 = st.columns([1, 1])
-        available_prods = (
-            filtered_sales[["product_id", "product_name", "category_name"]]
-            .drop_duplicates()
-            .sort_values("product_name")
-        )
-        prod_options = {
-            f"{row.product_name} ({row.product_id})": row.product_id
-            for _, row in available_prods.iterrows()
-        }
-
-        default_idx = 0
-        p0010_label = next((k for k, v in prod_options.items() if v == "P0010"), None)
-        if p0010_label and p0010_label in prod_options:
-            default_idx = list(prod_options.keys()).index(p0010_label)
-
-        with sim_col1:
-            selected_label = st.selectbox(
-                "Select product to simulate",
-                options=list(prod_options.keys()),
-                index=default_idx,
-                key="sim_product_select",
+        with st.container(key="price-sensitivity-simulator"):
+            st.subheader("Price & Margin Sensitivity Simulator")
+            st.markdown(
+                '<p class="if-section-note">Model the bottom-line financial impact of hypothetical price '
+                "adjustments and customer demand responses. Initial defaults feature <strong>Basmati Rice 5kg (P0010)</strong>, "
+                "InsightFlow's #1 revenue driver with a slim 2.15% margin.</p>",
+                unsafe_allow_html=True,
             )
-            selected_prod_id = prod_options[selected_label]
-            price_change = st.slider(
-                "Price adjustment (%)",
-                min_value=-15.0,
-                max_value=25.0,
-                value=3.0,
-                step=0.5,
-                key="sim_price_slider",
+    
+            sim_col1, sim_col2 = st.columns([1, 1])
+            available_prods = (
+                filtered_sales[["product_id", "product_name", "category_name"]]
+                .drop_duplicates()
+                .sort_values("product_name")
             )
-
-        with sim_col2:
-            demand_mode = st.radio(
-                "Demand response model",
-                options=["Assumed price elasticity of demand (|ε|)", "Explicit volume change (%)"],
-                horizontal=True,
-                key="sim_demand_mode",
-            )
-            if demand_mode.startswith("Assumed price elasticity"):
-                elasticity_val = st.slider(
-                    "Price elasticity of demand (|ε|)",
-                    min_value=0.0,
-                    max_value=3.0,
-                    value=1.5,
-                    step=0.1,
-                    help="Assumed percentage demand drop per 1% price increase (e.g. 1.5 implies -4.5% volume at +3% price).",
-                    key="sim_elasticity_slider",
+            prod_options = {
+                f"{row.product_name} ({row.product_id})": row.product_id
+                for _, row in available_prods.iterrows()
+            }
+    
+            default_idx = 0
+            p0010_label = next((k for k, v in prod_options.items() if v == "P0010"), None)
+            if p0010_label and p0010_label in prod_options:
+                default_idx = list(prod_options.keys()).index(p0010_label)
+    
+            with sim_col1:
+                selected_label = st.selectbox(
+                    "Select product to simulate",
+                    options=list(prod_options.keys()),
+                    index=default_idx,
+                    key="sim_product_select",
                 )
-                sim_res = simulate_price_sensitivity(
-                    sales_lines=filtered_sales,
-                    product_id=selected_prod_id,
-                    price_change_pct=price_change,
-                    elasticity=elasticity_val,
-                )
-            else:
-                vol_change = st.slider(
-                    "Volume change (%)",
-                    min_value=-50.0,
-                    max_value=50.0,
-                    value=-4.5,
+                selected_prod_id = prod_options[selected_label]
+                price_change = st.slider(
+                    "Price adjustment (%)",
+                    min_value=-15.0,
+                    max_value=25.0,
+                    value=3.0,
                     step=0.5,
-                    key="sim_vol_slider",
+                    key="sim_price_slider",
                 )
-                sim_res = simulate_price_sensitivity(
-                    sales_lines=filtered_sales,
-                    product_id=selected_prod_id,
-                    price_change_pct=price_change,
-                    volume_change_pct=vol_change,
+    
+            with sim_col2:
+                demand_mode = st.radio(
+                    "Demand response model",
+                    options=["Assumed price elasticity of demand (|ε|)", "Explicit volume change (%)"],
+                    horizontal=True,
+                    key="sim_demand_mode",
                 )
-
-        scols = st.columns(4)
-        scols[0].metric(
-            "Modeled Net Revenue",
-            format_inr(sim_res["modeled"]["revenue"]),
-            delta=f"{sim_res['delta']['revenue']:+,.0f} ₹",
-        )
-        scols[1].metric(
-            "Modeled Gross Profit",
-            format_inr(sim_res["modeled"]["gross_profit"]),
-            delta=f"{sim_res['delta']['gross_profit']:+,.0f} ₹",
-        )
-        scols[2].metric(
-            "Modeled Gross Margin",
-            f"{sim_res['modeled']['margin_pct']:.2f}%",
-            delta=f"{sim_res['delta']['margin_points']:+.2f} pts",
-        )
-        scols[3].metric(
-            "Modeled Sales Units",
-            f"{sim_res['modeled']['units']:,}",
-            delta=f"{sim_res['modeled']['units'] - sim_res['baseline']['units']:+,} units",
-        )
-
-        # Visual Scenario Comparison Chart
-        sim_chart_df = pd.DataFrame(
-            [
-                {
-                    "Metric": "Net Revenue",
-                    "Scenario": "Baseline",
-                    "Amount": sim_res["baseline"]["revenue"],
-                },
-                {
-                    "Metric": "Net Revenue",
-                    "Scenario": "Modeled",
-                    "Amount": sim_res["modeled"]["revenue"],
-                },
-                {
-                    "Metric": "Cost of Goods (COGS)",
-                    "Scenario": "Baseline",
-                    "Amount": sim_res["baseline"]["cogs"],
-                },
-                {
-                    "Metric": "Cost of Goods (COGS)",
-                    "Scenario": "Modeled",
-                    "Amount": sim_res["modeled"]["cogs"],
-                },
-                {
-                    "Metric": "Gross Profit",
-                    "Scenario": "Baseline",
-                    "Amount": sim_res["baseline"]["gross_profit"],
-                },
-                {
-                    "Metric": "Gross Profit",
-                    "Scenario": "Modeled",
-                    "Amount": sim_res["modeled"]["gross_profit"],
-                },
-            ]
-        )
-        fig_sim = px.bar(
-            sim_chart_df,
-            x="Metric",
-            y="Amount",
-            color="Scenario",
-            barmode="group",
-            title=f"Scenario Financial Comparison: {selected_label}",
-            labels={"Amount": "Amount (₹)", "Metric": ""},
-            color_discrete_map={
-                "Baseline": "#94a3b8",
-                "Modeled": "#2563eb" if sim_res["delta"]["gross_profit"] >= 0 else "#dc2626",
-            },
-        )
-        fig_sim.update_traces(
-            hovertemplate="<b>%{x} (%{data.name})</b><br>Amount: ₹%{y:,.0f}<extra></extra>"
-        )
-        st.plotly_chart(
-            style_chart(fig_sim, height=300, show_legend=True, legend_position="top-right"),
-            use_container_width=True,
-        )
-
-        be_pct = sim_res["break_even_volume_decline_pct"]
-        if be_pct is not None and be_pct > 0:
-            st.success(
-                f"**Break-Even Tolerance:** At a **{price_change:+.1f}%** price adjustment, unit sales volume can decline by up to **{be_pct:.1f}%** before gross profit falls below the current baseline (₹{sim_res['baseline']['gross_profit']:,.2f})."
+                if demand_mode.startswith("Assumed price elasticity"):
+                    elasticity_val = st.slider(
+                        "Price elasticity of demand (|ε|)",
+                        min_value=0.0,
+                        max_value=3.0,
+                        value=1.5,
+                        step=0.1,
+                        help="Assumed percentage demand drop per 1% price increase (e.g. 1.5 implies -4.5% volume at +3% price).",
+                        key="sim_elasticity_slider",
+                    )
+                    sim_res = simulate_price_sensitivity(
+                        sales_lines=filtered_sales,
+                        product_id=selected_prod_id,
+                        price_change_pct=price_change,
+                        elasticity=elasticity_val,
+                    )
+                else:
+                    vol_change = st.slider(
+                        "Volume change (%)",
+                        min_value=-50.0,
+                        max_value=50.0,
+                        value=-4.5,
+                        step=0.5,
+                        key="sim_vol_slider",
+                    )
+                    sim_res = simulate_price_sensitivity(
+                        sales_lines=filtered_sales,
+                        product_id=selected_prod_id,
+                        price_change_pct=price_change,
+                        volume_change_pct=vol_change,
+                    )
+    
+            scols = st.columns(4)
+            scols[0].metric(
+                "Modeled Net Revenue",
+                format_inr(sim_res["modeled"]["revenue"]),
+                delta=f"{sim_res['delta']['revenue']:+,.0f} ₹",
             )
-        elif be_pct is not None:
-            st.warning(
-                f"**Margin Dilution:** At {price_change:+.1f}% price, volume would need to increase by {-be_pct:.1f}% to preserve current profit."
+            scols[1].metric(
+                "Modeled Gross Profit",
+                format_inr(sim_res["modeled"]["gross_profit"]),
+                delta=f"{sim_res['delta']['gross_profit']:+,.0f} ₹",
             )
-
-        sim_summary_df = pd.DataFrame(
-            [
-                {
-                    "Metric": "Net Revenue",
-                    "Baseline": f"₹{sim_res['baseline']['revenue']:,.2f}",
-                    "Modeled Scenario": f"₹{sim_res['modeled']['revenue']:,.2f}",
-                    "Change (Δ)": f"{sim_res['delta']['revenue']:+,.2f} ₹",
+            scols[2].metric(
+                "Modeled Gross Margin",
+                f"{sim_res['modeled']['margin_pct']:.2f}%",
+                delta=f"{sim_res['delta']['margin_points']:+.2f} pts",
+            )
+            scols[3].metric(
+                "Modeled Sales Units",
+                f"{sim_res['modeled']['units']:,}",
+                delta=f"{sim_res['modeled']['units'] - sim_res['baseline']['units']:+,} units",
+            )
+    
+            # Visual Scenario Comparison Chart
+            sim_chart_df = pd.DataFrame(
+                [
+                    {
+                        "Metric": "Net Revenue",
+                        "Scenario": "Baseline",
+                        "Amount": sim_res["baseline"]["revenue"],
+                    },
+                    {
+                        "Metric": "Net Revenue",
+                        "Scenario": "Modeled",
+                        "Amount": sim_res["modeled"]["revenue"],
+                    },
+                    {
+                        "Metric": "Cost of Goods (COGS)",
+                        "Scenario": "Baseline",
+                        "Amount": sim_res["baseline"]["cogs"],
+                    },
+                    {
+                        "Metric": "Cost of Goods (COGS)",
+                        "Scenario": "Modeled",
+                        "Amount": sim_res["modeled"]["cogs"],
+                    },
+                    {
+                        "Metric": "Gross Profit",
+                        "Scenario": "Baseline",
+                        "Amount": sim_res["baseline"]["gross_profit"],
+                    },
+                    {
+                        "Metric": "Gross Profit",
+                        "Scenario": "Modeled",
+                        "Amount": sim_res["modeled"]["gross_profit"],
+                    },
+                ]
+            )
+            fig_sim = px.bar(
+                sim_chart_df,
+                x="Metric",
+                y="Amount",
+                color="Scenario",
+                barmode="group",
+                title=f"Scenario Financial Comparison: {selected_label}",
+                labels={"Amount": "Amount (₹)", "Metric": ""},
+                color_discrete_map={
+                    "Baseline": "#94a3b8",
+                    "Modeled": "#2563eb" if sim_res["delta"]["gross_profit"] >= 0 else "#dc2626",
                 },
-                {
-                    "Metric": "Cost of Goods Sold (COGS)",
-                    "Baseline": f"₹{sim_res['baseline']['cogs']:,.2f}",
-                    "Modeled Scenario": f"₹{sim_res['modeled']['cogs']:,.2f}",
-                    "Change (Δ)": f"{sim_res['modeled']['cogs'] - sim_res['baseline']['cogs']:+,.2f} ₹",
-                },
-                {
-                    "Metric": "Gross Profit",
-                    "Baseline": f"₹{sim_res['baseline']['gross_profit']:,.2f}",
-                    "Modeled Scenario": f"₹{sim_res['modeled']['gross_profit']:,.2f}",
-                    "Change (Δ)": f"{sim_res['delta']['gross_profit']:+,.2f} ₹",
-                },
-                {
-                    "Metric": "Gross Margin %",
-                    "Baseline": f"{sim_res['baseline']['margin_pct']:.2f}%",
-                    "Modeled Scenario": f"{sim_res['modeled']['margin_pct']:.2f}%",
-                    "Change (Δ)": f"{sim_res['delta']['margin_points']:+.2f}% pts",
-                },
-                {
-                    "Metric": "Volume (Units Sold)",
-                    "Baseline": f"{sim_res['baseline']['units']:,}",
-                    "Modeled Scenario": f"{sim_res['modeled']['units']:,}",
-                    "Change (Δ)": f"{sim_res['modeled']['units'] - sim_res['baseline']['units']:+,} units ({sim_res['volume_change_pct']:+.1f}%)",
-                },
-            ]
-        )
-        st.dataframe(sim_summary_df, use_container_width=True, hide_index=True)
-        st.caption(
-            "Note: Elasticity values and demand responses are user-specified scenario planning parameters, not causal econometric estimates."
-        )
+            )
+            fig_sim.update_traces(
+                hovertemplate="<b>%{x} (%{data.name})</b><br>Amount: ₹%{y:,.0f}<extra></extra>"
+            )
+            st.plotly_chart(
+                style_chart(fig_sim, height=300, show_legend=True, legend_position="top-right"),
+                use_container_width=True,
+            )
+    
+            be_pct = sim_res["break_even_volume_decline_pct"]
+            if be_pct is not None and be_pct > 0:
+                st.success(
+                    f"**Break-Even Tolerance:** At a **{price_change:+.1f}%** price adjustment, unit sales volume can decline by up to **{be_pct:.1f}%** before gross profit falls below the current baseline (₹{sim_res['baseline']['gross_profit']:,.2f})."
+                )
+            elif be_pct is not None:
+                st.warning(
+                    f"**Margin Dilution:** At {price_change:+.1f}% price, volume would need to increase by {-be_pct:.1f}% to preserve current profit."
+                )
+    
+            sim_summary_df = pd.DataFrame(
+                [
+                    {
+                        "Metric": "Net Revenue",
+                        "Baseline": f"₹{sim_res['baseline']['revenue']:,.2f}",
+                        "Modeled Scenario": f"₹{sim_res['modeled']['revenue']:,.2f}",
+                        "Change (Δ)": f"{sim_res['delta']['revenue']:+,.2f} ₹",
+                    },
+                    {
+                        "Metric": "Cost of Goods Sold (COGS)",
+                        "Baseline": f"₹{sim_res['baseline']['cogs']:,.2f}",
+                        "Modeled Scenario": f"₹{sim_res['modeled']['cogs']:,.2f}",
+                        "Change (Δ)": f"{sim_res['modeled']['cogs'] - sim_res['baseline']['cogs']:+,.2f} ₹",
+                    },
+                    {
+                        "Metric": "Gross Profit",
+                        "Baseline": f"₹{sim_res['baseline']['gross_profit']:,.2f}",
+                        "Modeled Scenario": f"₹{sim_res['modeled']['gross_profit']:,.2f}",
+                        "Change (Δ)": f"{sim_res['delta']['gross_profit']:+,.2f} ₹",
+                    },
+                    {
+                        "Metric": "Gross Margin %",
+                        "Baseline": f"{sim_res['baseline']['margin_pct']:.2f}%",
+                        "Modeled Scenario": f"{sim_res['modeled']['margin_pct']:.2f}%",
+                        "Change (Δ)": f"{sim_res['delta']['margin_points']:+.2f}% pts",
+                    },
+                    {
+                        "Metric": "Volume (Units Sold)",
+                        "Baseline": f"{sim_res['baseline']['units']:,}",
+                        "Modeled Scenario": f"{sim_res['modeled']['units']:,}",
+                        "Change (Δ)": f"{sim_res['modeled']['units'] - sim_res['baseline']['units']:+,} units ({sim_res['volume_change_pct']:+.1f}%)",
+                    },
+                ]
+            )
+            st.dataframe(sim_summary_df, use_container_width=True, hide_index=True)
+            st.caption(
+                "Note: Elasticity values and demand responses are user-specified scenario planning parameters, not causal econometric estimates."
+            )
 
         st.download_button(
             "Download filtered sales lines (CSV)",
