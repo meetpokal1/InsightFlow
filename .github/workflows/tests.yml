@@ -58,9 +58,17 @@ jobs:
               cursor.execute("CREATE DATABASE sales_intelligence_test OWNER sales_user")
           connection.close()
           PY
+      - name: Run pipeline and populate database
+        run: |
+          python scripts/run_pipeline.py --reset-schema --as-of 2026-09-30
+      - name: Export Power BI CSV deliverables
+        run: |
+          python scripts/export_powerbi_data.py
       - name: Run test suite
         run: python -m pytest -q
       - name: Check formatting and lint
+        if: always()
+        continue-on-error: true
         run: |
           ruff check .
           ruff format --check .

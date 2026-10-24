@@ -1,17 +1,31 @@
 """Unit tests for the Data Assurance Workpaper (.xlsx) generation and structure."""
 
-import pathlib
+from pathlib import Path
+
 import openpyxl
 import pytest
 
 from scripts.generate_data_assurance_workpaper import generate_workbook
+from src.config import PROJECT_ROOT
 
 
 @pytest.fixture(scope="module")
 def workpaper_path(tmp_path_factory):
     out_dir = tmp_path_factory.mktemp("workpaper")
     out_file = out_dir / "data_assurance_workpaper.xlsx"
-    generate_workbook(out_file)
+    processed_dir = PROJECT_ROOT / "data" / "processed"
+    findings_file = processed_dir / "data_quality_report.csv"
+    if not findings_file.exists():
+        raw_dir = PROJECT_ROOT / "data" / "raw"
+        from src.pipeline import clean_raw_files, save_outputs
+        from tests.helpers import AS_OF
+
+        res = clean_raw_files(raw_dir, AS_OF)
+        temp_processed = tmp_path_factory.mktemp("processed")
+        save_outputs(res, temp_processed)
+        generate_workbook(out_file, processed_dir=temp_processed)
+    else:
+        generate_workbook(out_file, processed_dir=processed_dir)
     return out_file
 
 

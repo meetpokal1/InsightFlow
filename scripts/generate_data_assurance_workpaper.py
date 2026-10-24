@@ -7,7 +7,6 @@ each worksheet to executive presentation standards using openpyxl.
 
 from __future__ import annotations
 
-import json
 import pathlib
 from typing import Any
 
@@ -272,7 +271,7 @@ def build_reconciliation_sheet(wb: openpyxl.Workbook):
     autofit_columns(ws, 1, 10)
 
 
-def build_quality_findings_sheet(wb: openpyxl.Workbook):
+def build_quality_findings_sheet(wb: openpyxl.Workbook, processed_dir: pathlib.Path | None = None):
     ws = wb.create_sheet(title="Quality Findings")
     ws.views.sheetView[0].showGridLines = True
     ws.freeze_panes = "A4"
@@ -294,7 +293,8 @@ def build_quality_findings_sheet(wb: openpyxl.Workbook):
         ws.cell(row=3, column=c_idx, value=h)
     style_header_row(ws, 3, 1, len(headers))
 
-    findings_file = PROCESSED_DIR / "data_quality_report.csv"
+    p_dir = processed_dir or PROCESSED_DIR
+    findings_file = p_dir / "data_quality_report.csv"
     if findings_file.exists():
         import csv
         with open(findings_file, mode="r", encoding="utf-8") as f:
@@ -353,7 +353,7 @@ def build_quality_findings_sheet(wb: openpyxl.Workbook):
     autofit_columns(ws, 1, 6)
 
 
-def build_rejected_records_sheet(wb: openpyxl.Workbook):
+def build_rejected_records_sheet(wb: openpyxl.Workbook, rejected_dir: pathlib.Path | None = None):
     ws = wb.create_sheet(title="Rejected Records")
     ws.views.sheetView[0].showGridLines = True
     ws.freeze_panes = "A4"
@@ -379,8 +379,9 @@ def build_rejected_records_sheet(wb: openpyxl.Workbook):
     row_idx = 4
     import csv
 
+    r_dir = rejected_dir or REJECTED_DIR
     # 1. Orders rejected
-    rej_orders = REJECTED_DIR / "orders_rejected.csv"
+    rej_orders = r_dir / "orders_rejected.csv"
     if rej_orders.exists():
         with open(rej_orders, mode="r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -400,7 +401,7 @@ def build_rejected_records_sheet(wb: openpyxl.Workbook):
                 row_idx += 1
 
     # 2. Order items rejected
-    rej_items = REJECTED_DIR / "order_items_rejected.csv"
+    rej_items = r_dir / "order_items_rejected.csv"
     if rej_items.exists():
         with open(rej_items, mode="r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -420,7 +421,7 @@ def build_rejected_records_sheet(wb: openpyxl.Workbook):
                 row_idx += 1
 
     # 3. Inventory rejected
-    rej_inv = REJECTED_DIR / "inventory_rejected.csv"
+    rej_inv = r_dir / "inventory_rejected.csv"
     if rej_inv.exists():
         with open(rej_inv, mode="r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -570,9 +571,14 @@ def build_definitions_sheet(wb: openpyxl.Workbook):
     autofit_columns(ws, 1, 5)
 
 
-def generate_workbook(output_path: pathlib.Path | None = None) -> pathlib.Path:
+def generate_workbook(
+    output_path: pathlib.Path | None = None,
+    processed_dir: pathlib.Path | None = None,
+) -> pathlib.Path:
     out_file = output_path or (DOCS_DIR / "data_assurance_workpaper.xlsx")
     out_file.parent.mkdir(parents=True, exist_ok=True)
+    p_dir = processed_dir or PROCESSED_DIR
+    r_dir = p_dir / "rejected"
 
     wb = openpyxl.Workbook()
     # Remove default sheet
@@ -580,8 +586,8 @@ def generate_workbook(output_path: pathlib.Path | None = None) -> pathlib.Path:
 
     build_executive_summary_sheet(wb)
     build_reconciliation_sheet(wb)
-    build_quality_findings_sheet(wb)
-    build_rejected_records_sheet(wb)
+    build_quality_findings_sheet(wb, processed_dir=p_dir)
+    build_rejected_records_sheet(wb, rejected_dir=r_dir)
     build_validation_checks_sheet(wb)
     build_definitions_sheet(wb)
 

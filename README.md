@@ -200,7 +200,7 @@ Instead of an opaque binary `.pbix` file, the tabular semantic model and report 
 > python scripts/run_pipeline.py --skip-db
 > python scripts/export_powerbi_data.py
 > ```
-> Then open `powerbi/InsightFlow.pbip` in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) and click **Home > Refresh**. For an immediate interactive web demo without installing desktop software, launch the [Streamlit Live Demo](https://insightflow-portfolio.streamlit.app/).
+> Then open `powerbi/InsightFlow.pbip` in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) on Windows. If prompted or if the project folder was relocated on your workstation, configure the **`DataFolder`** parameter to your local `powerbi/data` directory via **Home > Transform data > Edit parameters** (or run `python scripts/build_powerbi_pbip.py` to auto-detect your local path), then click **Home > Refresh**. For an immediate interactive web demo without installing desktop software, launch the [Streamlit Live Demo](https://insightflow-portfolio.streamlit.app/).
 
 ### Dimensional Model Architecture
 

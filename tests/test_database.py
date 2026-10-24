@@ -203,3 +203,22 @@ def test_customer_segments_follow_the_rfm_rules(database, cleaned):
     assert (recent & (segments["frequency_score"] == 1))[segment == "New or one-time"].all()
     assert (segments["recency_score"] == 1)[segment == "Lost"].all()
     assert not ((recent & frequent) & (segment != "Champions")).any()
+
+
+def test_data_assurance_reconciliation_view_matches_tables_and_log(database):
+    recon = pd.read_sql_query('SELECT * FROM data_assurance_reconciliation', database)
+    assert len(recon) == 8
+    expected_tables = [
+        'categories',
+        'suppliers',
+        'locations',
+        'products',
+        'customers',
+        'orders',
+        'order_items',
+        'inventory',
+    ]
+    assert list(recon['table_name']) == expected_tables
+    assert (recon['reconciliation_status'] == 'BALANCED').all()
+    assert (recon['raw_ingested'] >= recon['clean_loaded']).all()
+    assert (recon['preservation_rate'] > 0).all()

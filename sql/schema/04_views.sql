@@ -5,6 +5,7 @@
 -- The views are dropped first (the ones that depend on others go first), so the file can be
 -- run again after a definition changes.
 
+DROP VIEW IF EXISTS data_assurance_reconciliation;
 DROP VIEW IF EXISTS vw_fact_inventory;
 DROP VIEW IF EXISTS vw_dim_location;
 DROP VIEW IF EXISTS vw_dim_customer;
@@ -171,3 +172,69 @@ SELECT
     (quantity_on_hand = 0) AS is_stockout,
     (quantity_on_hand < reorder_level) AS is_below_reorder
 FROM stock;
+
+
+-- Pipeline reconciliation summary between raw ingestion and clean loaded records.
+-- Combines current entity row counts with ETL quality log anomaly tracking for end-to-end auditability.
+CREATE VIEW data_assurance_reconciliation AS
+WITH latest_run AS (
+    SELECT MAX(run_at) AS max_run_at FROM etl_quality_log
+),
+quality_summary AS (
+    SELECT
+        q.table_name,
+        COALESCE(SUM(CASE WHEN q.action = 'dropped' THEN q.rows_affected ELSE 0 END), 0)::BIGINT AS exact_duplicates_dropped,
+        COALESCE(SUM(CASE WHEN q.action = 'rejected' THEN q.rows_affected ELSE 0 END), 0)::BIGINT AS quarantined_rejected,
+        COALESCE(SUM(CASE WHEN q.action LIKE '%merged%' THEN q.rows_affected ELSE 0 END), 0)::BIGINT AS merged_deduplicated
+    FROM etl_quality_log q
+    CROSS JOIN latest_run lr
+    WHERE lr.max_run_at IS NOT NULL AND q.run_at >= lr.max_run_at - INTERVAL '10 seconds'
+    GROUP BY q.table_name
+),
+table_counts AS (
+    SELECT 'categories' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 1 AS sort_order FROM categories
+    UNION ALL
+    SELECT 'suppliers' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 2 AS sort_order FROM suppliers
+    UNION ALL
+    SELECT 'locations' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 3 AS sort_order FROM locations
+    UNION ALL
+    SELECT 'products' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 4 AS sort_order FROM products
+    UNION ALL
+    SELECT 'customers' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 5 AS sort_order FROM customers
+    UNION ALL
+    SELECT 'orders' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 6 AS sort_order FROM orders
+    UNION ALL
+    SELECT 'order_items' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 7 AS sort_order FROM order_items
+    UNION ALL
+    SELECT 'inventory' AS table_name, COUNT(*)::BIGINT AS clean_loaded, 8 AS sort_order FROM inventory
+),
+reconciliation AS (
+    SELECT
+        tc.table_name,
+        (tc.clean_loaded
+         + COALESCE(qs.exact_duplicates_dropped, 0)
+         + COALESCE(qs.quarantined_rejected, 0)
+         + COALESCE(qs.merged_deduplicated, 0))::BIGINT AS raw_ingested,
+        COALESCE(qs.exact_duplicates_dropped, 0)::BIGINT AS exact_duplicates_dropped,
+        COALESCE(qs.quarantined_rejected, 0)::BIGINT AS quarantined_rejected,
+        COALESCE(qs.merged_deduplicated, 0)::BIGINT AS merged_deduplicated,
+        tc.clean_loaded,
+        tc.sort_order
+    FROM table_counts tc
+    LEFT JOIN quality_summary qs ON qs.table_name = tc.table_name
+)
+SELECT
+    table_name,
+    raw_ingested,
+    exact_duplicates_dropped,
+    quarantined_rejected,
+    merged_deduplicated,
+    clean_loaded,
+    CASE
+        WHEN (raw_ingested - exact_duplicates_dropped - quarantined_rejected - merged_deduplicated) = clean_loaded
+        THEN 'BALANCED'
+        ELSE 'DISCREPANCY'
+    END AS reconciliation_status,
+    ROUND(clean_loaded::NUMERIC / NULLIF(raw_ingested, 0), 3)::DOUBLE PRECISION AS preservation_rate
+FROM reconciliation
+ORDER BY sort_order;
