@@ -315,9 +315,14 @@
         "measures": [
           {
             "name": "Stock Value",
-            "expression": "\"₹\" & FORMAT(DIVIDE(SUM(Inventory[inventory_value]), 10000000), \"0.00\") & \" Cr\"",
+            "expression": "SUM(Inventory[inventory_value])",
             "formatString": "\"₹\"#,##0",
             "description": "Total valuation of stock on hand at cost price (₹22.49M)"
+          },
+          {
+            "name": "Stock Value Display",
+            "expression": "\"₹\" & FORMAT(DIVIDE([Stock Value], 10000000), \"0.00\") & \" Cr\"",
+            "description": "Presentation-only Indian-unit label; use Stock Value for numeric calculations"
           },
           {
             "name": "Stock Positions",
@@ -357,15 +362,25 @@
           },
           {
             "name": "Replenishment Cost Estimate",
-            "expression": "\"₹\" & FORMAT(DIVIDE(SUM(Inventory[replenishment_cost_estimate]), 100000), \"0.00\") & \" L\"",
+            "expression": "SUM(Inventory[replenishment_cost_estimate])",
             "formatString": "\"₹\"#,##0",
             "description": "Working capital required at purchase cost to restore buffer stock (₹9.66 L)"
           },
           {
+            "name": "Replenishment Cost Estimate Display",
+            "expression": "\"₹\" & FORMAT(DIVIDE([Replenishment Cost Estimate], 100000), \"0.00\") & \" L\"",
+            "description": "Presentation-only Indian-unit label; use Replenishment Cost Estimate for numeric calculations"
+          },
+          {
             "name": "Stock Gap Retail Valuation",
-            "expression": "\"₹\" & FORMAT(DIVIDE(SUM(Inventory[stock_gap_retail_valuation]), 100000), \"0.00\") & \" L\"",
+            "expression": "SUM(Inventory[stock_gap_retail_valuation])",
             "formatString": "\"₹\"#,##0",
             "description": "Catalog retail valuation of buffer deficit units; NOT lost revenue (₹13.41 L)"
+          },
+          {
+            "name": "Stock Gap Retail Valuation Display",
+            "expression": "\"₹\" & FORMAT(DIVIDE([Stock Gap Retail Valuation], 100000), \"0.00\") & \" L\"",
+            "description": "Presentation-only Indian-unit label; use Stock Gap Retail Valuation for numeric calculations"
           }
         ],
         "partitions": [
