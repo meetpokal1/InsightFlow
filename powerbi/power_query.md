@@ -217,6 +217,8 @@ LoadCsv(
 
 ### Date
 
+The CSV export uses the same 11-column date contract as the PBIP semantic model and PostgreSQL calendar.
+
 ```m
 let
     Calendar = LoadCsv(
@@ -225,10 +227,11 @@ let
             {"date_key", type date},
             {"year", Int64.Type},
             {"quarter", Int64.Type},
-            {"month_number", Int64.Type},
+            {"quarter_name", type text},
+            {"month", Int64.Type},
             {"month_name", type text},
             {"year_month", type text},
-            {"week_of_year", Int64.Type},
+            {"day", Int64.Type},
             {"day_of_week", Int64.Type},
             {"day_name", type text},
             {"is_weekend", type logical}
