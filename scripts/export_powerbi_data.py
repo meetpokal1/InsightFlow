@@ -292,9 +292,9 @@ def export_from_csv(processed_dir: Path, out_dir: Path):
     ]
     dim_cust.to_csv(out_dir / "vw_dim_customer.csv", index=False)
 
-    # 6. Dim Date
-    min_date = pd.to_datetime("2024-01-01")
-    max_date = pd.to_datetime("2026-09-30")
+    # 6. Dim Date. Match sql/schema/03_dim_date.sql and the PBIP Date table exactly.
+    min_date = pd.Timestamp("2023-01-01")
+    max_date = pd.Timestamp("2028-12-31")
     date_range = pd.date_range(min_date, max_date, freq="D")
     dim_date = pd.DataFrame(
         {
@@ -308,7 +308,7 @@ def export_from_csv(processed_dir: Path, out_dir: Path):
             "day": date_range.day,
             "day_of_week": date_range.dayofweek + 1,
             "day_name": date_range.strftime("%A"),
-            "is_weekend": date_range.dayofweek.isin([5, 6]),
+            "is_weekend": date_range.dayofweek >= 5,
         }
     )
     dim_date.to_csv(out_dir / "dim_date.csv", index=False)
