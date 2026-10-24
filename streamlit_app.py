@@ -646,7 +646,10 @@ elif page == "Sales & Products":
             with sim_col2:
                 demand_mode = st.radio(
                     "Demand response model",
-                    options=["Assumed price elasticity of demand (|ε|)", "Explicit volume change (%)"],
+                    options=[
+                        "Assumed price elasticity of demand (|ε|)",
+                        "Explicit volume change (%)",
+                    ],
                     horizontal=True,
                     key="sim_demand_mode",
                 )

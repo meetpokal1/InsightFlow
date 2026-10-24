@@ -201,9 +201,10 @@ def run_ui_qa():
     # Refuse duplicate evidence: the focused simulator capture must differ from the full page.
     simulator_screenshot = OUTPUT_DIR / "02_price_sensitivity_simulator.png"
     sales_screenshot = OUTPUT_DIR / "02_sales_and_products.png"
-    screenshots_distinct = hashlib.sha256(simulator_screenshot.read_bytes()).digest() != hashlib.sha256(
-        sales_screenshot.read_bytes()
-    ).digest()
+    screenshots_distinct = (
+        hashlib.sha256(simulator_screenshot.read_bytes()).digest()
+        != hashlib.sha256(sales_screenshot.read_bytes()).digest()
+    )
     results["screenshot_checks"] = {
         "simulator_preview_distinct_from_sales_page": screenshots_distinct
     }
