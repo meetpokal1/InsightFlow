@@ -1,7 +1,7 @@
 # InsightFlow Power BI Deliverable — Release Checklist & Gate
 
 **Audit Date:** October 23, 2026  
-**CI Revalidation:** October 24, 2026 — [GitHub Actions run #11](https://github.com/meetpokal1/InsightFlow/actions/runs/40068679173) passed with 233 tests and successful Ruff lint/format checks. The source CSV calendar now has 2,192 rows (2023-01-01 through 2028-12-31); Power Query filters the model to 730 dates for the current sales period.  
+**CI Revalidation:** October 24, 2026 — the [PR-head validation run #11](https://github.com/meetpokal1/InsightFlow/actions/runs/40068679173) and [post-merge `main` run #14](https://github.com/meetpokal1/InsightFlow/actions/runs/40069166558) passed. The post-merge run completed database bootstrap and Power BI CSV export, passed 233 tests, and passed Ruff lint/format checks. The source CSV calendar has 2,192 rows (2023-01-01 through 2028-12-31); Power Query filters the model to 730 dates for the current sales period.  
 **Project:** InsightFlow Retail Analytics Decision-Support Product  
 **Project Directory:** `powerbi/`  
 **Power BI Project:** `powerbi/InsightFlow.pbip`  
