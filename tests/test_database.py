@@ -59,6 +59,14 @@ def test_every_cleaned_table_is_in_the_database(database, cleaned):
         assert scalar(database, f"SELECT COUNT(*) FROM {name}") == len(df)
 
 
+def test_run_sql_file_preserves_percent_patterns(tmp_path, database):
+    """Regression test for raw SQL files containing LIKE patterns with percent signs."""
+    sql_file = tmp_path / "percent_pattern.sql"
+    sql_file.write_text("SELECT 'merged' LIKE '%merged%';", encoding="utf-8")
+
+    run_sql_file(database, sql_file)
+
+
 def test_the_quality_log_is_stored(database, cleaned):
     assert scalar(database, "SELECT COUNT(*) FROM etl_quality_log") == len(cleaned.quality_log)
 
