@@ -38,7 +38,7 @@ This exports:
 - `vw_dim_product.csv` (60 rows)
 - `vw_dim_customer.csv` (800 rows)
 - `vw_dim_location.csv` (8 rows)
-- `dim_date.csv` (1,004 rows)
+- `dim_date.csv` (2,192 source rows; Power Query retains 730 dates for the report period)
 - `data_assurance_reconciliation.csv` (8 rows)
 
 ### 2. Open the Project in Power BI Desktop
