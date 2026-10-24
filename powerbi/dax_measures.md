@@ -3,10 +3,12 @@
 The report uses 47 measures and 2 calculated columns, including three text-only card display measures. They assume the table names from
 [README.md](README.md): `Sales`, `Inventory`, `Date`, `Product`, `Customer` and `Location`.
 
-The measures were written for Power BI Desktop and could not be run in the environment where
-this project was built, because Power BI Desktop only runs on Windows. Every measure below has
-an expected value, calculated in PostgreSQL from the same views, so you can check each one
-after you create it ([Checking the measures](#checking-the-measures)).
+The analytical measures were written for Power BI Desktop and could not be run in the
+environment where this project was built, because Power BI Desktop only runs on Windows. Each
+numeric analytical measure has an expected value calculated in PostgreSQL from the same views, so
+you can check it after you create it ([Checking the measures](#checking-the-measures)). The
+three card-only currency display measures are text labels and are intentionally excluded from the
+numeric benchmark table.
 
 Create a measure with **Home > New measure** (or right-click a table > New measure) and paste
 the code. Keeping them all in the `Sales` table is fine. In the Model view, a *display folder*
