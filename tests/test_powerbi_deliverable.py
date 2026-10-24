@@ -548,16 +548,44 @@ def test_date_dimension_and_sales_relationship_data_types():
     """
     import csv
 
-    # 1. Inspect dim_date.csv
+    # 1. Inspect dim_date.csv and enforce the schema shared by SQL, CSV, and PBIP.
     date_csv = POWERBI_DIR / "data" / "dim_date.csv"
     assert date_csv.exists(), "dim_date.csv not found"
+    expected_date_columns = {
+        "date_key",
+        "year",
+        "quarter",
+        "quarter_name",
+        "month",
+        "month_name",
+        "year_month",
+        "day",
+        "day_of_week",
+        "day_name",
+        "is_weekend",
+    }
     with open(date_csv, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
+        assert set(reader.fieldnames or []) == expected_date_columns, (
+            f"Date columns must match the PBIP contract: {reader.fieldnames}"
+        )
         date_rows = list(reader)
 
-    assert len(date_rows) == 1004, f"Expected 1004 dates, found {len(date_rows)}"
+    from datetime import date, timedelta
+
+    start_date = date(2023, 1, 1)
+    end_date = date(2028, 12, 31)
+    expected_date_keys = {
+        (start_date + timedelta(days=offset)).isoformat()
+        for offset in range((end_date - start_date).days + 1)
+    }
     date_keys = {r["date_key"] for r in date_rows}
-    assert len(date_keys) == 1004, "Date keys must be unique"
+    assert len(date_rows) == len(expected_date_keys), (
+        f"Expected one row per date from {start_date} through {end_date}; found {len(date_rows)} rows"
+    )
+    assert date_keys == expected_date_keys, (
+        "Date dimension must cover every day from 2023-01-01 through 2028-12-31 exactly once"
+    )
     for r in date_rows:
         assert r["year_month"], "year_month cannot be empty"
 
