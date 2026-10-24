@@ -116,7 +116,7 @@ and Power BI all read those views, so they show the same numbers. More in
 | Streamlit, Plotly | the interactive no-database demo dashboard |
 | pytest, httpx | tests |
 | ruff, black | formatting and linting |
-| Power BI Desktop | interactive 4-page report deliverable (`powerbi/InsightFlow.pbip`), star schema semantic model, and 45+ DAX measures |
+| Power BI Desktop | interactive 4-page PBIP report and star-schema semantic model with 27 implemented measures; the DAX catalog documents additional definitions |
 | Git | version control |
 
 These are the versions the project was built and tested with, on Linux. `requirements.txt` allows
