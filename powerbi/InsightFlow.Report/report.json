@@ -161,7 +161,7 @@
           "z": 1000,
           "width": 230,
           "height": 110,
-          "config": "{\"name\": \"CardStockVal\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Stock Value\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stock Value\"}, \"Name\": \"Inventory.Stock Value\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Total Stock Value'\"}}}}}]}}}"
+          "config": "{\"name\": \"CardStockVal\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Stock Value Display\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stock Value Display\"}, \"Name\": \"Inventory.Stock Value Display\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Total Stock Value'\"}}}}}]}}}"
         },
         {
           "x": 270,
@@ -185,7 +185,7 @@
           "z": 1000,
           "width": 230,
           "height": 110,
-          "config": "{\"name\": \"CardReplenishCost\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 770, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Replenishment Cost Estimate\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Replenishment Cost Estimate\"}, \"Name\": \"Inventory.Replenishment Cost Estimate\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Replenishment Working Capital'\"}}}}}]}}}"
+          "config": "{\"name\": \"CardReplenishCost\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 770, \"y\": 80, \"z\": 1000, \"width\": 230, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Replenishment Cost Estimate Display\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Replenishment Cost Estimate Display\"}, \"Name\": \"Inventory.Replenishment Cost Estimate Display\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Replenishment Working Capital'\"}}}}}]}}}"
         },
         {
           "x": 1020,
@@ -193,7 +193,7 @@
           "z": 1000,
           "width": 240,
           "height": 110,
-          "config": "{\"name\": \"CardStockGapRetail\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 1020, \"y\": 80, \"z\": 1000, \"width\": 240, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Stock Gap Retail Valuation\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stock Gap Retail Valuation\"}, \"Name\": \"Inventory.Stock Gap Retail Valuation\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Stock Gap Retail Valuation'\"}}}}}]}}}"
+          "config": "{\"name\": \"CardStockGapRetail\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 1020, \"y\": 80, \"z\": 1000, \"width\": 240, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"Inventory.Stock Gap Retail Valuation Display\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"i\", \"Entity\": \"Inventory\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"i\"}}, \"Property\": \"Stock Gap Retail Valuation Display\"}, \"Name\": \"Inventory.Stock Gap Retail Valuation Display\"}]}, \"objects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Stock Gap Retail Valuation'\"}}}}}]}}}"
         },
         {
           "x": 20,
