@@ -30,5 +30,8 @@
     "Preservation Rate": "95.7%",
     "Quarantined Rows": "1,609",
     "Duplicates Dropped": "512"
+  },
+  "screenshot_checks": {
+    "simulator_preview_distinct_from_sales_page": true
   }
 }

@@ -57,36 +57,35 @@ streamlit run streamlit_app.py
 
 The dashboard should open at `http://localhost:8501`. All dashboard values are calculated from the included synthetic files, which pass through the project's ingestion, cleaning and validation pipeline. They are not real business results. The full `pytest` suite contains tests that require PostgreSQL; start the provided Docker Compose database or use the CI PostgreSQL service for the full suite.
 
-## 4. Capture genuine runtime screenshots
+## 4. Run runtime UI QA and capture genuine screenshots
 
-Use Antigravity's local browser controls against `http://localhost:8501`. These PNGs must be direct captures of the running Streamlit page—do not generate, repaint, or fabricate screenshots.
+Use the maintained QA-and-capture runner from the repository root. It starts Streamlit, checks the key interface content and interactions, and captures the runtime evidence in one pass.
 
-Save four files into `screenshots/runtime/`:
+```powershell
+python -m pip install playwright
+python scripts/validate_runtime_ui.py
+```
 
-- `01-executive-overview.png`: headline metrics, monthly revenue, regional/category charts, inventory signals.
-- `02-sales-products.png`: sales filters, monthly trend, margins and product performance.
-- `03-inventory-intelligence.png`: inventory statuses, inventory value and the priority review queue.
-- `04-customers-data-quality.png`: customer analysis, quality-action log and raw-data profile.
+The runner uses the active Python interpreter, requires Microsoft Edge to be installed, and writes these files to `screenshots/runtime/`:
 
-For each screenshot:
+- `01_executive_overview.png`
+- `02_sales_and_products.png` — full Sales & Products page
+- `02_price_sensitivity_simulator.png` — focused simulator view; verify this is visually distinct from the full-page capture
+- `03_inventory_intelligence.png`
+- `04_customers_and_data_quality.png`
+- `ui_qa_results.json` — the metric and UI-validation evidence
 
-1. Wait until the page has fully rendered and charts have finished loading.
-2. Keep the synthetic-data notice visible wherever possible.
-3. Make sure labels, charts, and tables are legible at desktop size; a viewport around 1440 × 1000 is a good starting point.
-4. Avoid cropping, retouching data, hiding application errors, or exposing personal/private information.
-5. Inspect each PNG after saving it and confirm the exact file exists in `screenshots/runtime/`.
+Inspect each PNG after capture. The screenshots must come from the running app; never fabricate, retouch business values, or use placeholders to cover broken visuals. If a validation step fails, fix the application or the test selector and rerun the QA script rather than marking the release as passed.
 
-If a page fails to load, stop and debug the application instead of using a mockup as a substitute. Report the failed step and the error message.
+## 5. Verify the Streamlit Community Cloud deployment
 
-## 5. Optional live demo deployment
-
-The Streamlit dashboard is the simplest public demo because it runs from synthetic data without a database service or secrets. After the GitHub repo has been pushed, deploy it on Streamlit Community Cloud by selecting:
+The repository README currently points to this Streamlit Community Cloud URL: https://insightflow-portfolio.streamlit.app/. Verify it in a normal browser and confirm the app is connected to the existing public repository. The dashboard runs from synthetic data without a database service or secrets. In Streamlit Community Cloud, the expected configuration is:
 
 - Repository: `meetpokal1/InsightFlow`
 - Branch: `main`
 - Main file path: `streamlit_app.py`
 
-Wait for the deployment build to finish, open the public URL, test all four navigation pages and the main filters, and capture screenshots from that hosted application only if the screens match the local run. Do not claim the backend API or Power BI report is publicly deployed unless it is independently deployed and tested.
+After a change reaches the configured branch, verify the deployment finished and open the public URL. Test all four navigation pages, the core filters, and the price-sensitivity interaction in the hosted app. Keep hosted-app evidence distinct from local runtime screenshots. Do not claim the PostgreSQL-backed API or Power BI Desktop report is publicly deployed unless each is independently deployed and verified.
 
 ## 6. After the first release
 

@@ -4,6 +4,7 @@ Performs live DOM inspection, slider interaction, extreme value testing,
 and captures verified high-resolution screenshots.
 """
 
+import hashlib
 import json
 import os
 import pathlib
@@ -40,7 +41,7 @@ def run_ui_qa():
     results = {}
 
     cmd = [
-        str(PROJECT_ROOT / ".venv" / "Scripts" / "python.exe"),
+        sys.executable,
         "-m",
         "streamlit",
         "run",
@@ -120,10 +121,10 @@ def run_ui_qa():
                 print("Clicked Explicit volume change mode.")
 
             # Capture focused simulator view
-            sim_section = page.locator("text=Price & Margin Sensitivity Simulator")
+            sim_section = page.locator("div.st-key-price-sensitivity-simulator")
             sim_section.scroll_into_view_if_needed()
             page.wait_for_timeout(1000)
-            page.screenshot(path=str(OUTPUT_DIR / "02_price_sensitivity_simulator.png"))
+            sim_section.screenshot(path=str(OUTPUT_DIR / "02_price_sensitivity_simulator.png"))
             print("Captured fresh 02_price_sensitivity_simulator.png")
 
             page.screenshot(path=str(OUTPUT_DIR / "02_sales_and_products.png"), full_page=True)
@@ -197,10 +198,25 @@ def run_ui_qa():
             proc.kill()
         print("Streamlit process terminated.")
 
+    # Refuse duplicate evidence: the focused simulator capture must differ from the full page.
+    simulator_screenshot = OUTPUT_DIR / "02_price_sensitivity_simulator.png"
+    sales_screenshot = OUTPUT_DIR / "02_sales_and_products.png"
+    screenshots_distinct = (
+        hashlib.sha256(simulator_screenshot.read_bytes()).digest()
+        != hashlib.sha256(sales_screenshot.read_bytes()).digest()
+    )
+    results["screenshot_checks"] = {
+        "simulator_preview_distinct_from_sales_page": screenshots_distinct
+    }
+    if not screenshots_distinct:
+        print("ERROR: simulator preview is identical to the full Sales & Products screenshot.")
+
     # Save summary results to JSON for verification reporting
     with open(OUTPUT_DIR / "ui_qa_results.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
     print("Saved ui_qa_results.json")
+    if not screenshots_distinct:
+        raise RuntimeError("UI QA failed because the two runtime screenshots are identical.")
 
 
 if __name__ == "__main__":
