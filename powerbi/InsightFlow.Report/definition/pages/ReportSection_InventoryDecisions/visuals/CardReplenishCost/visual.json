@@ -23,10 +23,10 @@
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "Replenishment Cost Estimate"
+                  "Property": "Replenishment Cost Estimate Display"
                 }
               },
-              "queryRef": "Inventory.Replenishment Cost Estimate",
+              "queryRef": "Inventory.Replenishment Cost Estimate Display",
               "displayName": "Replenishment Working Capital"
             }
           ]
