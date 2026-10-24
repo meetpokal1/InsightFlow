@@ -55,7 +55,7 @@ gives a different number depending on who built the spreadsheet.
   customer and data-quality views with filters and CSV exports. It runs against the cleaned synthetic
   dataset without a database connection.
 - **Power BI Project (`InsightFlow.pbip`).** A version-controlled Microsoft Fabric / Power BI Desktop project
-  with a star schema, 45+ DAX measures, local data extracts, and 4 report pages (`Executive Profitability`,
+  with a star schema, 27 implemented measures (24 numeric plus 3 card display measures), local data extracts, and 4 report pages (`Executive Profitability`,
   `Margin Investigation`, `Inventory Decisions`, `Data Integrity & Pipeline Assurance`).
 - **Tests what matters.** Automated tests cover data cleaning, inventory replenishment boundaries, price sensitivity, Excel workpaper integrity, PBIP semantic-model structure, raw-SQL execution, and Date-key coverage. GitHub Actions provisions PostgreSQL, runs the pipeline and export, then runs the complete suite plus blocking Ruff lint and formatting checks. Offline runs skip explicitly database-dependent tests.
 
