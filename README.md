@@ -465,7 +465,7 @@ InsightFlow/
 ├── powerbi/                  version-controlled PBIP report, semantic model, DAX, queries, and theme
 │   ├── InsightFlow.pbip      Power BI Project entry point (double-click in Windows)
 │   ├── InsightFlow.Report/   Fabric PBIR visual layer definitions and queryState bindings
-│   ├── InsightFlow.SemanticModel/ Tabular model (model.bim), star schema, and 45+ DAX measures
+│   ├── InsightFlow.SemanticModel/ Tabular model (model.bim), star schema, and 27 implemented measures
 │   └── data/                 production CSV extracts generated for offline desktop loading
 ├── documentation/            architecture, data flow, schema, API, KPIs, data quality, workpapers
 │   └── diagrams/             Mermaid sources and PNG images
