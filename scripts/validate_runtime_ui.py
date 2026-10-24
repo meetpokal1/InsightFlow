@@ -40,7 +40,7 @@ def run_ui_qa():
     results = {}
 
     cmd = [
-        str(PROJECT_ROOT / ".venv" / "Scripts" / "python.exe"),
+        sys.executable,
         "-m",
         "streamlit",
         "run",
