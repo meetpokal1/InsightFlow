@@ -1,9 +1,25 @@
 # InsightFlow — Sales & Inventory Intelligence
 
-InsightFlow turns messy retail and distribution exports into cleaner data, decision-ready sales and
-inventory metrics, and reviewable exceptions. It combines an **interactive Streamlit demo dashboard**,
-a Python data-quality pipeline, PostgreSQL schema and views, 17 SQL analytics queries, a FastAPI
-service, and a documented Power BI reporting design.
+InsightFlow demonstrates how a retailer with several stores or warehouses can turn messy sales and
+stock exports into more trustworthy reports. It checks records, helps teams see which products earn
+money and which need stock attention, and keeps calculation rules consistent across its dashboard,
+SQL queries, API, and Power BI reporting design. It combines an **interactive Streamlit demo dashboard**,
+a Python data-quality pipeline, PostgreSQL schema and views, 17 SQL analytics queries, and a FastAPI
+service.
+
+**Who it's for:** Supermarket chains, multi-branch retailers, distributors, and wholesalers that already
+track sales and inventory digitally across locations. A small shop that only keeps handwritten records
+is unlikely to need this kind of system yet.
+
+**How it can help:** Managers can investigate products that sell a lot but earn little profit, review
+items that are out of stock or running low, and identify records that need checking before using a report.
+
+**Why not just Excel?** Excel can handle many small or one-off analyses. A reusable pipeline becomes more
+useful when files arrive repeatedly from different systems and the team needs the same cleaning rules,
+checks, and calculations each time.
+
+**Important boundary:** The project uses synthetic demonstration data. It shows what the workflow can
+identify, but does not claim that a real retailer has saved money or improved profit.
 
 - **Run the interactive dashboard:** `streamlit run streamlit_app.py` — synthetic data only; no
   PostgreSQL service or credentials needed.
