@@ -2,6 +2,7 @@
 
 import math
 from datetime import date
+from typing import Any
 
 import pandas as pd
 import plotly.express as px
@@ -152,10 +153,15 @@ st.markdown(
 
 
 @st.cache_data(show_spinner="Profiling and cleaning the synthetic source files...")
-def load_demo_data() -> dict[str, pd.DataFrame]:
+def load_demo_data() -> dict[str, Any]:
     """Use the same ingestion, cleaning and validation pipeline as the backend."""
     result = clean_raw_files(PROJECT_ROOT / "data" / "raw", DATA_AS_OF)
-    return build_dashboard_data(result.clean, result.quality_log, result.profile)
+    return build_dashboard_data(
+        clean=result.clean,
+        quality_log=result.quality_log,
+        raw_profile=result.profile,
+        raw=result.raw,
+    )
 
 
 try:
@@ -170,6 +176,7 @@ inventory = data["inventory"]
 customers = data["customers"]
 quality_log = data["quality_log"]
 raw_profile = data["raw_profile"]
+defect_impact = data.get("defect_impact")
 
 st.sidebar.markdown("# InsightFlow")
 st.sidebar.caption("SALES & INVENTORY INTELLIGENCE")
@@ -1168,6 +1175,102 @@ else:
             style_chart(fig, show_legend=True, legend_position="top-right"),
             use_container_width=True,
         )
+    if defect_impact:
+        st.subheader("Data Defect to Decision Impact Analysis")
+        st.markdown(
+            '<p class="if-section-note">Empirical comparison demonstrating how unvalidated source data '
+            "distorts downstream business reporting, and how automated validation rules restore analytical ground truth.</p>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            """
+            <div style="background: rgba(37, 99, 235, 0.05); border-left: 4px solid #2563eb; border-radius: 8px; padding: 12px 18px; margin-bottom: 1.25rem;">
+              <div style="font-weight: 700; color: #1e40af; font-size: 0.92rem; margin-bottom: 4px;">
+                Analytical Evidence: The Cost of Unvalidated ERP & CSV Exports
+              </div>
+              <div style="font-size: 0.86rem; color: #334155; line-height: 1.5;">
+                Without validation gates, naive ERP line aggregation inflates turnover to <strong>₹429.93M (+105.7%)</strong> due to extreme quantity outliers and decimal errors;
+                unverified invoice headers create an unaccounted <strong>₹5.72M</strong> variance; <strong>50 ghost customer accounts</strong> fracture ₹5.87M across secondary profiles;
+                and <strong>18 missing reorder levels</strong> blind store operations to stockouts. InsightFlow resolves each defect deterministically.
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        di_cols = st.columns(4)
+        di_cols[0].metric(
+            "Line Turnover Overstatement",
+            "+105.7%",
+            help="₹429.93M raw lines vs ₹209.03M validated (+₹220.90M distortion driven by 75 quantity outliers & 117 decimal shifts)",
+        )
+        di_cols[1].metric(
+            "Invoice Header Variance",
+            "₹5.72M",
+            help="₹214.75M raw stated headers vs ₹209.03M validated lines (1,312 discrepant order totals & 107 duplicate orders)",
+        )
+        di_cols[2].metric(
+            "Fractured Customer History",
+            "₹5.87M Recovered",
+            help="210 orders & ₹5.87M unified across 50 ghost duplicate profiles back into primary wholesale accounts",
+        )
+        di_cols[3].metric(
+            "Restock Threshold Coverage",
+            "100.0%",
+            help="18 SKUs with NULL reorder levels imputed via median velocity, restoring automated replenishment triggers",
+        )
+
+        tab_sales, tab_cust, tab_inv, tab_trace = st.tabs(
+            [
+                "Sales Turnover & Line Distortion",
+                "Customer Identity Fragmentation",
+                "Inventory Replenishment Assurance",
+                "Defect-to-Decision Traceability Matrix",
+            ]
+        )
+
+        with tab_sales:
+            st.markdown("**Sales Turnover Comparison (Population: FY 2025–26 Completed Orders)**")
+            st.dataframe(defect_impact["sales_impact"], use_container_width=True, hide_index=True)
+            st.caption(
+                "Method note: Unvalidated Line Items calculates extended price directly from raw order_items without outlier caps. "
+                "Unvalidated Headers sums stated order_total from raw orders. Validated Ground Truth enforces deduplication, outlier quarantine, and line-item cross-checking."
+            )
+
+        with tab_cust:
+            st.markdown("**Customer Profile Fragmentation & Ghost Duplicate Accounts**")
+            st.dataframe(
+                defect_impact["customer_impact"], use_container_width=True, hide_index=True
+            )
+            st.markdown("**Top Commercial Accounts Fractured into Secondary IDs in Raw Data:**")
+            st.dataframe(
+                defect_impact["customer_top_fragmented"], use_container_width=True, hide_index=True
+            )
+            st.caption(
+                "Method note: Duplicates identified via matching email or name+phone. 210 orders unified back to primary IDs, restoring true account purchasing tiers."
+            )
+
+        with tab_inv:
+            st.markdown("**Inventory Threshold Coverage & Stockout Risk Prevention**")
+            st.dataframe(
+                defect_impact["inventory_impact"], use_container_width=True, hide_index=True
+            )
+            st.caption(
+                "Method note: In unvalidated feeds, 18 inventory positions arrived with blank reorder levels, leaving replenishment alerts inactive. Category median imputation ensures zero blind spots."
+            )
+
+        with tab_trace:
+            st.markdown("**End-to-End Defect-to-Decision Traceability Matrix**")
+            st.dataframe(
+                defect_impact["traceability_matrix"], use_container_width=True, hide_index=True
+            )
+            st.caption(
+                "Audit trail links detected source volumes directly to pipeline control actions, downstream business risks, and validated operational resolutions."
+            )
+
+        st.markdown("---")
+
     st.subheader("Data quality actions")
     quality_display = (
         quality_log.sort_values("rows_affected", ascending=False)

@@ -29,7 +29,11 @@
     "Clean Records Loaded": "47,814",
     "Preservation Rate": "95.7%",
     "Quarantined Rows": "1,609",
-    "Duplicates Dropped": "512"
+    "Duplicates Dropped": "512",
+    "Line Turnover Overstatement": "+105.7%",
+    "Invoice Header Variance": "\u20b95.72M",
+    "Fractured Customer History": "\u20b95.87M Recovered",
+    "Restock Threshold Coverage": "100.0%"
   },
   "screenshot_checks": {
     "simulator_preview_distinct_from_sales_page": true

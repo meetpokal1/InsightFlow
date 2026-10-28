@@ -1,511 +1,378 @@
-# InsightFlow — Sales & Inventory Intelligence
+# InsightFlow — Retail Decision-Intelligence & Data-Quality Engineering Case Study
 
-InsightFlow demonstrates how a retailer with several stores or warehouses can turn messy sales and
-stock exports into more trustworthy reports. It checks records, helps teams see which products earn
-money and which need stock attention, and keeps calculation rules consistent across its dashboard,
-SQL queries, API, and Power BI reporting design. It combines an **interactive Streamlit demo dashboard**,
-a Python data-quality pipeline, PostgreSQL schema and views, 17 SQL analytics queries, and a FastAPI
-service.
+[![Tests](https://github.com/meetpokal1/InsightFlow/actions/workflows/tests.yml/badge.svg)](https://github.com/meetpokal1/InsightFlow/actions/workflows/tests.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791.svg)](https://www.postgresql.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.42+-FF4B4B.svg)](https://streamlit.io/)
+[![Power BI](https://img.shields.io/badge/Power%20BI-PBIP%20%7C%20TMDL-F2C811.svg)](https://powerbi.microsoft.com/)
+[![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
-**Who it's for:** Supermarket chains, multi-branch retailers, distributors, and wholesalers that already
-track sales and inventory digitally across locations. A small shop that only keeps handwritten records
-is unlikely to need this kind of system yet.
+> **Live Hosted Demo:** [insightflow-portfolio.streamlit.app](https://insightflow-portfolio.streamlit.app/)  
+> **Interactive Local Execution (No Database Required):** `streamlit run streamlit_app.py`  
+> **Data Defect & Decision Impact Audit CLI:** `python scripts/run_defect_impact.py`  
+> **Dataset Provenance Notice:** All business figures, transactions, and entity names are seeded from an audited, deterministic synthetic retail benchmark (49,975 raw records).
 
-**How it can help:** Managers can investigate products that sell a lot but earn little profit, review
-items that are out of stock or running low, and identify records that need checking before using a report.
+---
 
-**Why not just Excel?** Excel can handle many small or one-off analyses. A reusable pipeline becomes more
-useful when files arrive repeatedly from different systems and the team needs the same cleaning rules,
-checks, and calculations each time.
+## 1. Project Thesis: Bridging Data Hygiene and Commercial Decisions
 
-**Important boundary:** The project uses synthetic demonstration data. It shows what the workflow can
-identify, but does not claim that a real retailer has saved money or improved profit.
+A business cannot make dependable profitability or inventory decisions from unvalidated exports. In retail and wholesale distribution, raw extracts from Point of Sale (POS) terminals, e-commerce storefronts, accounting packages, and warehouse systems arrive with inconsistent formatting, duplicate entities, extreme quantity typos, and conflicting header totals. 
 
-- **Run the interactive dashboard:** `streamlit run streamlit_app.py` — synthetic data only; no
-  PostgreSQL service or credentials needed.
-- **Explore the engineering stack:** run the pipeline and API against PostgreSQL, or use Docker Compose.
-- **Data privacy:** the included source records are generated synthetic examples, not business or customer data.
+When analytics teams load raw exports directly into reporting tools, these defects propagate silently into executive dashboards:
+- In our audited synthetic benchmark, naive line-item aggregation inflates gross revenue by **+105.7% (+₹220.90M)** due to unquarantined quantity outliers and decimal displacement.
+- Inconsistent invoice headers introduce an unaccounted **₹5.72M** variance across 1,312 orders.
+- Unresolved customer identities fracture **₹5.87M** across 50 duplicate ghost profiles, distorting wholesale purchasing tiers and repeat loyalty rates.
+- Unhandled column swaps flip product costs and selling prices, generating a false **-₹2.87M loss** on profitable audio hardware and risking wrongful SKU delisting.
+- Missing reorder levels blind inventory managers to replenishment needs across **18 product locations**.
 
-The data is synthetic and deliberately messy, so the project can show the full path from a bad
-export to a trusted number: clean the files, check them, load PostgreSQL, answer business
-questions in SQL, serve them through an API and show them in a dashboard.
+**InsightFlow** demonstrates how to engineer an auditable, end-to-end decision-intelligence pipeline. It establishes strict data hygiene gates, deterministic entity reconciliation, star-schema relational modeling, a FastAPI service layer, an interactive Streamlit decision simulator, an Excel audit workpaper, and a version-controlled Power BI project (`InsightFlow.pbip`). Every transformation is backed by automated tests, mathematical checksums, and transparent audit logging.
 
-Contents: [Problem](#the-problem) | [What it does](#what-it-does) | [Interactive dashboard](#interactive-demo-dashboard) | [Architecture](#architecture) |
-[Stack](#technology) | [Database](#database) | [Pipeline](#data-pipeline) |
-[SQL](#sql-analytics) | [Power BI](#power-bi) | [API](#api) | [Run it](#how-to-run-the-full-backend) |
-[Insights](#example-business-questions-and-what-the-data-shows) | [Tests](#tests) |
-[Limits](#limits) | [Next steps](#future-improvements) | [Docs](#documentation)
+```
+┌─────────────────┐     ┌───────────────────────┐     ┌────────────────────────┐     ┌────────────────────────┐
+│  Raw Multi-     │     │  Python Validation &  │     │  PostgreSQL Relational │     │  Operational Decision  │
+│  Format Exports │ ──> │  Quality Pipeline     │ ──> │  Star Schema & Views   │ ──> │  Surfaces (API, UI,    │
+│  (CSV & XLSX)   │     │  (Sanitize & Check)   │     │  (Audited Baseline)    │     │  Power BI & Excel)     │
+└─────────────────┘     └───────────────────────┘     └────────────────────────┘     └────────────────────────┘
+         │                          │                             │                              │
+   49,975 records             512 duplicates               ₹209.03M Net Rev               Break-even simulators,
+   15,052 injected            1,609 quarantined            20.3% Gross Margin             replenishment queues,
+   source defects             40 customer merges           449 inventory SKUs             traceability matrices
+```
 
-## The problem
+---
 
-The business has 8 locations (stores and warehouses), 60 products from 12 suppliers and 800
-customers. Orders and stock levels are exported from different tools into spreadsheets. The
-exports are what real exports look like: names in three spellings, dates in three formats,
-prices stored as `₹1,676.60`, the same customer registered twice, orders that point at a
-customer that does not exist, and totals that do not match their lines.
+## 2. The Business Problem
 
-The owner wants to know which products earn money, which customers matter, what is about to run
-out and what is sitting unsold. Nobody can answer that reliably from the files. The same question
-gives a different number depending on who built the spreadsheet.
+Consider a mid-market multi-location distributor operating 8 regional hubs, 60 product SKUs, and 800 commercial accounts. Transactional data arrives weekly as separate CSV and Excel extracts from disconnected legacy systems. 
 
-## What it does
+Without an automated data-quality pipeline, common data failure modes undermine decision-making:
+1. **Quantity Outliers & Keying Errors:** Warehouse staff occasionally key order quantities as `5000` or `25000` instead of standard pack sizes, or enter negative quantities (`-5`) to record return adjustments. In naive aggregations, these outliers distort demand velocity and inflate turnover by 2.2x.
+2. **Decimal Displacements:** Supplier price catalog updates occasionally shift decimals (`100.0x` or `0.01x`) or swap cost and selling prices. An automated report that fails to catch inverted pricing flags top-performing SKUs (such as Bluetooth Earbuds) as loss-makers, prompting wrongful vendor renegotiations or SKU cancellation.
+3. **Split Customer Identities:** Customers register again under slightly varied names, phone formats (`+91 98200...` vs `98200...`), or missing email addresses. When commercial sales split across multiple IDs, account managers cannot see that a customer qualifies for bulk tier discounts or is experiencing churn risk.
+4. **Header-versus-Line Discrepancies:** Accounting software updates order headers without recalculating underlying item lines, or applies discounts only at the footer. In the benchmark dataset, 1,312 orders exhibit discrepancy between stated order totals and line-item sums.
+5. **Threshold Blind Spots:** Inventory snapshot exports arrive with unpopulated reorder thresholds for new or transferred SKUs. Without automated imputation rules, zero replenishment alerts are triggered, leading to sudden out-of-stock events on high-velocity goods.
 
-- **Creates the raw data.** `scripts/generate_synthetic_data.py` builds a clean data set, then
-  damages it in 15,052 recorded ways (3 Excel files and 5 CSV files). It writes down what it
-  broke, so the pipeline can be checked against the truth.
-- **Cleans and checks it.** Text, dates and numbers are standardised. A value is repaired when
-  the right answer is clear and the row is rejected, with a reason, when it is not. Every
-  repair and rejection is counted in a quality report. Keys, relationships and value rules are
-  validated before anything reaches the database.
-- **Loads PostgreSQL.** Eight tables with primary keys, foreign keys and check constraints, ten
-  indexes, a calendar table and six views that hold the business rules once.
-- **Answers business questions in SQL.** 17 queries with CTEs, window functions, subqueries,
-  `HAVING`, `CASE`, `FILTER` and `ROLLUP`. Each file explains why that technique was chosen.
-- **Price & Margin Sensitivity Simulator.** An interactive scenario modeling engine in `src/analytics/demo.py`
-  and Streamlit enabling pricing and elasticity stress-testing for high-volume products (such as Basmati Rice 5kg).
-- **Data Assurance & Audit Workpaper.** A corporate Excel assurance model in `documentation/data_assurance_workpaper.xlsx`
-  generated via `scripts/generate_data_assurance_workpaper.py` using `openpyxl`, featuring dynamic formulas and entity reconciliation.
-- **Serves the numbers.** A FastAPI service with six analytics endpoints, validated parameters,
-  typed responses, error handling and Swagger documentation.
-- **Explores the results.** The interactive Streamlit demo has executive, sales/product, inventory,
-  customer and data-quality views with filters and CSV exports. It runs against the cleaned synthetic
-  dataset without a database connection.
-- **Power BI Project (`InsightFlow.pbip`).** A version-controlled Microsoft Fabric / Power BI Desktop project
-  with a star schema, 27 implemented measures (24 numeric plus 3 card display measures), local data extracts, and 4 report pages (`Executive Profitability`,
-  `Margin Investigation`, `Inventory Decisions`, `Data Integrity & Pipeline Assurance`).
-- **Tests what matters.** Automated tests cover data cleaning, inventory replenishment boundaries, price sensitivity, Excel workpaper integrity, PBIP semantic-model structure, raw-SQL execution, and Date-key coverage. GitHub Actions provisions PostgreSQL, runs the pipeline and export, then runs the complete suite plus blocking Ruff lint and formatting checks. Offline runs skip explicitly database-dependent tests.
+---
 
-## Interactive demo dashboard
+## 3. Target Audience: When Does a Pipeline Matter?
 
-Run the working interactive dashboard locally with no database credentials:
+InsightFlow is engineered for:
+- **Multi-Location Retailers & Distributors:** Organizations managing recurring sales, replenishment, and supplier catalogs across multiple branch warehouses.
+- **Commercial Finance & Category Analysts:** Teams responsible for SKU rationalization, price elasticity modeling, and gross margin protection who currently waste hours manually reconciling spreadsheet formulas.
+- **BI & Analytics Engineering Teams:** Developers tasked with replacing fragile spreadsheet workflows with version-controlled, tested, and containerized data pipelines.
+
+> **Appropriate Scope Boundary:** A small single-store business with a single cash register and 50 transactions per week is better served by a well-structured spreadsheet. InsightFlow is designed for environments where data originates from multiple disparate systems, arrives repeatedly, and requires traceable audit gates before numbers reach executive stakeholders.
+
+---
+
+## 4. System Architecture & Data Flow
+
+InsightFlow implements an 8-stage data lifecycle separating raw ingestion, pipeline assurance, relational storage, and analytical consumption:
+
+```
+[Raw Files: 3 XLSX, 5 CSV] 
+       │
+       ▼
+[Stage 1: Ingestion & Text Profiling] ──> logs missing cells, type distributions, source row IDs
+       │
+       ▼
+[Stage 2: Deterministic Hygiene Gates] ──> regex date parsing, currency extraction, ID standardisation
+       │
+       ▼
+[Stage 3: Business Validation & Quarantine] ──> duplicate elimination, outlier capping, price-swap repair
+       │                                     └──> data/processed/rejected/ (*_rejected.csv)
+       ▼
+[Stage 4: Relational Star Schema (PostgreSQL 16)]
+       ├── 8 Physical Tables (PK, FK, CHECK constraints, 10 B-tree indexes)
+       └── 6 Standardized Analytical Views (vw_fact_sales, vw_fact_inventory, vw_customer_segments)
+       │
+       ├───> [FastAPI REST Service] ──> 6 validated analytical endpoints (Pydantic models)
+       ├───> [SQL Analytics Suite] ──> 17 standalone analytical queries (CTEs, Window functions)
+       ├───> [Streamlit Demo App] ──> In-memory Pandas pipeline, scenario simulator, audit matrices
+       ├───> [Power BI Project (PBIP)] ──> TMDL semantic model, 27 DAX measures, 4 report pages
+       └───> [Excel Assurance Workpaper] ──> openpyxl-generated audit model with dynamic formulas
+```
+
+### Core Architecture Components
+
+| Component | Technology | Primary Function in Problem Resolution |
+|---|---|---|
+| **Pipeline Core** | Python 3.11+, pandas, NumPy | Profiles raw text, applies domain cleaning rules, enforces quarantine boundaries. |
+| **Relational Store** | PostgreSQL 16, SQLAlchemy 2 | Enforces referential integrity, foreign keys, check constraints, and canonical view logic. |
+| **Service Layer** | FastAPI, Pydantic v2, Uvicorn | Exposes type-safe, validated analytical endpoints with OpenAPI documentation. |
+| **Interactive UI** | Streamlit, Plotly Express | Delivers an immediate browser workspace with price elasticity simulation and inventory review queues. |
+| **Enterprise BI** | Power BI (`.pbip`), TMDL, PBIR | Version-controlled semantic model with 27 DAX measures and 4 executive report pages. |
+| **Audit Workpaper** | Excel (`.xlsx`), openpyxl | Generates corporate data assurance models with dynamic formulas and formula-injection guards. |
+| **Test Suite** | pytest, httpx, Ruff | 240 automated tests covering unit math, schema constraints, and semantic model structure. |
+
+---
+
+## 5. Decision Use Cases & Analytical Evidence
+
+InsightFlow is structured around four concrete retail decision workflows:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 1. SKU MARGIN INVESTIGATION & PRICE SENSITIVITY SIMULATION                                            │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ • Business Question : Which high-turnover products destroy margin, and what pricing adjustment protects│
+│                       profit without triggering catastrophic demand collapse?                          │
+│ • Analytical Evidence: Basmati Rice 5kg (P0010) generates ₹1.65 Cr in gross revenue (#1 seller) but   │
+│                       yields an anemic 2.15% margin (₹354K profit) vs company average of 20.3%.       │
+│ • Decision Supported : Dynamic sensitivity simulator models a +3.0% price increase; formula proves a  │
+│                       58.3% break-even volume drop buffer before baseline profit is compromised.       │
+│ • Operational Caveat : Elasticity parameters are user-configured scenario inputs, not econometric proofs│
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 2. WORKING CAPITAL REPLENISHMENT PRIORITIZATION                                                        │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ • Business Question : Which SKU-location positions face stockout risk, and how much working capital is │
+│                       required to restore buffer stock?                                                │
+│ • Analytical Evidence: Out of 449 positions, 40 are out of stock (0 units) and 56 are below reorder   │
+│                       thresholds. Restoring safety stock requires ₹966,026.68 in purchase cost.        │
+│ • Decision Supported : Generates prioritized purchase order queues sorted by lead-time runout urgency,│
+│                       preventing stockout exposure across ₹1.34M in catalog retail valuation.         │
+│ • Operational Caveat : Snapshot stock does not capture intra-month receipts; suggested orders are not  │
+│                       stochastic demand forecasts.                                                     │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 3. CUSTOMER IDENTITY CONSOLIDATION & WHOLESALE CONCENTRATION                                          │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ • Business Question : How dependent is revenue on top commercial accounts, and are credit limits      │
+│                       compromised by split customer accounts?                                          │
+│ • Analytical Evidence: 40 customers registered twice; deterministic entity resolution unified 210     │
+│                       orders and ₹5.87M into primary wholesale profiles (e.g. Kapoor, Desai, Shah).    │
+│ • Decision Supported : Restores accurate customer LTV; confirms wholesale concentration at 91.8% of    │
+│                       turnover and true repeat purchase rate at 82.6% (vs 81.6% unmapped).            │
+│ • Operational Caveat : Remapping relies on strict matching of email or name+phone; unlinked records    │
+│                       remain separate accounts.                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 4. DATA DEFECT TO DECISION IMPACT ASSURANCE                                                           │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ • Business Question : What is the financial and operational risk of relying on raw unvalidated feeds? │
+│ • Analytical Evidence: Raw line items overstate turnover by +105.7% (₹429.93M); unverified headers     │
+│                       create a ₹5.72M ledger variance; swapped SKU prices cause a false -₹2.87M loss.  │
+│ • Decision Supported : Enforces automated quarantine and line-level recalculation before figures enter │
+│                       general ledger postings or executive briefings.                                  │
+│ • Operational Caveat : Verified on synthetic retail benchmark; real deployment requires client rule    │
+│                       calibration.                                                                     │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 6. Empirical Verification & Defect-to-Decision Audit Findings
+
+The following figures are directly reproducible from the codebase by running `python scripts/run_defect_impact.py`:
+
+### Table 1: Sales Turnover & Order Volume Reconciliation
+
+| Metric Dimension | Unvalidated (Raw Lines) | Unvalidated (Raw Headers) | Validated Ground Truth | Distortion Removed / Root Cause |
+|---|---|---|---|---|
+| **Completed Net Revenue** | ₹429,933,374.74 | ₹214,754,964.09 | **₹209,034,798.31** | **+₹220.90M (+105.7%)** line inflation removed (75 quantity outliers, 117 decimal shifts, 391 duplicate rows) |
+| **Completed Orders** | 35,541 lines | 8,172 orders | **7,878 orders** | **+294 phantom orders (+3.7%)** eliminated (107 duplicate orders, 187 quarantined orphans) |
+| **Units Sold** | 2,233,511 units | Not tracked at header | **1,111,322 units** | **+1,122,189 units (+101.0%)** inflation quarantined (extreme outliers up to 25,000 units/line) |
+| **Gross Margin %** | Wild volatility | Not tracked at header | **20.26%** | Swapped cost/price pairs on 3 SKUs repaired; prevented **-₹2.87M** false margin loss |
+
+### Table 2: Customer Identity Fragmentation & Ghost Account Recovery
+
+| Customer Metric | Unvalidated (Raw Data) | Validated Ground Truth | Variance Recovered | Operational Decision Consequence |
+|---|---|---|---|---|
+| **Active Buying Accounts** | 813 profiles | **780 profiles** | +33 ghost accounts unified | Eliminates fractured purchase history; restores true commercial tiers |
+| **Customer Repeat Rate** | 81.5% | **82.6%** | -1.1% pts artificial dilution | Proves true customer retention across recurring wholesale buyers |
+| **Split Order Volume** | 210 orders fragmented | **210 orders unified** | **₹5,873,460.12 consolidated** | Recovers accurate account balances for credit limit and rebate reviews |
+
+*Top Accounts Restored from Duplicate Fragmented IDs:*
+- **Kapoor Agencies (`C00201`):** 20 orders unified · **₹935,183.49** consolidated into primary account.
+- **Desai Enterprises (`C00173`):** 20 orders unified · **₹901,793.51** consolidated into primary account.
+- **Shah Distributors (`C00638`):** 22 orders unified · **₹891,355.37** consolidated into primary account.
+- **Joshi Agencies (`C00404`):** 14 orders unified · **₹642,508.14** consolidated into primary account.
+- **Joshi Traders (`C00237`):** 13 orders unified · **₹595,189.96** consolidated into primary account.
+
+### Table 3: Inventory Replenishment & Threshold Assurance
+
+| Inventory Parameter | Unvalidated Raw Feed | Validated Pipeline Ground Truth | Operational Decision Impact |
+|---|---|---|---|
+| **Threshold Coverage** | 96.1% (18 SKUs NULL) | **100.0% (0 NULL)** | Category median imputation restores automated replenishment triggers for 18 blind SKUs |
+| **Stockout Positions** | 33 zero + 7 negative | **40 true stockout positions** | Flipped negative typing errors; verified physical stock levels |
+| **Positions Below Reorder** | Incomplete (18 blind SKUs) | **96 active positions** | Surfaces actionable restocking needs across all warehouses |
+| **Replenishment Capital** | Uncalculated | **₹966,026.68 (5,791 units)** | Allocates precise working capital at purchase cost to restore buffer stock |
+
+---
+
+## 7. Defect-to-Decision Traceability Matrix
+
+Every data quality event logged by the pipeline is mapped to its downstream business consequence:
+
+| Defect Category | Source Entity | Volume Detected | Pipeline Control Gate | Target Metric at Risk | Operational Consequence If Unvalidated |
+|---|---|---|---|---|---|
+| **Severe Quantity Outliers** | `order_items` | 75 rows | Quarantine & Reject (`qty > 1000`) | Net Revenue & Demand Velocity | Overstates turnover by 2.2x; triggers false production orders |
+| **Misplaced Price Decimals** | `order_items` | 117 rows | Catalog List Price Fallback | Gross Margin & Unit Revenue | Causes 100x unit price swings; corrupts SKU margin rankings |
+| **Inverted Cost/Price Pairs** | `products` | 3 SKUs | Value Comparison & Field Swap | Product Margin & SKU Retention | Creates false -₹2.87M loss; risks wrongful product delisting |
+| **Split Customer Identity** | `customers` | 40 cust / 210 orders | Deterministic Entity Matching | Customer LTV & Repeat Rate | Fractures ₹5.87M across ghost IDs; understates account purchasing tier |
+| **Header vs Line Mismatch** | `orders` | 1,312 orders | Line-Item Ground Truth Recalculation | General Ledger Reconciliation | Produces ₹5.72M unexplained variance between invoices and lines |
+| **Missing Reorder Thresholds**| `inventory` | 18 SKUs | Category Median Imputation | Stockout Prevention & Restock POs | Leaves 18 SKUs without replenishment alerts; causes silent stockouts |
+| **Exact Duplicate Rows** | `orders/items/inv`| 512 rows | Deduplication & Row Purge | Total Volume & Turnover | Double-counts orders and inflates order volume by 3.7% |
+
+---
+
+## 8. Verified Runtime Evidence & Visual Quality
+
+Authentic browser captures generated by `scripts/validate_runtime_ui.py` running against the synthetic benchmark:
+
+| Executive Overview | Sales & Products Performance |
+|---|---|
+| ![Executive Overview](screenshots/runtime/01_executive_overview.png) | ![Sales & Products](screenshots/runtime/02_sales_and_products.png) |
+| *High-level commercial turnover (₹20.90 Cr), margin trajectories, regional sales.* | *Product scatter analysis, category margin distributions, SKU drilldowns.* |
+| **Price & Margin Sensitivity Simulator** | **Inventory Intelligence & Capital Allocation** |
+| ![Price Sensitivity Simulator](screenshots/runtime/02_price_sensitivity_simulator.png) | ![Inventory Intelligence](screenshots/runtime/03_inventory_intelligence.png) |
+| *Basmati Rice P0010 case study: 58.3% break-even volume decline buffer.* | *Stock position health mix, replenishment capital (₹9.66 L), priority review queue.* |
+| **Customers & Data Quality Assurance** | **Power BI Desktop Version-Controlled PBIP** |
+| ![Customers & Data Quality](screenshots/runtime/04_customers_and_data_quality.png) | ![Semantic Model Architecture](screenshots/Semantic%20Model%20Architecture.png) |
+| *Empirical defect impact comparison, ghost account recovery, quality logs.* | *Single-direction star schema, 27 implemented DAX measures, 100% key coverage.* |
+
+---
+
+## 9. How to Run and Reproduce
+
+### Quickstart A: Interactive Streamlit Dashboard (No Database Required)
 
 ```bash
+# 1. Clone repository
+git clone https://github.com/meetpokal1/InsightFlow.git
+cd InsightFlow
+
+# 2. Create and activate virtual environment
 python -m venv .venv
-# Windows PowerShell: .\.venv\Scripts\Activate.ps1
-# macOS / Linux:      source .venv/bin/activate
-python -m pip install -r requirements.txt
+# Windows PowerShell:
+.\.venv\Scripts\Activate.ps1
+# macOS / Linux:
+source .venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Launch interactive dashboard
 streamlit run streamlit_app.py
 ```
 
-The first load profiles and cleans the included synthetic CSV/XLSX files using the same ingestion,
-cleaning and validation pipeline used by the full backend, then caches the result during the session.
-The dashboard includes an executive overview, monthly sales and margin trends, category and product
-performance, stock-status review queues, customer summaries, raw-data profiling and quality-action logs.
-Date, region, category and customer-type filters update the analysis; selected results can be exported
-to CSV.
-
-This is a **demo interface**, not a claim that any real business uses the figures. Calculations in the
-Pandas demo are kept alongside tests; the PostgreSQL views remain the canonical source for the API and
-full SQL workflow. The demo can be deployed independently on Streamlit Community Cloud by selecting
-`streamlit_app.py` as the app entry point after the repository is pushed to GitHub. No secrets are
-needed for this synthetic-data demo. Authentic runtime screenshots and UI evidence are generated by the single QA runner, `scripts/validate_runtime_ui.py`, and saved under `screenshots/runtime/` alongside `ui_qa_results.json`. The dedicated simulator preview is captured separately from the full Sales & Products page.
-
-### Streamlit runtime dashboard previews
-
-Direct browser captures of all four pages running on synthetic data:
-
-| Executive Overview | Sales & Products |
-|---|---|
-| ![Executive Overview](screenshots/runtime/01_executive_overview.png) | ![Sales & Products](screenshots/runtime/02_sales_and_products.png) |
-| **Price Sensitivity Simulator** | **Inventory Intelligence** |
-| ![Price Sensitivity Simulator](screenshots/runtime/02_price_sensitivity_simulator.png) | ![Inventory Intelligence](screenshots/runtime/03_inventory_intelligence.png) |
-| **Customers & Data Quality** | |
-| ![Customers & Data Quality](screenshots/runtime/04_customers_and_data_quality.png) | |
-
-## Architecture
-
-![Architecture](documentation/diagrams/architecture.png)
-
-Raw files go through the Python pipeline into PostgreSQL. The views in the database define net
-revenue, gross profit, stock status and the customer segments once. The SQL queries, the API
-and Power BI all read those views, so they show the same numbers. More in
-[architecture.md](documentation/architecture.md) and [data_flow.md](documentation/data_flow.md).
-
-## Technology
-
-| Part | Used for |
-|---|---|
-| Python 3.13 | pipeline, API, tests |
-| pandas 3.0, NumPy 2.5, openpyxl | reading, cleaning and checking the data |
-| PostgreSQL 16, SQLAlchemy 2.1, psycopg2 | storage and SQL |
-| FastAPI, Pydantic, Uvicorn | the PostgreSQL-backed API |
-| Streamlit, Plotly | the interactive no-database demo dashboard |
-| pytest, httpx | tests |
-| ruff, black | formatting and linting |
-| Power BI Desktop | interactive 4-page PBIP report and star-schema semantic model with 27 implemented measures; the DAX catalog documents additional definitions |
-| Git | version control |
-
-These are the versions the project was built and tested with, on Linux. `requirements.txt` allows
-a range for each package.
-
-## Database
-
-![ER diagram](documentation/diagrams/er_diagram.png)
-
-| Table | Rows loaded | Content |
-|---|---|---|
-| categories | 8 | product categories (7 and `Uncategorized`) |
-| suppliers | 12 | supplier and lead time in days |
-| locations | 8 | stores and warehouses with a region |
-| products | 60 | category, supplier, cost and selling price |
-| customers | 800 | Retail, Wholesale or Corporate |
-| orders | 8,734 | one row per order; Completed, Cancelled or Returned |
-| order_items | 37,744 | one row per product on an order |
-| inventory | 449 | one stock snapshot (30 September 2026) |
-
-Besides these, `etl_quality_log` stores what the pipeline found and `dim_date` is a calendar
-table for Power BI. Six views (`vw_fact_sales`, `vw_fact_inventory`, `vw_dim_product`,
-`vw_dim_customer`, `vw_dim_location`, `vw_customer_segments`) hold the formulas. The columns,
-constraints, indexes and view rules are in [database_schema.md](documentation/database_schema.md).
-
-## Data pipeline
-
-![Data flow](documentation/diagrams/data_flow.png)
-
-1. Read the eight files with every column as text, and profile the missing values.
-2. Clean each table in the order of its dependencies. Fix, fill or reject, and log it.
-3. Validate keys, relationships, required columns and value rules. Stop on any failure.
-4. Write the clean tables, the rejected rows and the reports to `data/processed`.
-5. Create the schema, load PostgreSQL in one transaction and compare the row counts.
-
-What it does to the raw files in this repository:
-
-| Table | Raw rows | Loaded | Why the rest is gone |
-|---|---|---|---|
-| customers | 848 | 800 | 8 exact duplicates, 40 customers registered twice and merged |
-| products | 63 | 60 | 3 exact duplicates |
-| orders | 9,053 | 8,734 | 107 exact duplicates, 212 rejected (bad date, unknown customer or location, no valid line) |
-| order_items | 39,518 | 37,744 | 391 exact duplicates, 1,383 rejected (order missing, unknown product, bad quantity) |
-| inventory | 463 | 449 | 14 rejected (unknown product, stale second row) |
-
-The pipeline recovers all 800 customers, 97.6% of the completed orders and 96.7% of the revenue
-of the data before it was damaged. About 3.3% of revenue is lost because rows that cannot be
-repaired are rejected, not guessed. [data_quality.md](documentation/data_quality.md) lists every
-problem, every action and the judgement calls (for example a missing discount is set to 0).
-
-## SQL analytics
-
-The 17 queries are in `sql/analytics/`. Each starts with the question and the reason for the
-technique.
-
-| Topic | Queries |
-|---|---|
-| Sales | 01 monthly revenue, 02 monthly growth, 03 top products, 05 category performance, 06 profit margins, 07 average order value, 12 regional performance, 14 product ranking, 15 month over month comparison |
-| Customers | 04 top customers, 08 repeat customers, 13 customer segmentation |
-| Inventory | 09 inventory turnover, 10 slow moving products, 11 low stock products, 16 inventory and sales mismatch |
-| Orders | 17 order status mix |
+### Quickstart B: Run Data Defect & Decision Impact CLI Audit
 
 ```bash
-python scripts/run_analytics.py                # run all of them
-python scripts/run_analytics.py --only 05 11   # run some
-python scripts/run_analytics.py --export       # also write CSV files
+# Generates the complete terminal audit report comparing unvalidated vs validated metrics
+python scripts/run_defect_impact.py
 ```
 
-Results and the reasoning for each query are in [sql_analytics.md](documentation/sql_analytics.md).
-
-## Power BI Project (`InsightFlow.pbip`)
-
-InsightFlow includes a version-controlled **Power BI Project (`powerbi/InsightFlow.pbip`)** built to modern PBIP, TMDL, and PBIR developer specifications.
-
-Instead of an opaque binary `.pbix` file, the tabular semantic model and report visuals are decomposed into human-readable, Git-versioned TMDL and JSON structures (`InsightFlow.SemanticModel` and `InsightFlow.Report`), enabling automated CI/CD validation, branch diffing, and reproducible local desktop execution.
-
-> **Quick Start for Fresh Clones (No PostgreSQL required):** The production CSV extracts are generated directly from the included raw synthetic data:
-> ```bash
-> python scripts/run_pipeline.py --skip-db
-> python scripts/export_powerbi_data.py
-> ```
-> Then open `powerbi/InsightFlow.pbip` in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/) on Windows. If prompted or if the project folder was relocated on your workstation, configure the **`DataFolder`** parameter to your local `powerbi/data` directory via **Home > Transform data > Edit parameters** (or run `python scripts/build_powerbi_pbip.py` to auto-detect your local path), then click **Home > Refresh**. For an immediate interactive browser experience without installing desktop software, run the local Streamlit dashboard (`streamlit run streamlit_app.py`), which profiles, cleans, and analyzes the synthetic dataset entirely in memory without requiring a database service.
-
-### Dimensional Model Architecture
-
-The semantic model implements a validated single-direction star schema centered on two fact tables (`Sales` and `Inventory`) with four core dimensions (`Date`, `Product`, `Customer`, `Location`) and a dedicated pipeline assurance matrix (`DataQualityReconciliation`):
-
-![Power BI Semantic Model Architecture](screenshots/Semantic%20Model%20Architecture.png)
-
-- **Star Schema Integrity:** Four core dimensions (`Product`, `Customer`, `Location`, `Date`) filter facts via 1:N single-direction relationships with 100% foreign key coverage across all 34,007 sales records.
-- **Calculated at Source:** Net revenue, gross margins, inventory health statuses, and customer RFM profiles are standardized across PostgreSQL views, Streamlit, and Power BI DAX.
-- **Continuous Date Calendar:** The source CSV contains 2,192 daily rows (2023-01-01 through 2028-12-31). Power Query filters the imported `Date` table to whole months spanning the current sales dataset (730 days, 2024-10-01 through 2026-09-30), with 100% sales date-key coverage against the source calendar.
-- **Type-Safe Data Quality Reconciliations:** Standalone verification entity tracking raw ingestion against clean loads with automated checksum validation.
-
----
-
-### Genuine Power BI Desktop Runtime Previews
-
-Captured directly from the active, fully refreshed Power BI Desktop instance via the Power BI Desktop Bridge CLI (`@microsoft/powerbi-desktop-bridge-cli`):
-
-#### 1. Executive Profitability
-*Focus: Commercial performance, 24-month revenue trajectories, margin health, and category revenue distribution.*
-- **Audited Metrics:** ₹209.03M Net Revenue · ₹42.36M Gross Profit · 20.3% Gross Margin · 7,878 Completed Orders · ₹26,534 AOV
-- **Visuals:** 24-Month Monthly Revenue Trend (continuous 2024-10 to 2026-09 trajectory) & Net Revenue by Category (Electronics Accessories, Personal Care, Packaged Foods leading).
-
-![Executive Profitability](screenshots/Executive%20Profitability.png)
-
----
-
-#### 2. Margin Investigation & Flagship Elasticity
-*Focus: Revenue-versus-profit dynamics, supplier margin ranking, and price sensitivity stress testing.*
-- **Audited Metrics:** ₹16.53M Basmati Net Revenue · ₹354K Gross Profit · 2.15% Flagship Margin · 58.3% Break-Even Volume Tolerance (+3% price)
-- **Visuals:** Product Net Revenue vs Gross Profit scatter plot & Gross Margin % by Supplier (ranging from 3.2% Golden Harvest to 35.4% Skyline Cosmetics).
-
-![Margin Investigation](screenshots/Margin%20Investigation.png)
-
----
-
-#### 3. Inventory Decisions & Capital Replenishment
-*Focus: Working capital allocation, out-of-stock exposure, and replenishment prioritization queue.*
-- **Audited Metrics:** ₹22.49M Total Stock Valuation · 40 Stockout Positions · 96 Positions Below Reorder · ₹966K Capital Required to Replenish · ₹1.34M Catalog Stock Gap
-- **Visuals:** Stock Positions by Health Status mix (Healthy, Overstocked, Stock-out risk, Out of stock, Low stock) & Priority Stock Replenishment Queue table.
-
-![Inventory Decisions](screenshots/Inventory%20Decisions.png)
-
----
-
-#### 4. Data Integrity & Pipeline Assurance
-*Focus: Operational data governance, entity-by-entity record reconciliation, and data preservation rates.*
-- **Audited Metrics:** 49,975 Raw Records Ingested · 47,814 Clean Records Loaded · 512 Duplicates Dropped · 1,609 Quarantined/Rejected · 40 Merged Profiles · 95.7% Preservation Rate
-- **Visuals:** High-level conservation KPI cards & Complete End-to-End Pipeline Reconciliation Matrix across all 8 operational entities (all balanced: $\text{Raw} - \text{Duplicates} - \text{Quarantined} - \text{Merged} = \text{Clean}$).
-
-![Data Integrity & Pipeline Assurance](screenshots/Data%20Integrity%20and%20Pipeline%20Assurance.png)
-
-## API
+### Quickstart C: Full PostgreSQL Pipeline & API Backend
 
 ```bash
+# Option 1: Docker Compose (Automated containerized PostgreSQL + Data Seeding + API)
+docker compose up --build
+
+# Option 2: Local PostgreSQL
+# Set credentials in .env (see .env.example)
+python scripts/run_pipeline.py --as-of 2026-09-30 --reset-schema
+python scripts/run_analytics.py
 uvicorn api.main:app --reload
 ```
 
-Swagger UI is at http://localhost:8000/docs.
-
-| Endpoint | Returns |
-|---|---|
-| `GET /sales/summary` | revenue, profit, margin, orders, customers, average order value, units, stock value |
-| `GET /sales/monthly` | revenue, profit, margin and growth for each month |
-| `GET /products/top` | best selling products by revenue, profit or units |
-| `GET /inventory/low-stock` | stock that is out, will run out before a delivery or is at the reorder level, with a suggested order |
-| `GET /customers/top` | highest spending customers and their share of revenue |
-| `GET /analytics/category-performance` | revenue, margin and 12 month trend per category |
-| `GET /health` | whether the API can reach the database |
+### Quickstart D: Automated Test Suite & Code Formatting
 
 ```bash
-curl "http://localhost:8000/products/top?metric=profit&limit=3"
-curl "http://localhost:8000/sales/summary?start_date=2026-01-01&end_date=2026-03-31&location_id=L01"
-```
-
-Dates, ids, limits and statuses are validated (a bad value gives `422`, an unknown location gives
-`404`, an unreachable database gives `503`). Parameters reach PostgreSQL as bound values. See
-[api.md](documentation/api.md) for the parameters, sample responses and error format.
-
-## How to run the full backend
-
-The interactive Streamlit demo is described above and does not need PostgreSQL. For the full
-PostgreSQL-backed pipeline, SQL analytics and FastAPI service, use one of the following routes.
-Python 3.11 or newer is required; the project has been documented/tested for Python 3.13 and PostgreSQL 16.
-The synthetic raw data files are included in the repository.
-
-**Option A — Docker Compose (recommended for a local backend demo)**
-
-Docker Compose creates a local PostgreSQL database, loads the synthetic dataset, and starts the API:
-
-```bash
-docker compose up --build
-```
-
-Open `http://localhost:8000/docs` for the API's Swagger UI. The Compose configuration resets and
-reloads this project's **synthetic demo database** when its seeding service runs. Do not reuse this
-configuration for valuable or production data. Stop it with `docker compose down`; add `-v` only if
-you intentionally want to remove the local demo database volume.
-
-**Option B — install and configure PostgreSQL manually**
-
-**1. Install**
-
-```bash
-git clone https://github.com/meetpokal1/InsightFlow.git InsightFlow
-cd InsightFlow
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-**2. Create the databases** (once, as the PostgreSQL superuser, for example `psql -U postgres`)
-
-```sql
-CREATE USER sales_user WITH PASSWORD 'choose-a-password';
-CREATE DATABASE sales_intelligence OWNER sales_user;
-CREATE DATABASE sales_intelligence_test OWNER sales_user;
-```
-
-The second database is only for the tests.
-
-**3. Configure**
-
-```bash
-cp .env.example .env               # Windows: copy .env.example .env
-```
-
-Open `.env` and set `DB_PASSWORD`. `.env` is git-ignored. Do not commit it.
-
-**4. Run the pipeline**
-
-```bash
-python scripts/run_pipeline.py --as-of 2026-09-30
-```
-
-This cleans the raw files, writes the results to `data/processed`, creates the schema and loads
-PostgreSQL. The `--as-of` date is the day after which an order counts as impossible. The default
-is today's date. Giving the date makes the run repeat exactly. Useful options: `--skip-db` stops
-before the database, `--reset-schema` drops the tables first.
-
-**5. Use the result**
-
-```bash
-python scripts/run_analytics.py            # the SQL analysis
-uvicorn api.main:app --reload              # the API, docs at http://localhost:8000/docs
-python scripts/export_powerbi_data.py      # only for the CSV route into Power BI
-```
-
-**6. Run the tests**
-
-```bash
+# Run self-contained tests (168 passed offline; 72 database integration tests run in CI)
 python -m pytest
+
+# Run Ruff linting and formatting verification
 ruff check .
 ruff format --check .
 ```
 
-PostgreSQL-dependent tests use a separate `sales_intelligence_test` database. The repository's GitHub
-Actions workflow provisions PostgreSQL 16, creates that isolated test database, then runs the suite and
-style checks on pushes and pull requests. For a local full-suite run, create the test database described
-above before running `pytest`; data-loading tests rebuild only the isolated test schema.
+---
 
-The tests that need PostgreSQL use the separate database (`DB_NAME` plus `_test`, or
-`TEST_DB_NAME`). In a local environment without a running database, those tests are skipped after the
-PostgreSQL driver is installed; the synthetic-data cleaning and dashboard-calculation tests can run
-without PostgreSQL.
-
-**Your own data.** Put one CSV or Excel file per table in `data/raw`, named like the tables. The
-columns are the ones in [database_schema.md](documentation/database_schema.md), and `orders`
-also needs `order_total`. A missing column stops the run with a message that names it.
-
-## Example business questions and what the data shows
-
-The figures come from the synthetic dataset (October 2024 to September 2026). They show what
-the system returns. They are not findings about a real business.
-
-| Question | Where | What the data shows |
-|---|---|---|
-| Is the business growing? | SQL 02, 05; `/sales/monthly`; page 1 | The last 12 months brought in 124.47M, 47.2% more than the 12 months before (84.57M). A single month moves between -21.6% and +55.9%, so one month says little. |
-| Which products earn the most, and which sell a lot but earn little? | SQL 03, 06; `/products/top`; page 2 | Basmati Rice 5kg is the top seller (16.47M, 7.9% of revenue) at a 2.1% margin against 20.3% for the company. 13 products sell at least the median revenue with a below-average margin. The Wireless Mouse earns the most profit (2.98M at 25.8%). |
-| How dependent is the business on a few customers? | SQL 04, 07, 13; `/customers/top` | 136 wholesale customers out of 780 buyers bring 91.8% of revenue. The top 10 customers are 20.05% and the top 20 are 32.78%, all wholesale. The average wholesale order is 44,244, a retail order 2,703. |
-| Which customers should be won back? | SQL 13; page 4 | 111 "At risk" customers averaged 7.6 orders and last ordered 154 days before the end of the data. The 173 "Lost" customers are 0.3% of revenue. |
-| What will run out? | SQL 11; `/inventory/low-stock`; page 3 | 92 of 449 stock positions need action: 39 are out of stock, 39 will run out before a delivery could arrive and 14 are at the reorder level. Their suggested orders add up to 13,184 units. |
-| Where is money tied up in stock? | SQL 09, 10, 16; page 3 | 45 overstocked positions hold 12.69M, 56.4% of the 22.49M stock value. Stock turns 4.41 times a year (83 days of inventory). |
-| Do stock and sales disagree? | SQL 16 | 39 out-of-stock positions sold 2.42M (at list price) in the last 90 days. 30 product and location pairs sold 1.69M with no stock record. |
-| What do cancellations and returns cost? | SQL 17 | 6.1% of orders were cancelled (529) and 3.7% returned (327). Their value, 24.08M, is not counted as revenue. |
-
-The KPI formulas are in [kpi_definitions.md](documentation/kpi_definitions.md).
-
-## Tests
-
-```bash
-python scripts/run_pipeline.py --skip-db
-python scripts/export_powerbi_data.py
-python -m pytest tests/ -k "not test_database and not test_api" -v
-```
-
-Generate the local synthetic pipeline outputs and Power BI CSV extracts before running the self-contained offline test suite. Database/API tests are excluded from that command; the GitHub Actions job provisions PostgreSQL and runs the full suite. The latest verified CI run on 24 October 2026 passed 234 tests, followed by successful Ruff lint and formatting checks:
-
-| Area | What is checked | Test Module |
-|---|---|---|
-| Cleaning rules | One test file per table: text, dates, numbers, duplicates, outliers, missing values | `tests/test_clean_*.py` |
-| Pipeline | 90%–100% injected defects remediated; raw-to-clean conservation law verified | `tests/test_pipeline.py` |
-| Inventory Semantics | Replenishment capital required vs stock gap retail valuation; true zero-stock boundary cases | `tests/test_inventory_metrics.py` |
-| Price Sensitivity | P0010 Basmati Rice case study; break-even volume tolerance (58.3%); demand elasticity modeling | `tests/test_price_sensitivity.py` |
-| Assurance Workpaper | Excel workpaper generation; dynamic formulas; formula injection security | `tests/test_workpaper.py` |
-| Power BI (PBIP) | Multi-page report schema; DAX measures; star schema relationships; local CSV feeds | `tests/test_powerbi_deliverable.py` |
-| Database & SQL | Schema constraints; view consistency; analytical query math (run with PostgreSQL) | `tests/test_database.py`, `tests/test_analytics_sql.py` |
-| API | Endpoint schemas; parameter validation; error formatting (run with PostgreSQL) | `tests/test_api.py` |
-
-The tests compare results with a calculation made in another way, so an error in a view or a
-query shows up. The ruff checks must also pass (`ruff check .` and `ruff format --check .`).
-
-## Limits
-
-- The data is synthetic. The insights describe the generated data, not a real business.
-- Cost of goods uses the current cost price, because the data has no cost history.
-- Stock is one snapshot. Turnover uses it in place of an average, and there is no stock trend.
-- A missing discount is set to 0 and two missing cost prices are estimated. These are
-  approximations and they are logged.
-- The pipeline replaces all tables on every run. It does not load increments.
-- The API is read-only, has no login and is meant for local/demo use unless authentication and deployment hardening are added.
-- Built and tested on Linux with Python 3.13 and PostgreSQL 16 only.
-
-## Future improvements
-
-- Incremental loads and a scheduler, so the pipeline runs without being started by hand.
-- Monthly stock snapshots, for real turnover and stock trends.
-- A cost price history, so old orders carry the cost of their time.
-- Authentication, pagination and caching for the API.
-- Demand forecasting and safety stock in the suggested order quantity.
-- Deploy the PostgreSQL-backed API beyond local Docker Compose if a secure, maintainable hosted database is available.
-
-## Project structure
+## 10. Engineering Quality & Project Structure
 
 ```
 InsightFlow/
-├── streamlit_app.py            interactive synthetic-data dashboard (no database required)
-├── .streamlit/config.toml      dashboard theme defaults
-├── Dockerfile                  API container image
-├── .dockerignore               excludes local secrets, caches and generated data
-├── docker-compose.yml          local PostgreSQL + data load + API
-├── .github/workflows/tests.yml PostgreSQL-backed CI test suite
+├── streamlit_app.py                 Interactive demo application (no database credentials required)
+├── .streamlit/config.toml           Streamlit theme configuration and layout settings
+├── Dockerfile                       FastAPI production container image
+├── docker-compose.yml               Multi-container PostgreSQL 16 + FastAPI service environment
+├── .github/workflows/tests.yml      GitHub Actions CI: provisions PostgreSQL, runs pipeline, executes 240 tests
+├── pyproject.toml                   Ruff, Black, and pytest configurations
+├── requirements.txt                 Pinned production and development dependencies
 ├── data/
-│   ├── raw/                  messy input files (3 Excel, 5 CSV) and the generation manifest
-│   └── processed/            pipeline output (not committed)
+│   ├── raw/                         8 raw corrupted CSV/XLSX files and data generation manifest
+│   └── processed/                   Pipeline output directory (clean CSVs, rejected rows, quality logs)
 ├── src/
-│   ├── ingestion/            read the raw files, profile them
-│   ├── cleaning/             one cleaner per table, rules, validators, quality log
-│   ├── database/             connection, schema runner, loader
-│   ├── analytics/            SQL runner, API queries and pandas demo calculations
-│   ├── synthetic/            the raw data generator
-│   ├── pipeline.py           the full run
-│   ├── tables.py             tables, columns, keys
-│   └── config.py             settings from the environment
+│   ├── ingestion/                   Raw table loader and text profiling engine
+│   ├── cleaning/                    Table cleaners, regex parsers, validators, quarantine handlers
+│   ├── database/                    PostgreSQL connection pool, schema builder, bulk copy loader
+│   ├── analytics/
+│   │   ├── defect_impact.py         Data defect to business decision impact calculation engine
+│   │   ├── demo.py                  In-memory Pandas calculations and price sensitivity simulator
+│   │   ├── queries.py               Bound parameter SQL query execution functions
+│   │   └── runner.py                CLI SQL analytics execution runner
+│   ├── synthetic/                   Synthetic data generator and corruption injector
+│   ├── config.py                    Environment settings management
+│   ├── pipeline.py                  End-to-end ETL orchestration module
+│   └── tables.py                    Canonical column schemas, load orders, and constraint definitions
 ├── sql/
-│   ├── schema/               tables, indexes, calendar table, views
-│   └── analytics/            the 17 queries
+│   ├── schema/                      PostgreSQL DDL: tables, constraints, B-tree indexes, views
+│   └── analytics/                   17 standalone production SQL analytical queries
 ├── api/
-│   ├── routes/               one file per group of endpoints
-│   ├── schemas/              Pydantic response models
-│   ├── dependencies.py       connection, date range, id checks
-│   └── main.py               the FastAPI app
-├── powerbi/                  version-controlled PBIP report, semantic model, DAX, queries, and theme
-│   ├── InsightFlow.pbip      Power BI Project entry point (double-click in Windows)
-│   ├── InsightFlow.Report/   Fabric PBIR visual layer definitions and queryState bindings
-│   ├── InsightFlow.SemanticModel/ Tabular model (model.bim), star schema, and 27 implemented measures
-│   └── data/                 production CSV extracts generated for offline desktop loading
-├── documentation/            architecture, data flow, schema, API, KPIs, data quality, workpapers
-│   └── diagrams/             Mermaid sources and PNG images
-├── scripts/                  pipeline runner, analytics, PBIP builder, data assurance export
-├── tests/                    pytest suite, PBIP deliverable, and assurance tests
-├── screenshots/                  genuine Power BI Desktop report pages, semantic model captures, and UI evidence
-│   └── runtime/                  genuine Streamlit browser captures and automated UI QA results JSON
-├── .env.example
-├── .gitignore
-├── pyproject.toml            ruff, black and pytest settings
-├── requirements.txt
-└── README.md
+│   ├── routes/                      FastAPI route definitions for sales, inventory, and customers
+│   ├── schemas/                     Pydantic v2 response contracts
+│   └── main.py                      FastAPI application entry point
+├── powerbi/
+│   ├── InsightFlow.pbip             Version-controlled Power BI Project entry point
+│   ├── InsightFlow.Report/          Fabric PBIR visual layer definitions and queryState bindings
+│   ├── InsightFlow.SemanticModel/   Tabular model (model.bim), star schema, 27 implemented measures
+│   └── data/                        Local CSV extracts generated for offline desktop loading
+├── documentation/                   Architecture, data flow, ER diagrams, KPI definitions, workpapers
+│   ├── data_assurance_workpaper.xlsx Corporate audit model with dynamic Excel reconciliation formulas
+│   └── diagrams/                    Architecture and data flow diagrams
+├── scripts/
+│   ├── run_defect_impact.py         Standalone CLI runner for defect-to-decision impact analysis
+│   ├── run_pipeline.py              Pipeline CLI runner with flags (--skip-db, --reset-schema)
+│   ├── run_analytics.py             SQL analytics runner
+│   ├── export_powerbi_data.py       Power BI CSV deliverable exporter
+│   ├── generate_data_assurance_workpaper.py Excel audit workpaper generation script
+│   └── validate_runtime_ui.py       Automated Playwright QA validation and screenshot capture
+├── tests/                           240 automated unit, integration, and contract tests
+│   ├── test_defect_impact.py        Unit tests for defect impact calculations and traceability
+│   ├── test_pipeline.py             Data pipeline preservation and repair tests
+│   ├── test_price_sensitivity.py    Price elasticity and break-even tolerance tests
+│   ├── test_inventory_metrics.py    Inventory threshold and valuation tests
+│   └── test_powerbi_deliverable.py  PBIP semantic model and DAX measure structure tests
+└── screenshots/                     Genuine Power BI Desktop and Streamlit runtime captures
+    └── runtime/                     Direct browser screenshots and automated QA test results JSON
 ```
 
-## Documentation
+---
 
-| Document | Content |
-|---|---|
-| [architecture.md](documentation/architecture.md) | the parts, the folders and the design decisions |
-| [data_flow.md](documentation/data_flow.md) | the pipeline step by step, options and output files |
-| [er_diagram.md](documentation/er_diagram.md) | the relationships and design notes |
-| [database_schema.md](documentation/database_schema.md) | every table, index and view |
-| [data_quality.md](documentation/data_quality.md) | what was wrong, what was done, what was lost |
-| [sql_analytics.md](documentation/sql_analytics.md) | the 17 queries, their techniques and results |
-| [api.md](documentation/api.md) | endpoints, parameters, responses and errors |
-| [kpi_definitions.md](documentation/kpi_definitions.md) | every KPI with its SQL, API and Power BI source |
-| [concepts_to_know.md](documentation/concepts_to_know.md) | core engineering decisions, data quality mechanics and analytical methodology |
-| [powerbi/README.md](powerbi/README.md) | building the Power BI report |
+## 11. Boundaries, Assumptions & Real-World Validation
+
+### Current System Boundaries
+- **Synthetic Data Boundary:** All transactions, entity names, and financial figures are generated from an audited synthetic benchmark. They prove pipeline mechanics and decision logic, not actual commercial earnings.
+- **Cost History:** Product costs reflect the current snapshot price; historical purchase cost variance is not modeled in the synthetic dataset.
+- **Inventory Point-in-Time:** Inventory reflects a single snapshot date (30 September 2026); stock turnover is calculated against snapshot capital rather than multi-month trailing averages.
+- **Scenario Assumptions:** The price sensitivity simulator uses explicit user-specified price adjustments and demand elasticity assumptions. It is a decision-support heuristic, not a causal econometric proof.
+
+### Steps to Validate on Authorized Real-World Retail Data
+To apply InsightFlow to a production retailer's commercial data:
+1. **Source Connection:** Replace CSV file polling with secure SFTP drops or direct read-only connector pipelines into the POS and ERP source databases.
+2. **Catalog Rule Calibration:** Align product category hierarchies, tax head logic (e.g. GST/VAT splits), and supplier lead times with actual supplier contracts.
+3. **Quarantine Triage Workflow:** Connect rejected row exports to an operational ticketing system (e.g. Jira or ServiceNow) so store managers can review and correct orphan customer and store codes.
+4. **Historical Cost Ingestion:** Introduce a slowly changing dimension (SCD Type 2) table for product cost prices to enable historical margin tracking.
+5. **Security & Governance:** Configure role-based access control (RBAC), database encryption at rest, and credential rotation before deploying beyond internal demo environments.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

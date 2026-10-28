@@ -25,6 +25,7 @@ class PipelineResult:
     rejected: dict
     quality_log: pd.DataFrame
     profile: pd.DataFrame
+    raw: dict | None = None
 
 
 def clean_raw_files(raw_dir, as_of):
@@ -34,7 +35,7 @@ def clean_raw_files(raw_dir, as_of):
     log = QualityLog()
     clean, rejected = clean_all_tables(raw, as_of, log)
     assert_valid(clean)  # stops the pipeline before anything reaches the database
-    return PipelineResult(clean, rejected, log.to_frame(), profile)
+    return PipelineResult(clean, rejected, log.to_frame(), profile, raw)
 
 
 def save_outputs(result, processed_dir):

@@ -187,7 +187,7 @@ def run_ui_qa():
 
             # Capture Customers & Data Quality from top header showing reconciliation metrics
             page.locator(
-                "text=Pipeline Assurance & Reconciliation Balance"
+                "text=Data Defect to Decision Impact Analysis"
             ).scroll_into_view_if_needed()
             page.wait_for_timeout(1000)
             page.screenshot(path=str(OUTPUT_DIR / "04_customers_and_data_quality.png"))

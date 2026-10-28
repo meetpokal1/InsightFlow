@@ -146,10 +146,11 @@ def build_dashboard_data(
     clean: dict[str, pd.DataFrame],
     quality_log: pd.DataFrame | None = None,
     raw_profile: pd.DataFrame | None = None,
-) -> dict[str, pd.DataFrame]:
+    raw: dict[str, pd.DataFrame] | None = None,
+) -> dict[str, Any]:
     """Prepare all data frames displayed by the Streamlit demo.
 
-    Optional quality/profile frames come directly from the same pipeline run, so the
+    Optional quality/profile/raw frames come directly from the same pipeline run, so the
     dashboard never needs to invent placeholder quality metrics.
     """
     sales_lines = build_sales_lines(clean)
@@ -160,6 +161,12 @@ def build_dashboard_data(
         result["quality_log"] = quality_log.copy()
     if raw_profile is not None:
         result["raw_profile"] = raw_profile.copy()
+    if raw is not None and quality_log is not None:
+        from src.analytics.defect_impact import generate_defect_impact_report
+
+        result["defect_impact"] = generate_defect_impact_report(
+            raw, clean, sales_lines, inventory_view, quality_log
+        )
     return result
 
 
