@@ -15,7 +15,23 @@
 
 ---
 
-## 1. Project Thesis: Bridging Data Hygiene and Commercial Decisions
+## 1. Business Context & Operational Decision Support
+
+### Business Problem
+Retail teams often combine sales and inventory files exported from different systems. Duplicate customers, incorrect quantities, mismatched order totals and missing stock thresholds can distort profit reports and hide items that need attention. In InsightFlow's synthetic benchmark, calculating revenue before cleaning the records overstated it by ₹22.09 crore (105.7%) compared with the validated result. InsightFlow demonstrates how automated checks and an audit trail can catch and explain these issues before the data informs business decisions.
+
+### Who It Is For
+Retail operations, finance, category-planning and business intelligence (BI) teams at companies with multiple stores or warehouses that regularly combine digital sales and inventory files. It is most relevant when teams need consistent checks and traceable figures every reporting cycle—not for a small shop whose needs are already met by a simple spreadsheet.
+
+### How Teams Use It
+Teams run incoming files through repeatable quality checks, review duplicates and mismatched totals, investigate products that sell well but earn little profit, and prioritize stockouts or items below reorder levels. The price simulator lets them test how a proposed price change and an assumed change in sales volume could affect gross profit.
+
+### Decision Benefits & Boundaries
+InsightFlow aims to reduce repeated manual checking, make data issues easier to trace, and help teams focus pricing and restocking reviews on the items that need attention. All figures come from a synthetic dataset—not a real retailer's operations—so the results demonstrate the method, not actual savings or profit growth. Price tests are what-if scenarios, not forecasts; replenishment priorities use explicit rules rather than an advanced demand-forecasting model.
+
+---
+
+## 2. Project Thesis: Bridging Data Hygiene and Commercial Decisions
 
 A business cannot make dependable profitability or inventory decisions from unvalidated exports. In retail and wholesale distribution, raw extracts from Point of Sale (POS) terminals, e-commerce storefronts, accounting packages, and warehouse systems arrive with inconsistent formatting, duplicate entities, extreme quantity typos, and conflicting header totals. 
 
@@ -42,7 +58,7 @@ When analytics teams load raw exports directly into reporting tools, these defec
 
 ---
 
-## 2. The Business Problem
+### Data Failure Modes in Disconnected Retail Systems
 
 Consider a mid-market multi-location distributor operating 8 regional hubs, 60 product SKUs, and 800 commercial accounts. Transactional data arrives weekly as separate CSV and Excel extracts from disconnected legacy systems. 
 
